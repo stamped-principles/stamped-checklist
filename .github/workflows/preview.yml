@@ -1,22 +1,22 @@
 name: Preview
 
 on:
-  - pull_request
+    - pull_request
 
 concurrency: preview-${{ github.ref }}
 
 jobs:
-  deploy-preview:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    deploy-preview:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            pull-requests: write
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Deploy preview
-        uses: rossjrw/pr-preview-action@v1
-        with:
-          source-dir: .
-          preview-branch: gh-pages
+            - name: Deploy preview
+              uses: rossjrw/pr-preview-action@v1
+              with:
+                  source-dir: .
+                  preview-branch: gh-pages
