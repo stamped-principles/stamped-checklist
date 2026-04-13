@@ -1,4 +1,4 @@
-name: Refresh pages
+name: Deploy to GitHub Pages
 
 on:
     push:
@@ -7,16 +7,18 @@ on:
     workflow_dispatch:
 
 jobs:
-    refresh:
+    deploy:
         runs-on: ubuntu-latest
-
+        permissions:
+            contents: write
         steps:
-            - name: Checkout code
+            - name: Checkout
               uses: actions/checkout@v4
 
-            - name: Reset gh-pages to latest main
-              run: |
-                  git fetch origin
-                  git checkout gh-pages
-                  git reset --hard origin/main
-                  git push origin gh-pages --force
+            - name: Deploy to GitHub Pages
+              uses: peaceiris/actions-gh-pages@v4
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./src
+                  publish_branch: gh-pages
+                  keep_files: true
