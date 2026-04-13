@@ -463,9 +463,6 @@ code {
     .modal-overlay {
         display: none !important;
     }
-    .checklist {
-        padding: 0 1.2rem 1rem 1.2rem;
-    }
     body {
         background: white;
         padding: 0;
