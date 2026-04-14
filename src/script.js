@@ -179,7 +179,7 @@ function buildChecklist() {
         <span class="principle-code">${principle.code}</span>
         <div style="flex:1">
           <div class="principle-title">${principle.name}</div>
-          <div style="font-size:0.84rem; color:var(--text-light); margin-top:0.2rem;">${principle.desc}</div>
+          <div style="font-size:0.76rem; color:var(--text-light); margin-top:0.1rem;">${principle.desc}</div>
         </div>
         <span class="principle-count" id="count_${si}_${pi}">0/${numItems}</span>
       `;
