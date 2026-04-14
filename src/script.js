@@ -360,55 +360,6 @@ function loadFromURL() {
     }
 }
 
-// JSON Export/Import
-function exportJSON() {
-    const state = getState();
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "stamped-checklist-" + new Date().toISOString().slice(0, 10) + ".json";
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast("📤 Checklist exported as JSON");
-}
-
-function openImportModal() {
-    document.getElementById("importModal").classList.add("show");
-    document.getElementById("importData").value = "";
-}
-
-function closeImportModal() {
-    document.getElementById("importModal").classList.remove("show");
-}
-
-function doImport() {
-    const data = document.getElementById("importData").value.trim();
-    if (!data) {
-        showToast("⚠️ No data to import");
-        return;
-    }
-    try {
-        const state = JSON.parse(data);
-        setState(state);
-        autoSave();
-        closeImportModal();
-        showToast("📥 Checklist imported successfully!");
-    } catch (e) {
-        showToast("❌ Invalid JSON data");
-    }
-}
-
-function handleFileImport(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        document.getElementById("importData").value = e.target.result;
-    };
-    reader.readAsText(file);
-}
-
 // Reset
 function confirmReset() {
     if (confirm("Are you sure you want to reset all checkboxes? This cannot be undone.")) {
@@ -430,11 +381,6 @@ function showToast(message) {
     toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), 2500);
 }
-
-// Close modal on overlay click
-document.getElementById("importModal").addEventListener("click", function (e) {
-    if (e.target === this) closeImportModal();
-});
 
 // Build on load
 buildChecklist();
