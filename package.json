@@ -4,7 +4,6 @@
     "description": "An interactive checklist for compliance to STAMPED principles.",
     "main": "script.js",
     "scripts": {
-        "build": "node scripts/build-data.js && prettier --write src/data.js",
         "format": "prettier --write .",
         "format:check": "prettier --check ."
     },
