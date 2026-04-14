@@ -39,6 +39,15 @@
                     <input type="radio" name="cols" value="auto" onchange="setColumns('auto')" checked /> Auto
                 </label>
             </div>
+            <div class="col-toggle" title="Show or hide section grouping">
+                <span class="col-toggle-label">Sections:</span>
+                <label class="col-toggle-option">
+                    <input type="radio" name="sections" value="on" onchange="setSections('on')" checked /> On
+                </label>
+                <label class="col-toggle-option">
+                    <input type="radio" name="sections" value="off" onchange="setSections('off')" /> Off
+                </label>
+            </div>
         </div>
 
         <div class="container" id="app">
