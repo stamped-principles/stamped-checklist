@@ -141,6 +141,26 @@ const DATA = [
 let checkboxStates = {};
 let totalItems = 0;
 
+function setColumns(value) {
+    const grids = document.querySelectorAll(".cards-grid");
+    grids.forEach((g) => {
+        g.classList.remove("cols-1", "cols-2", "cols-auto");
+        g.classList.add(`cols-${value}`);
+    });
+    try {
+        localStorage.setItem("stamped_cols", String(value));
+    } catch (e) {}
+}
+
+function loadColumnPreference() {
+    const saved = localStorage.getItem("stamped_cols") || "auto";
+    const radio = document.querySelector(`input[name="cols"][value="${saved}"]`);
+    if (radio) {
+        radio.checked = true;
+        setColumns(saved);
+    }
+}
+
 function generateId(sectionIdx, principleIdx, itemIdx) {
     return `s${sectionIdx}_p${principleIdx}_i${itemIdx}`;
 }
@@ -166,6 +186,9 @@ function buildChecklist() {
     `;
         sectionDiv.appendChild(sectionHeader);
 
+        const cardsGrid = document.createElement("div");
+        cardsGrid.className = "cards-grid";
+
         section.principles.forEach((principle, pi) => {
             const card = document.createElement("div");
             card.className = `principle-card ${section.level}`;
@@ -179,7 +202,7 @@ function buildChecklist() {
         <span class="principle-code">${principle.code}</span>
         <div style="flex:1">
           <div class="principle-title">${principle.name}</div>
-          <div style="font-size:0.84rem; color:var(--text-light); margin-top:0.2rem;">${principle.desc}</div>
+          <div style="font-size:0.76rem; color:var(--text-light); margin-top:0.1rem;">${principle.desc}</div>
         </div>
         <span class="principle-count" id="count_${si}_${pi}">0/${numItems}</span>
       `;
@@ -206,15 +229,17 @@ function buildChecklist() {
             });
 
             card.appendChild(checklist);
-            sectionDiv.appendChild(card);
+            cardsGrid.appendChild(card);
         });
 
+        sectionDiv.appendChild(cardsGrid);
         container.appendChild(sectionDiv);
     });
 
     loadFromURL();
     loadFromLocalStorage();
     updateAllCounts();
+    loadColumnPreference();
 }
 
 function handleCheck(id) {

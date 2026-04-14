@@ -27,6 +27,18 @@
             <button class="danger" onclick="confirmReset()" title="Reset all checkboxes">
                 <span class="icon">🗑️</span> Reset
             </button>
+            <div class="col-toggle" title="Number of columns">
+                <span class="col-toggle-label">Columns:</span>
+                <label class="col-toggle-option">
+                    <input type="radio" name="cols" value="1" onchange="setColumns(1)" /> 1
+                </label>
+                <label class="col-toggle-option">
+                    <input type="radio" name="cols" value="2" onchange="setColumns(2)" /> 2
+                </label>
+                <label class="col-toggle-option">
+                    <input type="radio" name="cols" value="auto" onchange="setColumns('auto')" checked /> Auto
+                </label>
+            </div>
         </div>
 
         <div class="container" id="app">
