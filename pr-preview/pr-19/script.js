@@ -287,4 +287,5 @@ function showToast(message) {
 // Build on load
 buildChecklist();
 
-document.getElementById("version-indicator").textContent = "v" + VERSION;
+const versionEl = document.getElementById("version-indicator");
+if (versionEl) versionEl.textContent = "v" + VERSION;
