@@ -315,6 +315,7 @@ function autoSave() {
 
 // URL Sharing
 function shareURL() {
+    // Encode checkbox states as a compact bitstring (existing format)
     const state = getState();
     const bits = [];
     DATA.forEach((section, si) => {
@@ -326,7 +327,18 @@ function shareURL() {
         });
     });
     const encoded = btoa(bits.join(""));
-    const url = window.location.origin + window.location.pathname + "?state=" + encodeURIComponent(encoded);
+    let url = window.location.origin + window.location.pathname + "?state=" + encodeURIComponent(encoded);
+
+    // Encode non-empty response states (value + reason) as base64 JSON
+    const nonEmptyResponses = {};
+    Object.entries(responseStates).forEach(([id, rs]) => {
+        if (rs.value !== null || rs.reason) {
+            nonEmptyResponses[id] = rs;
+        }
+    });
+    if (Object.keys(nonEmptyResponses).length > 0) {
+        url += "&responses=" + encodeURIComponent(btoa(JSON.stringify(nonEmptyResponses)));
+    }
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard
@@ -349,27 +361,47 @@ function showPromptURL(url) {
 function loadFromURL() {
     const params = new URLSearchParams(window.location.search);
     const stateParam = params.get("state");
-    if (!stateParam) return;
+    const responsesParam = params.get("responses");
 
-    try {
-        const bits = atob(decodeURIComponent(stateParam)).split("");
-        let idx = 0;
-        const state = {};
-        DATA.forEach((section, si) => {
-            section.principles.forEach((principle, pi) => {
-                principle.items.forEach((_, ii) => {
-                    const id = generateId(si, pi, ii);
-                    state[id] = bits[idx] === "1";
-                    idx++;
+    if (!stateParam && !responsesParam) return;
+
+    if (stateParam) {
+        try {
+            const bits = atob(decodeURIComponent(stateParam)).split("");
+            let idx = 0;
+            const state = {};
+            DATA.forEach((section, si) => {
+                section.principles.forEach((principle, pi) => {
+                    principle.items.forEach((_, ii) => {
+                        const id = generateId(si, pi, ii);
+                        state[id] = bits[idx] === "1";
+                        idx++;
+                    });
                 });
             });
-        });
-        setState(state);
-        // Clean URL
-        window.history.replaceState({}, "", window.location.pathname);
-    } catch (e) {
-        console.warn("Could not load state from URL", e);
+            setState(state);
+        } catch (e) {
+            console.warn("Could not load state from URL", e);
+        }
     }
+
+    if (responsesParam) {
+        try {
+            const decoded = JSON.parse(atob(decodeURIComponent(responsesParam)));
+            Object.keys(decoded).forEach((id) => {
+                if (id in responseStates) {
+                    responseStates[id] = decoded[id];
+                    applyResponseState(id);
+                }
+            });
+            updateAllCounts();
+        } catch (e) {
+            console.warn("Could not load responses from URL", e);
+        }
+    }
+
+    // Clean URL
+    window.history.replaceState({}, "", window.location.pathname);
 }
 
 // Reset
