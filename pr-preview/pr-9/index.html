@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>STAMPED Compliance Checklist</title>
-        <link rel="stylesheet" href="styles.css" />
+        <link rel="stylesheet" href="style.css" />
     </head>
     <body>
         <div class="header">
@@ -23,10 +23,6 @@
             <button onclick="shareURL()" title="Generate a shareable URL">
                 <span class="icon">🔗</span> Share URL
             </button>
-            <button onclick="exportJSON()" title="Export as JSON file"><span class="icon">📤</span> Export</button>
-            <button onclick="openImportModal()" title="Import from JSON file">
-                <span class="icon">📥</span> Import
-            </button>
             <button onclick="window.print()" title="Print or save as PDF"><span class="icon">🖨️</span> Print</button>
             <button class="danger" onclick="confirmReset()" title="Reset all checkboxes">
                 <span class="icon">🗑️</span> Reset
@@ -37,7 +33,7 @@
             <div class="intro-text">
                 This checklist helps you assess compliance with the <strong>STAMPED</strong> principles for
                 computational reproducibility. Check each item that your research object satisfies. Your progress is
-                tracked above, and you can save, share, print, or export your results at any time.
+                tracked above, and you can save, share, or print your results at any time.
                 <div class="legend">
                     <div class="legend-item">
                         <div class="legend-dot must"></div>
@@ -56,42 +52,6 @@
         </div>
 
         <div class="toast" id="toast"></div>
-
-        <div class="modal-overlay" id="importModal">
-            <div class="modal">
-                <h2>📥 Import Checklist State</h2>
-                <p style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-light)">
-                    Paste the JSON data from a previous export, or drag a JSON file here.
-                </p>
-                <textarea id="importData" placeholder="Paste JSON here..."></textarea>
-                <div style="text-align: center; margin-bottom: 1rem">
-                    <label
-                        style="
-                            padding: 0.6rem 1.2rem;
-                            border: 2px dashed #ccc;
-                            border-radius: 8px;
-                            cursor: pointer;
-                            font-size: 0.85rem;
-                            color: var(--text-light);
-                            display: inline-block;
-                        "
-                    >
-                        📁 Or choose a file...
-                        <input
-                            type="file"
-                            accept=".json"
-                            id="importFile"
-                            style="display: none"
-                            onchange="handleFileImport(event)"
-                        />
-                    </label>
-                </div>
-                <div class="modal-buttons">
-                    <button onclick="closeImportModal()">Cancel</button>
-                    <button class="primary" onclick="doImport()">Import</button>
-                </div>
-            </div>
-        </div>
 
         <script src="script.js"></script>
     </body>
