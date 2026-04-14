@@ -1,4 +1,3 @@
-// AUTO-GENERATED — edit src/checklist.json and run `npm run build` to update.
 const DATA = [
     {
         level: "must",
