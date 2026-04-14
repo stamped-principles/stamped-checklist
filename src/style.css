@@ -411,6 +411,91 @@ body {
     transition: color 0.2s;
 }
 
+/* Response mode */
+.response-ui {
+    display: none;
+    width: 100%;
+}
+
+#app.mode-responses .check-item > label {
+    display: none;
+}
+
+#app.mode-responses .response-ui {
+    display: block;
+}
+
+.response-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.response-row .check-text {
+    flex: 1;
+}
+
+.response-btns {
+    display: flex;
+    gap: 0.3rem;
+    flex-shrink: 0;
+}
+
+.response-btn {
+    padding: 0.15rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.15s;
+    color: var(--text-light);
+}
+
+.response-btn:hover {
+    border-color: #aaa;
+    background: #f5f5f5;
+}
+
+.response-btn.yes-btn.active {
+    background: var(--may-bg);
+    border-color: var(--check-color);
+    color: var(--check-color);
+}
+
+.response-btn.no-btn.active {
+    background: var(--must-bg);
+    border-color: var(--must-border);
+    color: var(--must-color);
+}
+
+.reason-input {
+    display: none;
+    width: 100%;
+    margin-top: 0.3rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.78rem;
+    font-family: inherit;
+    resize: vertical;
+    color: var(--text);
+    background: #fafafa;
+    min-height: 2.5rem;
+}
+
+.reason-input.visible {
+    display: block;
+}
+
+.reason-input:focus {
+    outline: none;
+    border-color: var(--must-border);
+    background: white;
+}
+
 code {
     background: #f0f0f0;
     padding: 0.1rem 0.35rem;
@@ -608,6 +693,25 @@ code {
     }
     .check-item input:checked + label .checkbox-custom::after {
         content: "✓";
+    }
+    /* Response mode print styles */
+    .response-btn {
+        border: 1px solid #ddd !important;
+        color: #999 !important;
+        background: white !important;
+    }
+    .response-btn.active.yes-btn {
+        border-color: #27ae60 !important;
+        color: #27ae60 !important;
+    }
+    .response-btn.active.no-btn {
+        border-color: #c0392b !important;
+        color: #c0392b !important;
+    }
+    .reason-input.visible {
+        display: block !important;
+        border: 1px solid #ddd !important;
+        background: white !important;
     }
     .version-indicator {
         position: fixed;

@@ -48,6 +48,16 @@
                     <input type="radio" name="sections" value="off" onchange="setSections('off')" checked /> Off
                 </label>
             </div>
+            <div class="col-toggle" title="Switch between checkbox and Yes/No response mode">
+                <span class="col-toggle-label">Mode:</span>
+                <label class="col-toggle-option">
+                    <input type="radio" name="mode" value="checkboxes" onchange="setMode('checkboxes')" checked />
+                    Checkboxes
+                </label>
+                <label class="col-toggle-option">
+                    <input type="radio" name="mode" value="responses" onchange="setMode('responses')" /> Responses
+                </label>
+            </div>
         </div>
 
         <div class="container" id="app">
