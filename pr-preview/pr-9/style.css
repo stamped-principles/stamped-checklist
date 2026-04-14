@@ -126,6 +126,43 @@ body {
     font-size: 0.85rem;
 }
 
+.col-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.76rem;
+    font-weight: 500;
+    background: white;
+    color: var(--text);
+}
+
+.col-toggle-label {
+    color: var(--text-light);
+    margin-right: 0.1rem;
+}
+
+.col-toggle-option {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    cursor: pointer;
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    transition: background 0.15s;
+}
+
+.col-toggle-option:has(input:checked) {
+    background: #e8f4fd;
+    color: #2980b9;
+}
+
+.col-toggle-option input[type="radio"] {
+    display: none;
+}
+
 .container {
     max-width: 1600px;
     margin: 0 auto;
@@ -141,6 +178,18 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
     gap: 0.5rem;
     align-items: start;
+}
+
+.cards-grid.cols-1 {
+    grid-template-columns: 1fr;
+}
+
+.cards-grid.cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.cards-grid.cols-auto {
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
 }
 
 .section-header {

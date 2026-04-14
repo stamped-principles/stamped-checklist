@@ -141,6 +141,26 @@ const DATA = [
 let checkboxStates = {};
 let totalItems = 0;
 
+function setColumns(value) {
+    const grids = document.querySelectorAll(".cards-grid");
+    grids.forEach((g) => {
+        g.classList.remove("cols-1", "cols-2", "cols-auto");
+        g.classList.add(`cols-${value}`);
+    });
+    try {
+        localStorage.setItem("stamped_cols", String(value));
+    } catch (e) {}
+}
+
+function loadColumnPreference() {
+    const saved = localStorage.getItem("stamped_cols") || "auto";
+    const radio = document.querySelector(`input[name="cols"][value="${saved}"]`);
+    if (radio) {
+        radio.checked = true;
+        setColumns(saved);
+    }
+}
+
 function generateId(sectionIdx, principleIdx, itemIdx) {
     return `s${sectionIdx}_p${principleIdx}_i${itemIdx}`;
 }
@@ -219,6 +239,7 @@ function buildChecklist() {
     loadFromURL();
     loadFromLocalStorage();
     updateAllCounts();
+    loadColumnPreference();
 }
 
 function handleCheck(id) {
