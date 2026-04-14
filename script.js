@@ -1,4 +1,6 @@
 let checkboxStates = {};
+let responseStates = {};
+let currentMode = "checkboxes";
 let totalItems = 0;
 
 function setColumns(value) {
@@ -39,6 +41,29 @@ function loadSectionsPreference() {
     if (radio) {
         radio.checked = true;
         setSections(saved);
+    }
+}
+
+function setMode(value) {
+    currentMode = value;
+    const container = document.getElementById("app");
+    if (value === "responses") {
+        container.classList.add("mode-responses");
+    } else {
+        container.classList.remove("mode-responses");
+    }
+    updateAllCounts();
+    try {
+        localStorage.setItem("stamped_mode", value);
+    } catch (e) {}
+}
+
+function loadModePreference() {
+    const saved = localStorage.getItem("stamped_mode") || "checkboxes";
+    const radio = document.querySelector(`input[name="mode"][value="${saved}"]`);
+    if (radio) {
+        radio.checked = true;
+        setMode(saved);
     }
 }
 
@@ -92,6 +117,7 @@ function buildChecklist() {
                 const id = generateId(si, pi, ii);
                 totalItems++;
                 checkboxStates[id] = false;
+                responseStates[id] = { value: null, reason: "" };
 
                 const checkItem = document.createElement("div");
                 checkItem.className = "check-item";
@@ -101,6 +127,16 @@ function buildChecklist() {
             <span class="checkbox-custom">✓</span>
             <span class="check-text">${item}</span>
           </label>
+          <div class="response-ui">
+            <div class="response-row">
+              <span class="check-text">${item}</span>
+              <div class="response-btns">
+                <button type="button" class="response-btn yes-btn" id="yes_${id}" onclick="handleResponse('${id}', 'yes')">✓ Yes</button>
+                <button type="button" class="response-btn no-btn" id="no_${id}" onclick="handleResponse('${id}', 'no')">✗ No</button>
+              </div>
+            </div>
+            <textarea class="reason-input" id="reason_${id}" placeholder="Reason for not meeting requirement..." rows="2" oninput="handleReason('${id}', this.value)"></textarea>
+          </div>
         `;
                 checklist.appendChild(checkItem);
             });
@@ -117,6 +153,7 @@ function buildChecklist() {
     updateAllCounts();
     loadColumnPreference();
     loadSectionsPreference();
+    loadModePreference();
 }
 
 function handleCheck(id) {
@@ -124,6 +161,48 @@ function handleCheck(id) {
     checkboxStates[id] = cb.checked;
     updateAllCounts();
     autoSave();
+}
+
+function handleResponse(id, value) {
+    const current = responseStates[id].value;
+    responseStates[id].value = current === value ? null : value;
+
+    const yesBtn = document.getElementById(`yes_${id}`);
+    const noBtn = document.getElementById(`no_${id}`);
+    const reasonEl = document.getElementById(`reason_${id}`);
+
+    if (yesBtn) yesBtn.classList.toggle("active", responseStates[id].value === "yes");
+    if (noBtn) noBtn.classList.toggle("active", responseStates[id].value === "no");
+    if (reasonEl) {
+        const showReason = responseStates[id].value === "no";
+        reasonEl.classList.toggle("visible", showReason);
+        if (!showReason) {
+            responseStates[id].reason = "";
+            reasonEl.value = "";
+        }
+    }
+
+    updateAllCounts();
+    autoSave();
+}
+
+function handleReason(id, value) {
+    responseStates[id].reason = value;
+    autoSave();
+}
+
+function applyResponseState(id) {
+    const state = responseStates[id];
+    if (!state) return;
+    const yesBtn = document.getElementById(`yes_${id}`);
+    const noBtn = document.getElementById(`no_${id}`);
+    const reasonEl = document.getElementById(`reason_${id}`);
+    if (yesBtn) yesBtn.classList.toggle("active", state.value === "yes");
+    if (noBtn) noBtn.classList.toggle("active", state.value === "no");
+    if (reasonEl) {
+        reasonEl.classList.toggle("visible", state.value === "no");
+        reasonEl.value = state.reason || "";
+    }
 }
 
 function updateAllCounts() {
@@ -140,7 +219,11 @@ function updateAllCounts() {
 
             principle.items.forEach((_, ii) => {
                 const id = generateId(si, pi, ii);
-                if (checkboxStates[id]) checked++;
+                const isChecked =
+                    currentMode === "checkboxes"
+                        ? checkboxStates[id]
+                        : responseStates[id] && responseStates[id].value === "yes";
+                if (isChecked) checked++;
             });
 
             const countEl = document.getElementById(`count_${si}_${pi}`);
@@ -166,7 +249,8 @@ function updateAllCounts() {
 
     const pct = total > 0 ? Math.round((totalChecked / total) * 100) : 0;
     document.getElementById("progressBar").style.width = pct + "%";
-    document.getElementById("progressText").textContent = `${totalChecked} / ${total} items checked (${pct}%)`;
+    const modeLabel = currentMode === "responses" ? "meeting requirements" : "checked";
+    document.getElementById("progressText").textContent = `${totalChecked} / ${total} items ${modeLabel} (${pct}%)`;
 }
 
 function getState() {
@@ -186,7 +270,10 @@ function setState(state) {
 
 // Local Storage
 function saveToLocalStorage() {
-    localStorage.setItem("stamped_checklist", JSON.stringify(getState()));
+    localStorage.setItem(
+        "stamped_checklist",
+        JSON.stringify({ checkboxes: checkboxStates, responses: responseStates })
+    );
     showToast("💾 Progress saved to browser");
 }
 
@@ -194,17 +281,41 @@ function loadFromLocalStorage() {
     const data = localStorage.getItem("stamped_checklist");
     if (data) {
         try {
-            setState(JSON.parse(data));
+            const parsed = JSON.parse(data);
+            if (parsed && parsed.checkboxes !== undefined) {
+                // New format
+                Object.keys(parsed.checkboxes || {}).forEach((id) => {
+                    if (id in checkboxStates) {
+                        checkboxStates[id] = !!parsed.checkboxes[id];
+                        const cb = document.getElementById(id);
+                        if (cb) cb.checked = !!parsed.checkboxes[id];
+                    }
+                });
+                Object.keys(parsed.responses || {}).forEach((id) => {
+                    if (id in responseStates) {
+                        responseStates[id] = parsed.responses[id];
+                        applyResponseState(id);
+                    }
+                });
+            } else {
+                // Old format: direct checkbox states
+                setState(parsed);
+            }
+            updateAllCounts();
         } catch (e) {}
     }
 }
 
 function autoSave() {
-    localStorage.setItem("stamped_checklist", JSON.stringify(getState()));
+    localStorage.setItem(
+        "stamped_checklist",
+        JSON.stringify({ checkboxes: checkboxStates, responses: responseStates })
+    );
 }
 
 // URL Sharing
 function shareURL() {
+    // Encode checkbox states as a compact bitstring (existing format)
     const state = getState();
     const bits = [];
     DATA.forEach((section, si) => {
@@ -216,7 +327,18 @@ function shareURL() {
         });
     });
     const encoded = btoa(bits.join(""));
-    const url = window.location.origin + window.location.pathname + "?state=" + encodeURIComponent(encoded);
+    let url = window.location.origin + window.location.pathname + "?state=" + encodeURIComponent(encoded);
+
+    // Encode non-empty response states (value + reason) as base64 JSON
+    const nonEmptyResponses = {};
+    Object.entries(responseStates).forEach(([id, rs]) => {
+        if (rs.value !== null || rs.reason) {
+            nonEmptyResponses[id] = rs;
+        }
+    });
+    if (Object.keys(nonEmptyResponses).length > 0) {
+        url += "&responses=" + encodeURIComponent(btoa(JSON.stringify(nonEmptyResponses)));
+    }
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard
@@ -239,27 +361,47 @@ function showPromptURL(url) {
 function loadFromURL() {
     const params = new URLSearchParams(window.location.search);
     const stateParam = params.get("state");
-    if (!stateParam) return;
+    const responsesParam = params.get("responses");
 
-    try {
-        const bits = atob(decodeURIComponent(stateParam)).split("");
-        let idx = 0;
-        const state = {};
-        DATA.forEach((section, si) => {
-            section.principles.forEach((principle, pi) => {
-                principle.items.forEach((_, ii) => {
-                    const id = generateId(si, pi, ii);
-                    state[id] = bits[idx] === "1";
-                    idx++;
+    if (!stateParam && !responsesParam) return;
+
+    if (stateParam) {
+        try {
+            const bits = atob(decodeURIComponent(stateParam)).split("");
+            let idx = 0;
+            const state = {};
+            DATA.forEach((section, si) => {
+                section.principles.forEach((principle, pi) => {
+                    principle.items.forEach((_, ii) => {
+                        const id = generateId(si, pi, ii);
+                        state[id] = bits[idx] === "1";
+                        idx++;
+                    });
                 });
             });
-        });
-        setState(state);
-        // Clean URL
-        window.history.replaceState({}, "", window.location.pathname);
-    } catch (e) {
-        console.warn("Could not load state from URL", e);
+            setState(state);
+        } catch (e) {
+            console.warn("Could not load state from URL", e);
+        }
     }
+
+    if (responsesParam) {
+        try {
+            const decoded = JSON.parse(atob(decodeURIComponent(responsesParam)));
+            Object.keys(decoded).forEach((id) => {
+                if (id in responseStates) {
+                    responseStates[id] = decoded[id];
+                    applyResponseState(id);
+                }
+            });
+            updateAllCounts();
+        } catch (e) {
+            console.warn("Could not load responses from URL", e);
+        }
+    }
+
+    // Clean URL
+    window.history.replaceState({}, "", window.location.pathname);
 }
 
 // Reset
@@ -269,6 +411,10 @@ function confirmReset() {
             checkboxStates[id] = false;
             const cb = document.getElementById(id);
             if (cb) cb.checked = false;
+        });
+        Object.keys(responseStates).forEach((id) => {
+            responseStates[id] = { value: null, reason: "" };
+            applyResponseState(id);
         });
         updateAllCounts();
         autoSave();
