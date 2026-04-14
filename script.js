@@ -161,33 +161,49 @@ function loadColumnPreference() {
     }
 }
 
+function setSections(value) {
+    const container = document.getElementById("app");
+    if (value === "off") {
+        container.classList.add("flat-mode");
+    } else {
+        container.classList.remove("flat-mode");
+    }
+    try {
+        localStorage.setItem("stamped_sections", String(value));
+    } catch (e) {}
+}
+
+function loadSectionsPreference() {
+    const saved = localStorage.getItem("stamped_sections") || "off";
+    const radio = document.querySelector(`input[name="sections"][value="${saved}"]`);
+    if (radio) {
+        radio.checked = true;
+        setSections(saved);
+    }
+}
+
 function generateId(sectionIdx, principleIdx, itemIdx) {
     return `s${sectionIdx}_p${principleIdx}_i${itemIdx}`;
 }
 
 function buildChecklist() {
     const container = document.getElementById("app");
-    // Keep the intro text
-    const intro = container.querySelector(".intro-text");
+
+    const cardsGrid = document.createElement("div");
+    cardsGrid.className = "cards-grid";
 
     DATA.forEach((section, si) => {
-        const sectionDiv = document.createElement("div");
-        sectionDiv.className = "section";
-        sectionDiv.setAttribute("data-level", section.level);
-
-        const sectionHeader = document.createElement("div");
-        sectionHeader.className = "section-header";
-        sectionHeader.innerHTML = `
+        const sectionDivider = document.createElement("div");
+        sectionDivider.className = "section-divider";
+        sectionDivider.setAttribute("data-level", section.level);
+        sectionDivider.innerHTML = `
       <span class="section-badge ${section.level}">${section.label}</span>
       <span style="font-weight:600; font-size:0.95rem;">${
           section.level === "must" ? "Required" : section.level === "should" ? "Recommended" : "Optional"
       } Requirements</span>
       <span class="section-progress" id="sectionProgress_${si}"></span>
     `;
-        sectionDiv.appendChild(sectionHeader);
-
-        const cardsGrid = document.createElement("div");
-        cardsGrid.className = "cards-grid";
+        cardsGrid.appendChild(sectionDivider);
 
         section.principles.forEach((principle, pi) => {
             const card = document.createElement("div");
@@ -199,6 +215,7 @@ function buildChecklist() {
             const header = document.createElement("div");
             header.className = "principle-header";
             header.innerHTML = `
+        <span class="level-badge ${section.level}">${section.label}</span>
         <span class="principle-code">${principle.code}</span>
         <div style="flex:1">
           <div class="principle-title">${principle.name}</div>
@@ -231,15 +248,15 @@ function buildChecklist() {
             card.appendChild(checklist);
             cardsGrid.appendChild(card);
         });
-
-        sectionDiv.appendChild(cardsGrid);
-        container.appendChild(sectionDiv);
     });
+
+    container.appendChild(cardsGrid);
 
     loadFromURL();
     loadFromLocalStorage();
     updateAllCounts();
     loadColumnPreference();
+    loadSectionsPreference();
 }
 
 function handleCheck(id) {
