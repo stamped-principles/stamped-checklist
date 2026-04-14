@@ -203,28 +203,9 @@ body {
 
 .principle-header {
     padding: 1rem 1.2rem;
-    cursor: pointer;
     display: flex;
     align-items: flex-start;
     gap: 0.7rem;
-    user-select: none;
-    transition: background 0.2s;
-}
-
-.principle-header:hover {
-    background: #f8f9fa;
-}
-
-.principle-toggle {
-    font-size: 0.8rem;
-    color: var(--text-light);
-    transition: transform 0.3s;
-    margin-top: 0.25rem;
-    flex-shrink: 0;
-}
-
-.principle-toggle.open {
-    transform: rotate(90deg);
 }
 
 .principle-code {
@@ -270,10 +251,6 @@ body {
 
 .checklist {
     padding: 0 1.2rem 1rem 1.2rem;
-    display: none;
-}
-
-.checklist.open {
     display: block;
 }
 
@@ -485,12 +462,6 @@ code {
     }
     .modal-overlay {
         display: none !important;
-    }
-    .checklist {
-        display: block !important;
-    }
-    .principle-toggle {
-        display: none;
     }
     body {
         background: white;
