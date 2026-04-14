@@ -175,9 +175,7 @@ function buildChecklist() {
 
             const header = document.createElement("div");
             header.className = "principle-header";
-            header.onclick = () => togglePrinciple(si, pi);
             header.innerHTML = `
-        <span class="principle-toggle" id="toggle_${si}_${pi}">▶</span>
         <span class="principle-code">${principle.code}</span>
         <div style="flex:1">
           <div class="principle-title">${principle.name}</div>
@@ -189,7 +187,6 @@ function buildChecklist() {
 
             const checklist = document.createElement("div");
             checklist.className = "checklist";
-            checklist.id = `checklist_${si}_${pi}`;
 
             principle.items.forEach((item, ii) => {
                 const id = generateId(si, pi, ii);
@@ -218,14 +215,6 @@ function buildChecklist() {
     loadFromURL();
     loadFromLocalStorage();
     updateAllCounts();
-}
-
-function togglePrinciple(si, pi) {
-    const checklist = document.getElementById(`checklist_${si}_${pi}`);
-    const toggle = document.getElementById(`toggle_${si}_${pi}`);
-    const isOpen = checklist.classList.contains("open");
-    checklist.classList.toggle("open");
-    toggle.classList.toggle("open");
 }
 
 function handleCheck(id) {
@@ -432,17 +421,6 @@ function confirmReset() {
         autoSave();
         showToast("🗑️ Checklist reset");
     }
-}
-
-// Expand/Collapse
-function expandAll() {
-    document.querySelectorAll(".checklist").forEach((el) => el.classList.add("open"));
-    document.querySelectorAll(".principle-toggle").forEach((el) => el.classList.add("open"));
-}
-
-function collapseAll() {
-    document.querySelectorAll(".checklist").forEach((el) => el.classList.remove("open"));
-    document.querySelectorAll(".principle-toggle").forEach((el) => el.classList.remove("open"));
 }
 
 // Toast
