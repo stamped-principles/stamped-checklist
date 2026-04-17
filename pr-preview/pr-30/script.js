@@ -178,6 +178,7 @@ function buildChecklist() {
 function handleCheck(id) {
     const cb = document.getElementById(id);
     checkboxStates[id] = cb.checked;
+    cb.closest(".check-item").classList.toggle("checked", cb.checked);
     updateAllCounts();
     autoSave();
 }
