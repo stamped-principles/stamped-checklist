@@ -51,13 +51,16 @@ classes:
     Checklist:
         description: Top-level container for the full reproducibility checklist.
         tree_root: true
+        class_uri: schema:ItemList
         attributes:
             version:
                 description: Schema/content version string (e.g., "1.0.1").
+                slot_uri: schema:version
                 required: true
                 pattern: "^\\d+\\.\\d+\\.\\d+$"
             data:
                 description: Ordered list of requirement-level groupings.
+                slot_uri: schema:itemListElement
                 range: LevelGroup
                 multivalued: true
                 inlined_as_list: true
@@ -65,6 +68,7 @@ classes:
 
     LevelGroup:
         description: A group of principles sharing the same requirement level.
+        class_uri: schema:ItemList
         attributes:
             level:
                 description: The requirement level of this group.
@@ -72,6 +76,7 @@ classes:
                 required: true
             principles:
                 description: Principles belonging to this level.
+                slot_uri: schema:itemListElement
                 range: Principle
                 multivalued: true
                 inlined_as_list: true
@@ -79,17 +84,23 @@ classes:
 
     Principle:
         description: A single reproducibility principle with verification items.
+        class_uri: schema:DefinedTerm
+        id_prefixes:
+            - stamped
         attributes:
             code:
                 description: Short identifier for the principle (e.g., "S.1", "T.1 + T.3").
+                slot_uri: schema:termCode
                 identifier: true
                 required: true
             name:
                 description: Category name for the principle.
+                slot_uri: schema:name
                 range: PrincipleName
                 required: true
-            desc:
+            description:
                 description: Normative description of the principle.
+                slot_uri: schema:description
                 required: true
             items:
                 description: Checklist questions/items used to evaluate conformance.

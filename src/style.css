@@ -396,6 +396,14 @@ body {
     line-height: 1.4;
 }
 
+.check-item.checked .checkbox-custom {
+    background: var(--check-color);
+    border-color: var(--check-color);
+    color: white;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+}
+
 .checkbox-custom {
     width: 16px;
     height: 16px;
@@ -663,6 +671,42 @@ code {
 }
 
 @media print {
+    /* Force single-column layout for print — multi-column breaks pagination */
+    .cards-grid,
+    .cards-grid.cols-1,
+    .cards-grid.cols-2,
+    .cards-grid.cols-auto {
+        columns: auto !important;
+        column-count: 1 !important;
+        column-width: auto !important;
+        column-gap: 0 !important;
+        display: block !important;
+    }
+
+    /* Pagination control */
+    .principle-card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        display: block;
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .section-divider {
+        break-after: avoid;
+        page-break-after: avoid;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .check-item {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    /* Hide UI chrome */
     .header {
         position: relative;
     }
@@ -675,60 +719,67 @@ code {
     .modal-overlay {
         display: none !important;
     }
+
     body {
         background: white;
         padding: 0;
     }
+
     .container {
         max-width: 100%;
         padding: 0;
     }
-    .principle-card {
-        box-shadow: none;
-        border: 1px solid #ddd;
-        break-inside: avoid;
-    }
+
     .intro-text {
         box-shadow: none;
         border: 1px solid #ddd;
     }
-    .check-item input:checked + label .checkbox-custom {
-        border-color: #333;
-        color: #333;
-        background: white;
+
+    /* Checkbox rendering — use class-based state (requires JS change) */
+    .checkbox-custom {
+        border: 2px solid #333 !important;
+        color: transparent;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
     }
-    .check-item input:checked + label .check-text {
+
+    .check-item.checked .checkbox-custom {
+        border-color: #333 !important;
+        color: #333 !important;
+        background: white !important;
+    }
+
+    .check-item.checked .check-text {
         text-decoration: none;
         color: var(--text);
     }
-    .checkbox-custom {
-        border: 2px solid #333 !important;
-    }
-    .check-item input:not(:checked) + label .checkbox-custom::after {
-        content: "";
-    }
-    .check-item input:checked + label .checkbox-custom::after {
-        content: "✓";
-    }
+
     /* Response mode print styles */
     .response-btn {
         border: 1px solid #ddd !important;
         color: #999 !important;
         background: white !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
     }
+
     .response-btn.active.yes-btn {
         border-color: #27ae60 !important;
         color: #27ae60 !important;
     }
+
     .response-btn.active.no-btn {
         border-color: #c0392b !important;
         color: #c0392b !important;
     }
+
     .reason-input.visible {
         display: block !important;
         border: 1px solid #ddd !important;
         background: white !important;
     }
+
+    /* Version indicator */
     .version-indicator {
         position: fixed;
         bottom: 0.25rem;
@@ -737,9 +788,12 @@ code {
         font-size: 0.6rem;
         color: #555;
     }
+
+    /* Hide progress bar in print */
     .progress-bar-container {
         display: none;
     }
+
     .progress-text {
         display: none;
     }
