@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { DATA } from "../../checklist.js";
+import DATA from "../../checklist.json" with { type: "json" };
 
 const TOTAL_PRINCIPLES = DATA.flatMap((s) => s.principles).length;
 

@@ -1,5 +1,5 @@
 import { beforeEach, describe, it, expect, vi } from "vitest";
-import { DATA } from "../../checklist.js";
+import DATA from "../../checklist.json" with { type: "json" };
 
 // Set up a minimal DOM before importing script.js so that module-level
 // code that queries the DOM doesn't throw.

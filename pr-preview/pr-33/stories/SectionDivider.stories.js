@@ -1,4 +1,4 @@
-import { DATA } from "../checklist.js";
+import DATA from "../checklist.json" with { type: "json" };
 
 /** Build a section divider element matching the structure in buildChecklist(). */
 function buildSectionDivider(section, si) {

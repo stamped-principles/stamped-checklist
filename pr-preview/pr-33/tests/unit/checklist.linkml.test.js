@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
-import schema from "../../checklist.linkml.schema.json";
-import checklistEntries from "../../checklist.data.json";
-import { VERSION, DATA } from "../../checklist.js";
+import schema from "../../checklist.schema.json";
+import checklistEntries from "../../checklist.json" with { type: "json" };
 import { generateLinkmlSchema } from "../../scripts/generate-linkml-schema.mjs";
+
+const VERSION = schema.version;
 
 function validateAttributeValue(value, range, schema, path) {
     if (schema.enums?.[range]) {
@@ -72,8 +73,9 @@ describe("LinkML checklist schema", () => {
         expect(schema).toEqual(generatedSchema);
     });
 
-    it("keeps checklist.js DATA sourced from checklist.data.json", () => {
-        expect(DATA).toEqual(checklistEntries);
+    it("loads checklist entries from checklist.json", () => {
+        expect(Array.isArray(checklistEntries)).toBe(true);
+        expect(checklistEntries.length).toBeGreaterThan(0);
     });
 
     it("validates checklist payload against LinkML schema", () => {

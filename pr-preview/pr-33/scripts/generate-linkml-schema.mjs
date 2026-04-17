@@ -7,13 +7,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..", "..");
 const SOURCE_PATH = path.join(repoRoot, "schema", "linkml.yaml");
-const OUTPUT_PATH = path.join(repoRoot, "src", "checklist.linkml.schema.json");
+const OUTPUT_PATH = path.join(repoRoot, "src", "checklist.schema.json");
 
 function buildGeneratedSchema(linkml) {
     const requirementLevels = Object.keys(linkml?.enums?.RequirementLevel?.permissible_values || {});
 
     return {
-        id: "https://stamped-principles.github.io/stamped-checklist/checklist.linkml.schema.json",
+        id: "https://stamped-principles.github.io/stamped-checklist/checklist.schema.json",
         name: "stamped_checklist",
         title: "STAMPED Checklist LinkML Schema",
         version: linkml?.version,

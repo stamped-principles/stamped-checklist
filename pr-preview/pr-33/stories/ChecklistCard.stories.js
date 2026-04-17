@@ -1,4 +1,4 @@
-import { DATA } from "../checklist.js";
+import DATA from "../checklist.json" with { type: "json" };
 
 const section = DATA[0]; // must section
 const shouldSection = DATA[1]; // should section
