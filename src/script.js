@@ -73,6 +73,12 @@ function generateId(sectionIdx, principleIdx, itemIdx) {
     return `s${sectionIdx}_p${principleIdx}_i${itemIdx}`;
 }
 
+function getPrincipleExamplesURL(principle) {
+    const match = (principle.name || "").match(/[A-Za-z]/);
+    const firstLetter = match ? match[0].toLowerCase() : "";
+    return `https://stamped-principles.github.io/stamped-examples/stamped_principles/${firstLetter}/`;
+}
+
 function buildChecklist() {
     const container = document.getElementById("app");
 
@@ -98,6 +104,7 @@ function buildChecklist() {
             card.id = `card_${si}_${pi}`;
 
             const numItems = principle.items.length;
+            const examplesURL = getPrincipleExamplesURL(principle);
 
             const header = document.createElement("div");
             header.className = "principle-header";
@@ -105,7 +112,17 @@ function buildChecklist() {
         <span class="level-badge ${section.level}">${section.label}</span>
         <span class="principle-code">${principle.code}</span>
         <div style="flex:1">
-          <div class="principle-title">${principle.name}</div>
+          <div class="principle-title-row">
+            <div class="principle-title">${principle.name}</div>
+            <a
+              class="principle-examples-link"
+              href="${examplesURL}"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="View ${principle.name} examples"
+              title="View examples for ${principle.name}"
+            >💡</a>
+          </div>
           <div style="font-size:0.76rem; color:var(--text-light); margin-top:0.1rem;">${principle.desc}</div>
         </div>
         <span class="principle-count" id="count_${si}_${pi}">0/${numItems}</span>
