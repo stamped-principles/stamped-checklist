@@ -1,5 +1,5 @@
 {
-    "id": "https://stamped-principles.github.io/stamped-checklist/checklist.linkml.schema.json",
+    "id": "https://stamped-principles.github.io/stamped-checklist/checklist.schema.json",
     "name": "stamped_checklist",
     "title": "STAMPED Checklist LinkML Schema",
     "version": "1.0.1",

@@ -3,7 +3,8 @@ name: Check version bump
 on:
     pull_request:
         paths:
-            - src/checklist.js
+            - src/checklist.json
+            - src/checklist.schema.json
 
 jobs:
     check-version-bump:
@@ -18,10 +19,10 @@ jobs:
 
             - name: Check VERSION was bumped
               run: |
-                  BASE_VERSION=$(git show origin/${{ github.base_ref }}:src/checklist.js 2>/dev/null | grep -m1 'const VERSION' | sed 's/.*"\(.*\)".*/\1/')
-                  PR_VERSION=$(grep -m1 'const VERSION' src/checklist.js | sed 's/.*"\(.*\)".*/\1/')
+                  BASE_VERSION=$(git show origin/${{ github.base_ref }}:src/checklist.schema.json 2>/dev/null | python -c 'import json,sys; s=sys.stdin.read().strip(); print("" if not s else json.loads(s).get("version",""), end="")')
+                  PR_VERSION=$(python -c 'import json; print(json.load(open("src/checklist.schema.json")).get("version",""), end="")')
                   if [ -z "$PR_VERSION" ]; then
-                    echo "::error file=src/checklist.js::Could not extract VERSION from checklist.js. Ensure it is defined as: const VERSION = \"x.y.z\";"
+                    echo "::error file=src/checklist.schema.json::Could not extract version from checklist.schema.json. Ensure it contains: \"version\": \"x.y.z\"."
                     exit 1
                   fi
                   if [ -z "$BASE_VERSION" ]; then
@@ -31,7 +32,7 @@ jobs:
                   echo "Base branch version: $BASE_VERSION"
                   echo "PR branch version:   $PR_VERSION"
                   if [ "$BASE_VERSION" = "$PR_VERSION" ]; then
-                    echo "::error file=src/checklist.js::src/checklist.js was modified but VERSION was not bumped (still \"$PR_VERSION\"). Please update the VERSION constant."
+                    echo "::error file=src/checklist.schema.json::Checklist content changed but version was not bumped (still \"$PR_VERSION\"). Please update src/checklist.schema.json."
                     exit 1
                   fi
                   echo "VERSION bumped from $BASE_VERSION to $PR_VERSION ✓"

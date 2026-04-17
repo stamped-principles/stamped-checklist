@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
-import linkmlSchema from "../../checklist.linkml.schema.json";
-import { VERSION, DATA } from "../../checklist.js";
+import linkmlSchema from "../../checklist.schema.json";
+import DATA from "../../checklist.json" with { type: "json" };
+
+const VERSION = linkmlSchema.version;
 
 describe("VERSION", () => {
     it("follows semantic versioning format (x.y.z)", () => {

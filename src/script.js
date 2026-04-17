@@ -1,4 +1,7 @@
-import { VERSION, DATA } from "./checklist.js";
+import DATA from "./checklist.json" with { type: "json" };
+import schema from "./checklist.schema.json" with { type: "json" };
+
+const VERSION = schema.version;
 
 let checkboxStates = {};
 let responseStates = {};
