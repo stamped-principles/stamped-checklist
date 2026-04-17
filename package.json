@@ -8,6 +8,7 @@
         "preview": "vite preview --config config/vite.config.js",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
+        "generate:linkml-schema": "node scripts/generate-linkml-schema.mjs",
         "test": "vitest run --config config/vitest.config.js",
         "test:watch": "vitest --config config/vitest.config.js",
         "test:coverage": "vitest run --coverage --config config/vitest.config.js",
@@ -36,6 +37,7 @@
         "prettier": "^3.1.0",
         "storybook": "^10.3.5",
         "vite": "^8.0.8",
-        "vitest": "^4.1.4"
+        "vitest": "^4.1.4",
+        "yaml": "^2.8.3"
     }
 }

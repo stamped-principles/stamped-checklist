@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import schema from "../../checklist.linkml.schema.json";
 import checklistEntries from "../../checklist.data.json";
 import { VERSION, DATA } from "../../checklist.js";
+import { generateLinkmlSchema } from "../../../scripts/generate-linkml-schema.mjs";
 
 function validateAttributeValue(value, range, schema, path) {
     if (schema.enums?.[range]) {
@@ -60,6 +61,10 @@ function validateObjectInstance(instance, classDef, schema, path) {
 }
 
 describe("LinkML checklist schema", () => {
+    it("matches the generated schema from schema/linkml.yaml", () => {
+        expect(schema).toEqual(generateLinkmlSchema());
+    });
+
     it("keeps checklist.js DATA sourced from checklist.data.json", () => {
         expect(DATA).toEqual(checklistEntries);
     });
