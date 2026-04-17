@@ -4,6 +4,12 @@ const section = DATA[0]; // must section
 const shouldSection = DATA[1]; // should section
 const maySection = DATA[2]; // may section
 
+function getPrincipleExamplesURL(principle) {
+    const match = (principle.name || "").match(/[A-Za-z]/);
+    const firstLetter = match ? match[0].toLowerCase() : "";
+    return `https://stamped-principles.github.io/stamped-examples/${firstLetter}/`;
+}
+
 /** Build a principle card DOM element matching the structure created by buildChecklist(). */
 function buildCard(sec, principle, si, pi) {
     const card = document.createElement("div");
@@ -17,7 +23,17 @@ function buildCard(sec, principle, si, pi) {
             <span class="level-badge ${sec.level}">${sec.label}</span>
             <span class="principle-code">${principle.code}</span>
             <div style="flex:1">
-                <div class="principle-title">${principle.name}</div>
+                <div class="principle-title-row">
+                    <div class="principle-title">${principle.name}</div>
+                    <a
+                        class="principle-examples-link"
+                        href="${getPrincipleExamplesURL(principle)}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="View ${principle.name} examples"
+                        title="View examples for ${principle.name}"
+                    >💡</a>
+                </div>
                 <div style="font-size:0.76rem; color:var(--text-light); margin-top:0.1rem;">${principle.desc}</div>
             </div>
             <span class="principle-count" id="count_${si}_${pi}">0/${numItems}</span>
