@@ -1,36 +1,36 @@
-id: https://example.org/reproducibility-checklist
-name: reproducibility-checklist
-title: Reproducibility Checklist Schema
-description: >-
-    LinkML schema modeling a tiered (MUST/SHOULD/MAY) checklist of
-    reproducibility principles and their associated verification items.
+id: https://github.com/stamped-principles/stamped-checklist
+name: stamped-checklist
+title: STAMPED Checklist Schema
+description: LinkML schema modeling a tiered (MUST/SHOULD/MAY) checklist of STAMPED principles and their associated verification items.
 license: CC-BY-4.0
 version: 1.0.1
 
 prefixes:
     linkml: https://w3id.org/linkml/
-    repro: https://example.org/reproducibility-checklist/
+    stamped: https://github.com/stamped-principles/stamped-oao
     schema: http://schema.org/
+    rfc2119: https://datatracker.ietf.org/doc/html/rfc2119#
+    schema: https://schema.org/
 
-default_prefix: repro
+default_prefix: stamped
 default_range: string
 
 imports:
     - linkml:types
 
 enums:
-    RequirementLevel:
-        description: RFC 2119-style requirement levels used to group principles.
-        permissible_values:
-            must:
-                description: Absolute requirement.
-                meaning: repro:MUST
-            should:
-                description: Strongly recommended.
-                meaning: repro:SHOULD
-            may:
-                description: Optional / permissible.
-                meaning: repro:MAY
+  RequirementLevel:
+    description: RFC 2119 requirement levels.
+    permissible_values:
+      must:
+        description: Absolute requirement.
+        meaning: rfc2119:section-1
+      should:
+        description: Strongly recommended.
+        meaning: rfc2119:section-3
+      may:
+        description: Optional / permissible.
+        meaning: rfc2119:section-5
 
     PrincipleName:
         description: High-level principle categories.
