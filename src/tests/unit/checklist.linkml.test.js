@@ -62,7 +62,14 @@ function validateObjectInstance(instance, classDef, schema, path) {
 
 describe("LinkML checklist schema", () => {
     it("matches the generated schema from schema/linkml.yaml", () => {
-        expect(schema).toEqual(generateLinkmlSchema());
+        let generatedSchema;
+        try {
+            generatedSchema = generateLinkmlSchema();
+        } catch (error) {
+            throw new Error(`Failed to generate LinkML schema from schema/linkml.yaml: ${error.message}`);
+        }
+
+        expect(schema).toEqual(generatedSchema);
     });
 
     it("keeps checklist.js DATA sourced from checklist.data.json", () => {
