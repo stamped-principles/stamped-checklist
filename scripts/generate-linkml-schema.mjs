@@ -110,9 +110,10 @@ function writeGeneratedSchema(sourcePath = SOURCE_PATH, outputPath = OUTPUT_PATH
     fs.writeFileSync(outputPath, `${JSON.stringify(generated, null, 4)}\n`, "utf8");
 }
 
-const executedPath = process.argv[1] ? path.resolve(process.argv[1]) : null;
+const modulePath = fs.realpathSync(__filename);
+const executedPath = process.argv[1] ? fs.realpathSync(path.resolve(process.argv[1])) : null;
 
-if (executedPath === __filename) {
+if (executedPath === modulePath) {
     writeGeneratedSchema();
 }
 
