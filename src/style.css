@@ -336,6 +336,22 @@ body {
     flex: 1;
 }
 
+.principle-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.principle-examples-link {
+    text-decoration: none;
+    font-size: 0.9rem;
+    line-height: 1;
+}
+
+.principle-examples-link:hover {
+    filter: brightness(0.9);
+}
+
 .principle-count {
     font-size: 0.72rem;
     color: var(--text-light);

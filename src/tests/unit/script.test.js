@@ -39,6 +39,16 @@ describe("buildChecklist and state management", () => {
         expect(cards.length).toBe(totalPrinciples);
     });
 
+    it("renders examples links for principles using first letter route", () => {
+        const links = document.querySelectorAll(".principle-examples-link");
+        const totalPrinciples = DATA.flatMap((s) => s.principles).length;
+        expect(links.length).toBe(totalPrinciples);
+
+        const firstLink = document.querySelector("#card_0_0 .principle-examples-link");
+        expect(firstLink.getAttribute("href")).toBe("https://stamped-principles.github.io/stamped-examples/s/");
+        expect(firstLink.textContent).toBe("💡");
+    });
+
     it("builds correct number of check items", () => {
         const items = document.querySelectorAll(".check-item");
         const totalItems = DATA.flatMap((s) => s.principles).flatMap((p) => p.items).length;
