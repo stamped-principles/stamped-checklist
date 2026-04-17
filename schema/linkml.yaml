@@ -2,99 +2,97 @@ id: https://github.com/stamped-principles/stamped-checklist
 name: stamped-checklist
 title: STAMPED Checklist Schema
 description: >-
-  LinkML schema modeling a tiered (MUST/SHOULD/MAY) checklist of STAMPED
-  principles and their associated verification items.
+    LinkML schema modeling a tiered (MUST/SHOULD/MAY) checklist of STAMPED
+    principles and their associated verification items.
 license: CC-BY-4.0
 version: 1.0.1
 
 prefixes:
-  linkml: https://w3id.org/linkml/
-  schema: https://schema.org/
-  rfc2119: https://datatracker.ietf.org/doc/html/rfc2119#
-  stamped: https://github.com/stamped-principles/stamped-checklist/
+    linkml: https://w3id.org/linkml/
+    schema: https://schema.org/
+    rfc2119: https://datatracker.ietf.org/doc/html/rfc2119#
+    stamped: https://github.com/stamped-principles/stamped-checklist/
 
 default_prefix: stamped
 default_range: string
 
 imports:
-  - linkml:types
+    - linkml:types
 
 enums:
+    RequirementLevel:
+        description: RFC 2119 requirement levels.
+        permissible_values:
+            must:
+                title: MUST
+                description: Absolute requirement.
+                meaning: rfc2119:section-1
+            should:
+                title: SHOULD
+                description: Strongly recommended.
+                meaning: rfc2119:section-3
+            may:
+                title: MAY
+                description: Optional / permissible.
+                meaning: rfc2119:section-5
 
-  RequirementLevel:
-    description: RFC 2119 requirement levels.
-    permissible_values:
-      must:
-        title: MUST
-        description: Absolute requirement.
-        meaning: rfc2119:section-1
-      should:
-        title: SHOULD
-        description: Strongly recommended.
-        meaning: rfc2119:section-3
-      may:
-        title: MAY
-        description: Optional / permissible.
-        meaning: rfc2119:section-5
-
-  PrincipleName:
-    description: High-level principle categories.
-    permissible_values:
-      Self-containment:
-      Tracking:
-      Actionability:
-      Portability:
-      Distributability:
-      Modularity:
-      Ephemerality:
+    PrincipleName:
+        description: High-level principle categories.
+        permissible_values:
+            Self-containment:
+            Tracking:
+            Actionability:
+            Portability:
+            Distributability:
+            Modularity:
+            Ephemerality:
 
 classes:
+    Checklist:
+        description: Top-level container for the full reproducibility checklist.
+        tree_root: true
+        attributes:
+            version:
+                description: Schema/content version string (e.g., "1.0.1").
+                required: true
+                pattern: "^\\d+\\.\\d+\\.\\d+$"
+            data:
+                description: Ordered list of requirement-level groupings.
+                range: LevelGroup
+                multivalued: true
+                inlined_as_list: true
+                required: true
 
-  Checklist:
-    description: Top-level container for the full reproducibility checklist.
-    tree_root: true
-    attributes:
-      version:
-        description: Schema/content version string (e.g., "1.0.1").
-        required: true
-        pattern: "^\\d+\\.\\d+\\.\\d+$"
-      data:
-        description: Ordered list of requirement-level groupings.
-        range: LevelGroup
-        multivalued: true
-        inlined_as_list: true
-        required: true
+    LevelGroup:
+        description: A group of principles sharing the same requirement level.
+        attributes:
+            level:
+                description: The requirement level of this group.
+                range: RequirementLevel
+                required: true
+            principles:
+                description: Principles belonging to this level.
+                range: Principle
+                multivalued: true
+                inlined_as_list: true
+                required: true
 
-  LevelGroup:
-    description: A group of principles sharing the same requirement level.
-    attributes:
-      level:
-        description: The requirement level of this group.
-        range: RequirementLevel
-        required: true
-      principles:
-        description: Principles belonging to this level.
-        range: Principle
-        multivalued: true
-        inlined_as_list: true
-        required: true
-
-  Principle:
-    description: A single reproducibility principle with verification items.
-    attributes:
-      code:
-        description: Short identifier for the principle (e.g., "S.1", "T.1 + T.3").
-        identifier: true
-        required: true
-      name:
-        description: Category name for the principle.
-        range: PrincipleName
-        required: true
-      desc:
-        description: Normative description of the principle.
-        required: true
-      items:
-        description: Checklist questions/items used to evaluate conformance.
-        multivalued: true
-        required: true
-        minimum_cardinality: 1
+    Principle:
+        description: A single reproducibility principle with verification items.
+        attributes:
+            code:
+                description: Short identifier for the principle (e.g., "S.1", "T.1 + T.3").
+                identifier: true
+                required: true
+            name:
+                description: Category name for the principle.
+                range: PrincipleName
+                required: true
+            desc:
+                description: Normative description of the principle.
+                required: true
+            items:
+                description: Checklist questions/items used to evaluate conformance.
+                multivalued: true
+                required: true
+                minimum_cardinality: 1
