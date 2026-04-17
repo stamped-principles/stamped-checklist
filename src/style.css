@@ -396,6 +396,14 @@ body {
     line-height: 1.4;
 }
 
+.check-item.checked .checkbox-custom {
+    background: var(--check-color);
+    border-color: var(--check-color);
+    color: white;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+}
+
 .checkbox-custom {
     width: 16px;
     height: 16px;
