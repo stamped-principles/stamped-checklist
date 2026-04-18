@@ -3,7 +3,6 @@
     "data": [
         {
             "level": "must",
-            "label": "MUST",
             "principles": [
                 {
                     "code": "S.1",
@@ -75,7 +74,6 @@
         },
         {
             "level": "should",
-            "label": "SHOULD",
             "principles": [
                 {
                     "code": "T.2",
@@ -89,7 +87,9 @@
                     "code": "A.2",
                     "name": "Actionability",
                     "description": "Procedures SHOULD be specified as executable specifications.",
-                    "items": ["Is the workflow tested regularly to ensure instructions remain accurate?"]
+                    "items": [
+                        "Is the workflow tested regularly to ensure instructions remain accurate?"
+                    ]
                 },
                 {
                     "code": "M.1",
@@ -122,7 +122,6 @@
         },
         {
             "level": "may",
-            "label": "MAY",
             "principles": [
                 {
                     "code": "M.2",
