@@ -6,13 +6,16 @@ description: >-
   principles and their associated verification items.
 license: CC-BY-4.0
 version: 1.0.1
+
 prefixes:
   linkml: https://w3id.org/linkml/
   schema: https://schema.org/
   rfc2119: https://datatracker.ietf.org/doc/html/rfc2119#
   stamped: https://github.com/stamped-principles/stamped-checklist/
+  
 imports:
   - linkml:types
+  
 enums:
   RequirementLevel:
     description: RFC 2119 requirement levels.
@@ -29,6 +32,7 @@ enums:
         title: MAY
         description: Optional / permissible.
         meaning: rfc2119:section-5
+        
   PrincipleName:
     description: High-level principle categories.
     permissible_values:
@@ -39,6 +43,7 @@ enums:
       Distributability:
       Modularity:
       Ephemerality:
+      
 classes:
   Checklist:
     description: Top-level container for the full reproducibility checklist.
@@ -58,6 +63,7 @@ classes:
         multivalued: true
         inlined_as_list: true
         required: true
+        
   LevelGroup:
     description: A group of principles sharing the same requirement level.
     class_uri: schema:ItemList
@@ -73,6 +79,7 @@ classes:
         multivalued: true
         inlined_as_list: true
         required: true
+        
   Principle:
     description: A single reproducibility principle with verification items.
     class_uri: schema:DefinedTerm
