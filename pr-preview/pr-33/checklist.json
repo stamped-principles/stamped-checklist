@@ -87,9 +87,7 @@
                     "code": "A.2",
                     "name": "Actionability",
                     "description": "Procedures SHOULD be specified as executable specifications.",
-                    "items": [
-                        "Is the workflow tested regularly to ensure instructions remain accurate?"
-                    ]
+                    "items": ["Is the workflow tested regularly to ensure instructions remain accurate?"]
                 },
                 {
                     "code": "M.1",
