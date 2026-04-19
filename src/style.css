@@ -577,6 +577,17 @@ code {
     font-weight: 600;
 }
 
+.cookie-consent-actions {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.cookie-consent-banner button.secondary {
+    border-color: var(--border);
+    background: white;
+    color: var(--text);
+}
+
 .cookie-consent-banner.hidden {
     display: none;
 }

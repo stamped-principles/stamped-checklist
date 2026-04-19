@@ -31,6 +31,7 @@ test.describe("STAMPED Checklist App", () => {
 
     test("cookie consent banner is shown before acceptance", async ({ page }) => {
         await expect(page.locator("#cookie-consent-banner")).toBeVisible();
+        await expect(page.locator("#cookie-consent-decline")).toBeVisible();
     });
 
     test("accepting cookie consent hides banner and persists across reload", async ({ browser }) => {
@@ -46,6 +47,26 @@ test.describe("STAMPED Checklist App", () => {
         await expect
             .poll(async () => page.evaluate(() => localStorage.getItem("stamped_cookie_consent")))
             .toBe("accepted");
+
+        await page.reload();
+        await expect(page.locator("#cookie-consent-banner")).toBeHidden();
+
+        await context.close();
+    });
+
+    test("declining cookie consent hides banner and prevents analytics initialization", async ({ browser }) => {
+        const context = await browser.newContext();
+        const page = await context.newPage();
+        await page.goto("/");
+
+        await page.locator("#cookie-consent-decline").click();
+        await expect(page.locator("#cookie-consent-banner")).toBeHidden();
+        await expect(page.locator(`script[src*="googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}"]`)).toHaveCount(
+            0
+        );
+        await expect
+            .poll(async () => page.evaluate(() => localStorage.getItem("stamped_cookie_consent")))
+            .toBe("declined");
 
         await page.reload();
         await expect(page.locator("#cookie-consent-banner")).toBeHidden();
