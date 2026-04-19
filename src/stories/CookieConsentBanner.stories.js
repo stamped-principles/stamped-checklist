@@ -8,10 +8,8 @@ function buildCookieConsentBanner() {
     banner.innerHTML = `
         <span>This site uses Google Analytics to improve the checklist experience.</span>
         <div class="cookie-consent-actions">
-            <button id="cookie-consent-decline" type="button" class="secondary" aria-label="Decline cookie consent">
-                Decline
-            </button>
-            <button id="cookie-consent-accept" type="button" aria-label="Accept cookie consent">Accept</button>
+            <button id="cookie-consent-decline" type="button" class="secondary">Decline</button>
+            <button id="cookie-consent-accept" type="button">Accept</button>
         </div>
     `;
     return banner;
