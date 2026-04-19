@@ -1,0 +1,122 @@
+id: https://github.com/stamped-principles/stamped-principles
+name: stamped-principles
+title: STAMPED Principles Schema
+description: >-
+  LinkML schema defining the canonical STAMPED principles for computational
+  reproducibility research objects. Each principle is identified by a short
+  code (category letter + ordinal) and carries a normative statement and
+  RFC 2119 requirement level.
+license: CC-BY-4.0
+version: 1.0.0
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  schema: https://schema.org/
+  skos: http://www.w3.org/2004/02/skos/core#
+  rfc2119: https://datatracker.ietf.org/doc/html/rfc2119
+  stamped: https://github.com/stamped-principles/stamped-principles/
+
+default_prefix: stamped
+default_range: string
+imports:
+  - linkml:types
+
+enums:
+  RequirementLevel:
+    description: RFC 2119 requirement levels.
+    permissible_values:
+      must:
+        title: MUST
+        description: Absolute requirement.
+        meaning: rfc2119:#section-1
+      must_not:
+        title: MUST NOT
+        description: Absolute prohibition.
+        meaning: rfc2119:#section-2
+      should:
+        title: SHOULD
+        description: Strongly recommended.
+        meaning: rfc2119:#section-3
+      should_not:
+        title: SHOULD NOT
+        description: Strongly discouraged.
+        meaning: rfc2119:#section-4
+      may:
+        title: MAY
+        description: Optional / permissible.
+        meaning: rfc2119:#section-5
+
+  PrincipleCategory:
+    description: High-level STAMPED principle categories.
+    permissible_values:
+      self_contained:
+        title: Self-contained
+        description: Everything under one boundary.
+      tracked:
+        title: Tracked
+        description: Version control & provenance.
+      actionable:
+        title: Actionable
+        description: Executable & documented workflows.
+      modular:
+        title: Modular
+        description: Independent & composable modules.
+      portable:
+        title: Portable
+        description: Runs anywhere with explicit specifications.
+      ephemeral:
+        title: Ephemeral
+        description: Transient compute environment.
+      distributable:
+        title: Distributable
+        description: Shareable, persistent, and retrievable.
+
+classes:
+  Principle:
+    description: A single STAMPED principle.
+    class_uri: schema:DefinedTerm
+    id_prefixes:
+      - stamped
+    attributes:
+      code:
+        description: >-
+          Canonical short identifier for the principle, consisting of a
+          single capital letter (category) followed by a period and a
+          positive integer (ordinal within the category), e.g., "S.1".
+        slot_uri: schema:termCode
+        identifier: true
+        required: true
+        pattern: "^[A-Z]\\.[1-9][0-9]*$"
+      category:
+        description: High-level STAMPED category this principle belongs to.
+        slot_uri: schema:inDefinedTermSet
+        range: PrincipleCategory
+        required: true
+      level:
+        description: RFC 2119 requirement level of the principle.
+        range: RequirementLevel
+        required: true
+      statement:
+        description: Normative statement of the principle.
+        slot_uri: skos:definition
+        required: true
+
+  PrincipleSet:
+    description: >-
+      The full, versioned set of STAMPED principles.
+    tree_root: true
+    class_uri: schema:DefinedTermSet
+    attributes:
+      version:
+        description: Version string for this set of principles (e.g., "1.0.0").
+        slot_uri: schema:version
+        required: true
+        pattern: "^\\d+\\.\\d+\\.\\d+$"
+      principles:
+        description: The principles in this set.
+        slot_uri: schema:hasDefinedTerm
+        range: Principle
+        multivalued: true
+        inlined_as_list: true
+        required: true
+        minimum_cardinality: 1
