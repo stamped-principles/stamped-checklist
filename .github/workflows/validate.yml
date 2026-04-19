@@ -32,4 +32,4 @@ jobs:
               run: linkml-validate --schema ./stamped-checklist-schema.yaml --target-class Checklist ./stamped-checklist.json
 
             - name: Cross-schema referential integrity
-              run: python .github/scripts/check_cross_refs.py
+              run: python ./.github/scripts/check_cross_refs.py --principles ./schemas/stamped-principles.json --checklist ./schemas/stamped-checklist.json
