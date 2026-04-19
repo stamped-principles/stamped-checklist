@@ -6,7 +6,7 @@
             "principles": [
                 {
                     "code": "S.1",
-                    "name": "Self-containment",
+                    "name": "self_contained",
                     "description": "All modules and components essential to replicate computational execution MUST be reachable within a single top-level research object.",
                     "items": [
                         "Are all files and directories nested under a common root?",
@@ -16,7 +16,7 @@
                 },
                 {
                     "code": "T.1 + T.3",
-                    "name": "Tracking",
+                    "name": "tracked",
                     "description": "Persistent content identification MUST be recorded for all components. Provenance of all modifications MUST be recorded.",
                     "items": [
                         "Are version control systems such as <code>Git</code> used for code, text, documentation, and configuration files?",
@@ -26,7 +26,7 @@
                 },
                 {
                     "code": "A.1",
-                    "name": "Actionability",
+                    "name": "actionable",
                     "description": "The research object MUST contain sufficient instructions to reproduce all computational results.",
                     "items": [
                         "Is a <code>README.md</code> or <code>Makefile</code> included with instructions for installation and usage?",
@@ -35,7 +35,7 @@
                 },
                 {
                     "code": "P.1",
-                    "name": "Portability",
+                    "name": "portable",
                     "description": "Procedures MUST NOT depend on undocumented host environment state.",
                     "items": [
                         "Are relative paths used in scripts, avoiding hardcoded or system-specific paths like <code>C:\\Users\\...</code> or <code>/home/user/...</code>?",
@@ -45,7 +45,7 @@
                 },
                 {
                     "code": "P.2",
-                    "name": "Portability",
+                    "name": "portable",
                     "description": "Computational environments MUST be explicitly specified.",
                     "items": [
                         "Is there a clear list of system requirements and dependencies documented in the README or environment specifications?"
@@ -53,7 +53,7 @@
                 },
                 {
                     "code": "P.3",
-                    "name": "Portability",
+                    "name": "portable",
                     "description": "Environment definitions MUST be version controlled.",
                     "items": [
                         "Are environment specifications (e.g., Dockerfiles, <code>pyproject.toml</code>, <code>package.json</code>) included in the version control system alongside code and data?",
@@ -62,7 +62,7 @@
                 },
                 {
                     "code": "D.1",
-                    "name": "Distributability",
+                    "name": "distributable",
                     "description": "All referenced modules and components MUST be persistently retrievable by others.",
                     "items": [
                         "Are environment specifications (e.g., container digests, frozen package manifests) included to ensure others can attempt to exactly replicate the environment?",
@@ -77,7 +77,7 @@
             "principles": [
                 {
                     "code": "T.2",
-                    "name": "Tracking",
+                    "name": "tracked",
                     "description": "All components SHOULD be tracked using the same content-addressed version control system.",
                     "items": [
                         "Is a common version control system (e.g., <code>Git</code>, DVC, <code>git-annex</code>, or DataLad) used across all components?"
@@ -85,13 +85,15 @@
                 },
                 {
                     "code": "A.2",
-                    "name": "Actionability",
+                    "name": "actionable",
                     "description": "Procedures SHOULD be specified as executable specifications.",
-                    "items": ["Is the workflow tested regularly to ensure instructions remain accurate?"]
+                    "items": [
+                        "Is the workflow tested regularly to ensure instructions remain accurate?"
+                    ]
                 },
                 {
                     "code": "M.1",
-                    "name": "Modularity",
+                    "name": "modular",
                     "description": "Components SHOULD be organized in a modular structure.",
                     "items": [
                         "Are raw data, processed data, code, and environment definitions separated into distinct modules?"
@@ -99,7 +101,7 @@
                 },
                 {
                     "code": "E.1",
-                    "name": "Ephemerality",
+                    "name": "ephemeral",
                     "description": "Computational results SHOULD be produced in ephemeral environments.",
                     "items": [
                         "Is the pipeline tested in a fresh container, batch job, clean virtual machine, or cloud-based instance?",
@@ -108,7 +110,7 @@
                 },
                 {
                     "code": "D.2",
-                    "name": "Distributability",
+                    "name": "distributable",
                     "description": "Environment specifications SHOULD support reproducible builds.",
                     "items": [
                         "Are the exact environment specifications used to generate a specific set of results regularly tested to ensure they can be reconstituted as intended?",
@@ -123,7 +125,7 @@
             "principles": [
                 {
                     "code": "M.2",
-                    "name": "Modularity",
+                    "name": "modular",
                     "description": "Components MAY be included directly or linked as subdatasets.",
                     "items": [
                         "Are external datasets or software dependencies included as submodules or linked as submodules?",
