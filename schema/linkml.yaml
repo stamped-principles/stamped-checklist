@@ -13,9 +13,6 @@ prefixes:
   rfc2119: https://datatracker.ietf.org/doc/html/rfc2119#
   stamped: https://github.com/stamped-principles/stamped-checklist/
 
-default_prefix: stamped
-default_range: string
-
 imports:
   - linkml:types
 
@@ -56,6 +53,7 @@ classes:
       version:
         description: Schema/content version string (e.g., "1.0.1").
         slot_uri: schema:version
+        range: string
         required: true
         pattern: "^\\d+\\.\\d+\\.\\d+$"
       data:
@@ -91,6 +89,7 @@ classes:
       code:
         description: Short identifier for the principle (e.g., "S.1", "T.1 + T.3").
         slot_uri: schema:termCode
+        range: string
         identifier: true
         required: true
       name:
@@ -101,9 +100,11 @@ classes:
       description:
         description: Normative description of the principle.
         slot_uri: schema:description
+        range: string
         required: true
       items:
         description: Checklist questions/items used to evaluate conformance.
+        range: string
         multivalued: true
         required: true
         minimum_cardinality: 1
