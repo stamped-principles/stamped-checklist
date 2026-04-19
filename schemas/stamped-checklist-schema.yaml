@@ -77,7 +77,7 @@ classes:
           (version pinned via Checklist.principles_version).
         range: Principle
         multivalued: true
-        inlined: false          # serialize as identifier string
+        inlined: false # serialize as identifier string
         required: true
         minimum_cardinality: 1
         pattern: "^[A-Z]\\.[1-9][0-9]*$"
