@@ -88,6 +88,12 @@ test.describe("STAMPED Checklist App", () => {
         await expect(links.first()).not.toHaveAttribute("href", /404/i);
     });
 
+    test("inline markdown code text renders as code elements", async ({ page }) => {
+        const codeSpans = page.locator(".check-item .check-text code");
+        expect(await codeSpans.count()).toBeGreaterThan(0);
+        await expect(codeSpans.filter({ hasText: "git" }).first()).toBeVisible();
+    });
+
     test("initial progress shows 0 items checked", async ({ page }) => {
         const progressText = page.locator("#progressText");
         await expect(progressText).toContainText("0 /");

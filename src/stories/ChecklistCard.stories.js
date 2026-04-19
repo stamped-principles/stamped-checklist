@@ -4,6 +4,27 @@ const section = DATA[0]; // must section
 const shouldSection = DATA[1]; // should section
 const maySection = DATA[2]; // may section
 
+function escapeHtml(text) {
+    return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+}
+
+function renderInlineMarkdown(text) {
+    return String(text)
+        .split(/(`[^`]*`)/g)
+        .map((part) => {
+            if (part.startsWith("`") && part.endsWith("`")) {
+                return `<code>${escapeHtml(part.slice(1, -1))}</code>`;
+            }
+            return escapeHtml(part);
+        })
+        .join("");
+}
+
 function getPrincipleExamplesURL(principle) {
     const match = (principle.name || "").match(/[A-Za-z]/);
     const firstLetter = match ? match[0].toLowerCase() : "";
@@ -17,6 +38,8 @@ function buildCard(sec, principle, si, pi) {
     card.id = `card_${si}_${pi}`;
 
     const numItems = principle.items.length;
+    const principleName = escapeHtml(principle.name);
+    const principleDescription = renderInlineMarkdown(principle.desc);
 
     card.innerHTML = `
         <div class="principle-header">
@@ -24,17 +47,17 @@ function buildCard(sec, principle, si, pi) {
             <span class="principle-code">${principle.code}</span>
             <div style="flex:1">
                 <div class="principle-title-row">
-                    <div class="principle-title">${principle.name}</div>
+                    <div class="principle-title">${principleName}</div>
                     <a
                         class="principle-examples-link"
                         href="${getPrincipleExamplesURL(principle)}"
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label="View ${principle.name} examples"
-                        title="View examples for ${principle.name}"
+                        aria-label="View ${principleName} examples"
+                        title="View examples for ${principleName}"
                     >💡</a>
                 </div>
-                <div style="font-size:0.76rem; color:var(--text-light); margin-top:0.1rem;">${principle.desc}</div>
+                <div style="font-size:0.76rem; color:var(--text-light); margin-top:0.1rem;">${principleDescription}</div>
             </div>
             <span class="principle-count" id="count_${si}_${pi}">0/${numItems}</span>
         </div>
@@ -46,7 +69,7 @@ function buildCard(sec, principle, si, pi) {
                     <input type="checkbox" id="s${si}_p${pi}_i${ii}">
                     <label for="s${si}_p${pi}_i${ii}">
                         <span class="checkbox-custom">✓</span>
-                        <span class="check-text">${item}</span>
+                        <span class="check-text">${renderInlineMarkdown(item)}</span>
                     </label>
                 </div>
             `
@@ -88,4 +111,9 @@ export const CompleteCard = {
         card.querySelectorAll("input[type=checkbox]").forEach((cb) => (cb.checked = true));
         return card;
     },
+};
+
+export const InlineMarkdownCodeCard = {
+    name: "Inline markdown code rendering",
+    render: () => buildCard(section, section.principles[1], 0, 1),
 };
