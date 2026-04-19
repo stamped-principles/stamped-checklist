@@ -1,0 +1,95 @@
+{
+    "version": "1.0.0",
+    "principles": [
+        {
+            "code": "S.1",
+            "category": "self_contained",
+            "level": "must",
+            "statement": "All modules and components essential to replicate computational execution MUST be reachable within a single top-level research object."
+        },
+        {
+            "code": "T.1",
+            "category": "tracked",
+            "level": "must",
+            "statement": "Persistent content identification MUST be recorded for all components."
+        },
+        {
+            "code": "T.2",
+            "category": "tracked",
+            "level": "should",
+            "statement": "All components SHOULD be tracked using the same content-addressed version control system."
+        },
+        {
+            "code": "T.3",
+            "category": "tracked",
+            "level": "must",
+            "statement": "Provenance of all modifications MUST be recorded."
+        },
+        {
+            "code": "T.4",
+            "category": "tracked",
+            "level": "should",
+            "statement": "Code-driven provenance SHOULD be recorded programmatically and MUST include the versions of all components involved."
+        },
+        {
+            "code": "A.1",
+            "category": "actionable",
+            "level": "must",
+            "statement": "Research object MUST contain sufficient instructions to reproduce all computational results."
+        },
+        {
+            "code": "A.2",
+            "category": "actionable",
+            "level": "should",
+            "statement": "Procedures SHOULD be specified as executable specifications."
+        },
+        {
+            "code": "M.1",
+            "category": "modular",
+            "level": "should",
+            "statement": "Components SHOULD be organized in a modular structure."
+        },
+        {
+            "code": "M.2",
+            "category": "modular",
+            "level": "may",
+            "statement": "Components MAY be included directly or linked as subdatasets."
+        },
+        {
+            "code": "P.1",
+            "category": "portable",
+            "level": "must_not",
+            "statement": "Procedures MUST NOT depend on undocumented host environment state."
+        },
+        {
+            "code": "P.2",
+            "category": "portable",
+            "level": "must",
+            "statement": "Computational environments MUST be explicitly specified."
+        },
+        {
+            "code": "P.3",
+            "category": "portable",
+            "level": "must",
+            "statement": "Environment definitions MUST be version controlled."
+        },
+        {
+            "code": "E.1",
+            "category": "ephemeral",
+            "level": "should",
+            "statement": "Computational results SHOULD be produced in ephemeral environments."
+        },
+        {
+            "code": "D.1",
+            "category": "distributable",
+            "level": "must",
+            "statement": "All referenced modules and components MUST be persistently retrievable by others."
+        },
+        {
+            "code": "D.2",
+            "category": "distributable",
+            "level": "should",
+            "statement": "Environment specifications SHOULD support reproducible builds."
+        }
+    ]
+}
