@@ -1,15 +1,87 @@
+id: https://github.com/stamped-principles/stamped-checklist
+name: stamped-checklist
+title: STAMPED Checklist Schema
+description: >-
+  LinkML schema modeling a tiered (MUST/SHOULD/MAY) checklist of verification
+  items grouped under STAMPED principles. References principles defined in
+  the separately versioned `stamped-principles` schema.
+license: CC-BY-4.0
+version: 2.0.0
+prefixes:
+  linkml: https://w3id.org/linkml/
+  schema: https://schema.org/
+  stamped: https://github.com/stamped-principles/stamped-checklist/
+default_prefix: stamped
+default_range: string
 imports:
   - linkml:types
-  - stamped-principles-metaschema
+  - stamped-principles
 
 classes:
+  Checklist:
+    description: Top-level container for the full reproducibility checklist.
+    tree_root: true
+    class_uri: schema:ItemList
+    attributes:
+      version:
+        description: Version string for this checklist (e.g., "2.0.0").
+        slot_uri: schema:version
+        required: true
+        pattern: "^\\d+\\.\\d+\\.\\d+$"
+      principles_version:
+        description: >-
+          Version of the `stamped-principles` schema whose principle codes
+          are referenced by this checklist. Consumers SHOULD verify that the
+          imported principles schema matches this version.
+        required: true
+        pattern: "^\\d+\\.\\d+\\.\\d+$"
+      data:
+        description: Ordered list of requirement-level groupings.
+        slot_uri: schema:itemListElement
+        range: LevelGroup
+        multivalued: true
+        inlined_as_list: true
+        required: true
+        minimum_cardinality: 1
+
+  LevelGroup:
+    description: A group of checklist entries sharing the same requirement level.
+    class_uri: schema:ItemList
+    attributes:
+      level:
+        description: The requirement level shared by entries in this group.
+        range: RequirementLevel
+        required: true
+      entries:
+        description: Checklist entries belonging to this level.
+        slot_uri: schema:itemListElement
+        range: ChecklistEntry
+        multivalued: true
+        inlined_as_list: true
+        required: true
+        minimum_cardinality: 1
+
   ChecklistEntry:
+    description: >-
+      A set of verification items associated with one or more STAMPED
+      principles. Entries addressing multiple principles jointly list each
+      principle's code in `principle_codes`.
+    class_uri: schema:ItemList
     attributes:
       principle_codes:
+        description: >-
+          Codes of the STAMPED principles this entry verifies. References
+          `Principle.code` in the `stamped-principles` schema.
         range: Principle
         multivalued: true
         required: true
+        minimum_cardinality: 1
       items:
+        description: >-
+          Verification questions/items used to evaluate conformance with
+          the referenced principle(s).
+        slot_uri: schema:itemListElement
         range: string
         multivalued: true
         required: true
+        minimum_cardinality: 1
