@@ -9,6 +9,8 @@ function setupDOM() {
         <div class="progress-bar" id="progressBar" style="width:0%"></div>
         <div id="progressText"></div>
         <div id="toast"></div>
+        <div id="cookie-consent-banner" class="cookie-consent-banner hidden"></div>
+        <button id="cookie-consent-accept" type="button">Accept</button>
         <div id="version-indicator"></div>
     `;
 }
@@ -170,6 +172,37 @@ describe("showToast", () => {
         showToast("Test");
         const toast = document.getElementById("toast");
         expect(toast.classList.contains("show")).toBe(true);
+    });
+});
+
+describe("cookie consent and analytics", () => {
+    let script;
+
+    beforeEach(async () => {
+        setupDOM();
+        localStorage.clear();
+        vi.resetModules();
+        script = await import("../../script.js");
+    });
+
+    it("shows cookie banner when consent is missing", () => {
+        script.init();
+        const banner = document.getElementById("cookie-consent-banner");
+        expect(banner.classList.contains("hidden")).toBe(false);
+    });
+
+    it("accepting consent hides banner and loads analytics", () => {
+        script.init();
+        document.getElementById("cookie-consent-accept").click();
+
+        const banner = document.getElementById("cookie-consent-banner");
+        const analyticsScript = document.querySelector(
+            'script[src="https://www.googletagmanager.com/gtag/js?id=G-YRFVW79476"]'
+        );
+
+        expect(localStorage.getItem("stamped_cookie_consent")).toBe("accepted");
+        expect(banner.classList.contains("hidden")).toBe(true);
+        expect(analyticsScript).not.toBeNull();
     });
 });
 

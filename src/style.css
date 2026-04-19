@@ -549,6 +549,38 @@ code {
     transform: translateX(-50%) translateY(0);
 }
 
+.cookie-consent-banner {
+    position: fixed;
+    left: 50%;
+    bottom: 1rem;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 0.6rem 0.8rem;
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    font-size: 0.78rem;
+    z-index: 1001;
+}
+
+.cookie-consent-banner button {
+    border: 1px solid #3498db;
+    background: #3498db;
+    color: white;
+    border-radius: 6px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.cookie-consent-banner.hidden {
+    display: none;
+}
+
 /* Modal */
 .modal-overlay {
     display: none;
@@ -717,6 +749,9 @@ code {
         display: none !important;
     }
     .modal-overlay {
+        display: none !important;
+    }
+    .cookie-consent-banner {
         display: none !important;
     }
 
