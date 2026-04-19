@@ -100,16 +100,17 @@ classes:
       id:
         description: >-
           Stable identifier for this checklist item, unique within the
-          checklist. Convention: `stamped:check/<PRINCIPLE_CODE>/<ORDINAL>`
-          where `<PRINCIPLE_CODE>` matches a `Principle.code` associated
-          with the enclosing entry and `<ORDINAL>` is a positive integer
-          assigned in item order within the entry. For entries covering
-          multiple principles, use the first code listed in
-          `principle_codes`.
+          checklist. Convention: `stamped:check/<LEVEL>/<ORDINAL>` where
+          `<LEVEL>` is one of `must`, `should`, or `may` (matching the
+          enclosing `LevelGroup.level`) and `<ORDINAL>` is a zero-padded
+          3-digit positive integer assigned in document order within the
+          level group, starting at `001`. Ordinals MUST NOT be reused: if
+          an item is removed, its ordinal is retired; new items receive
+          the next unused ordinal.
         range: uriorcurie
         identifier: true
         required: true
-        pattern: "^stamped:check/[A-Z]\\.[1-9][0-9]*/[1-9][0-9]*$"
+        pattern: "^stamped:check/(must|should|may)/[0-9]{3}$"
       text:
         description: >-
           Verification question or statement, formatted as
