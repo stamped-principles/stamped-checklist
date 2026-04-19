@@ -15,7 +15,7 @@ module.exports = {
     vueIndentScriptAndStyle: false,
     overrides: [
         {
-            files: ["schemas/*.{yaml,yml}", ".pre-commit-config.yaml"],
+            files: ["../schemas/*.{yaml,yml}", "../.pre-commit-config.yaml"],
             options: {
                 tabWidth: 2,
             },

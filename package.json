@@ -3,17 +3,17 @@
     "version": "1.0.0",
     "description": "An interactive checklist for compliance to STAMPED principles.",
     "scripts": {
-        "dev": "vite --config config/vite.config.js",
-        "build": "vite build --config config/vite.config.js",
-        "preview": "vite preview --config config/vite.config.js",
-        "format": "prettier --write .",
-        "format:check": "prettier --check .",
-        "test": "vitest run --config config/vitest.config.js",
-        "test:watch": "vitest --config config/vitest.config.js",
-        "test:coverage": "vitest run --coverage --config config/vitest.config.js",
-        "test:e2e": "playwright test --config config/playwright.config.js",
-        "storybook": "storybook dev -p 6006 --config-dir config/storybook",
-        "build-storybook": "storybook build --config-dir config/storybook"
+        "dev": "vite --config configs/vite.config.js",
+        "build": "vite build --config configs/vite.config.js",
+        "preview": "vite preview --config configs/vite.config.js",
+        "format": "prettier --config configs/prettier.config.cjs --write .",
+        "format:check": "prettier --config configs/prettier.config.cjs --check .",
+        "test": "vitest run --config configs/vitest.config.js",
+        "test:watch": "vitest --config configs/vitest.config.js",
+        "test:coverage": "vitest run --coverage --config configs/vitest.config.js",
+        "test:e2e": "playwright test --config configs/playwright.config.js",
+        "storybook": "storybook dev -p 6006 --config-dir configs/storybook",
+        "build-storybook": "storybook build --config-dir configs/storybook"
     },
     "repository": {
         "type": "git",
