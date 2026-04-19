@@ -19,6 +19,15 @@ prefixes:
 imports:
   - linkml:types
 
+types:
+  PrincipleCode:
+    uri: xsd:string
+    base: str
+    description: >-
+      Canonical short identifier for a STAMPED principle
+      (category letter + "." + positive integer), e.g. "S.1".
+    pattern: "^[A-Z]\\.[1-9][0-9]*$"
+
 enums:
   RequirementLevel:
     description: >-
@@ -77,10 +86,9 @@ classes:
           single capital letter (category) followed by a period and a
           positive integer (ordinal within the category), e.g., "S.1".
         slot_uri: schema:termCode
-        range: string
+        range: PrincipleCode
         identifier: true
         required: true
-        pattern: "^[A-Z]\\.[1-9][0-9]*$"
       category:
         description: High-level STAMPED category this principle belongs to.
         slot_uri: schema:inDefinedTermSet
