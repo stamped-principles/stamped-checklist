@@ -16,5 +16,6 @@ repos:
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
+        args: [--config, configs/prettier.config.cjs]
         additional_dependencies:
           - prettier@3.1.0
