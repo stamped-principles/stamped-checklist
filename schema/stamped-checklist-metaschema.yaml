@@ -6,7 +6,8 @@ description: >-
   items grouped under STAMPED principles. References principles defined in
   the separately versioned `stamped-principles` schema.
 license: CC-BY-4.0
-version: 2.0.0
+
+version: 1.0.0
 prefixes:
   linkml: https://w3id.org/linkml/
   schema: https://schema.org/
