@@ -4,7 +4,7 @@ on:
     pull_request:
         paths:
             - "schemas/**"
-            - ".github/workflows/validate-linkml.yml"
+            - ".github/workflows/validate.yml"
     workflow_dispatch:
 
 jobs:
@@ -25,8 +25,8 @@ jobs:
 
             - name: Validate principles
               working-directory: schemas
-              run: linkml-validate --schema ./stamped-principles-schema.yaml ./stamped-principles.json
+              run: linkml-validate --schema ./stamped-principles-schema.yaml --target-class PrincipleSet ./stamped-principles.json
 
             - name: Validate checklist
               working-directory: schemas
-              run: linkml-validate --schema ./stamped-checklist-schema.yaml ./stamped-checklist.json
+              run: linkml-validate --schema ./stamped-checklist-schema.yaml --target-class Checklist ./stamped-checklist.json
