@@ -1,0 +1,3 @@
+const GA_MEASUREMENT_ID = "G-YRFVW79476";
+
+export { GA_MEASUREMENT_ID };

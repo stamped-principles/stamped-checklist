@@ -1,5 +1,6 @@
 import { beforeEach, describe, it, expect, vi } from "vitest";
 import { DATA } from "../../checklist.js";
+import { GA_MEASUREMENT_ID } from "../../analytics.js";
 
 // Set up a minimal DOM before importing script.js so that module-level
 // code that queries the DOM doesn't throw.
@@ -197,7 +198,7 @@ describe("cookie consent and analytics", () => {
 
         const banner = document.getElementById("cookie-consent-banner");
         const analyticsScript = document.querySelector(
-            'script[src="https://www.googletagmanager.com/gtag/js?id=G-YRFVW79476"]'
+            `script[src="https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}"]`
         );
 
         expect(localStorage.getItem("stamped_cookie_consent")).toBe("accepted");

@@ -1,11 +1,11 @@
 import { VERSION, DATA } from "./checklist.js";
+import { GA_MEASUREMENT_ID } from "./analytics.js";
 
 let checkboxStates = {};
 let responseStates = {};
 let currentMode = "checkboxes";
 let totalItems = 0;
 const COOKIE_CONSENT_KEY = "stamped_cookie_consent";
-const GA_MEASUREMENT_ID = "G-YRFVW79476";
 let analyticsInitialized = false;
 
 function setColumns(value) {

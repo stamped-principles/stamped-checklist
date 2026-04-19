@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { DATA } from "../../checklist.js";
+import { GA_MEASUREMENT_ID } from "../../analytics.js";
 
 const TOTAL_PRINCIPLES = DATA.flatMap((s) => s.principles).length;
 
@@ -39,7 +40,9 @@ test.describe("STAMPED Checklist App", () => {
 
         await page.locator("#cookie-consent-accept").click();
         await expect(page.locator("#cookie-consent-banner")).toBeHidden();
-        await expect(page.locator('script[src*="googletagmanager.com/gtag/js?id=G-YRFVW79476"]')).toHaveCount(1);
+        await expect(page.locator(`script[src*="googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}"]`)).toHaveCount(
+            1
+        );
         await expect
             .poll(async () => page.evaluate(() => localStorage.getItem("stamped_cookie_consent")))
             .toBe("accepted");
