@@ -6,6 +6,8 @@ let responseStates = {};
 let currentMode = "checkboxes";
 let totalItems = 0;
 const COOKIE_CONSENT_KEY = "stamped_cookie_consent";
+const COOKIE_CONSENT_ACCEPTED = "accepted";
+const COOKIE_CONSENT_DECLINED = "declined";
 let analyticsInitialized = false;
 
 function setColumns(value) {
@@ -486,18 +488,27 @@ function showCookieBanner() {
 }
 
 function acceptCookieConsent() {
-    localStorage.setItem(COOKIE_CONSENT_KEY, "accepted");
+    localStorage.setItem(COOKIE_CONSENT_KEY, COOKIE_CONSENT_ACCEPTED);
     hideCookieBanner();
     initializeAnalytics();
 }
 
+function declineCookieConsent() {
+    localStorage.setItem(COOKIE_CONSENT_KEY, COOKIE_CONSENT_DECLINED);
+    hideCookieBanner();
+}
+
 function setupCookieConsent() {
     const acceptButton = document.getElementById("cookie-consent-accept");
+    const declineButton = document.getElementById("cookie-consent-decline");
     if (acceptButton) acceptButton.onclick = acceptCookieConsent;
+    if (declineButton) declineButton.onclick = declineCookieConsent;
 
-    if (localStorage.getItem(COOKIE_CONSENT_KEY) === "accepted") {
+    if (localStorage.getItem(COOKIE_CONSENT_KEY) === COOKIE_CONSENT_ACCEPTED) {
         hideCookieBanner();
         initializeAnalytics();
+    } else if (localStorage.getItem(COOKIE_CONSENT_KEY) === COOKIE_CONSENT_DECLINED) {
+        hideCookieBanner();
     } else {
         showCookieBanner();
     }

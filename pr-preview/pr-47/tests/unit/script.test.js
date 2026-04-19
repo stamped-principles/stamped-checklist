@@ -5,12 +5,14 @@ import { GA_MEASUREMENT_ID } from "../../analytics.js";
 // Set up a minimal DOM before importing script.js so that module-level
 // code that queries the DOM doesn't throw.
 function setupDOM() {
+    document.querySelectorAll('script[src*="googletagmanager.com/gtag/js?id="]').forEach((el) => el.remove());
     document.body.innerHTML = `
         <div id="app"></div>
         <div class="progress-bar" id="progressBar" style="width:0%"></div>
         <div id="progressText"></div>
         <div id="toast"></div>
         <div id="cookie-consent-banner" class="cookie-consent-banner hidden"></div>
+        <button id="cookie-consent-decline" type="button">Decline</button>
         <button id="cookie-consent-accept" type="button">Accept</button>
         <div id="version-indicator"></div>
     `;
@@ -204,6 +206,20 @@ describe("cookie consent and analytics", () => {
         expect(localStorage.getItem("stamped_cookie_consent")).toBe("accepted");
         expect(banner.classList.contains("hidden")).toBe(true);
         expect(analyticsScript).not.toBeNull();
+    });
+
+    it("declining consent hides banner and does not load analytics", () => {
+        script.init();
+        document.getElementById("cookie-consent-decline").click();
+
+        const banner = document.getElementById("cookie-consent-banner");
+        const analyticsScript = document.querySelector(
+            `script[src="https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}"]`
+        );
+
+        expect(localStorage.getItem("stamped_cookie_consent")).toBe("declined");
+        expect(banner.classList.contains("hidden")).toBe(true);
+        expect(analyticsScript).toBeNull();
     });
 });
 
