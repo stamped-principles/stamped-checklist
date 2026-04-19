@@ -4,7 +4,6 @@ let checkboxStates = {};
 let responseStates = {};
 let currentMode = "checkboxes";
 let totalItems = 0;
-const COOKIE_CONSENT_KEY = "stamped_cookie_consent";
 
 function setColumns(value) {
     const grids = document.querySelectorAll(".cards-grid");
@@ -451,26 +450,6 @@ function showToast(message) {
     setTimeout(() => toast.classList.remove("show"), 2500);
 }
 
-function loadCookieConsent() {
-    const banner = document.getElementById("cookie-consent-banner");
-    if (!banner) return;
-
-    let accepted = false;
-    try {
-        accepted = localStorage.getItem(COOKIE_CONSENT_KEY) === "accepted";
-    } catch (e) {}
-    banner.hidden = accepted;
-}
-
-function acceptCookieConsent() {
-    try {
-        localStorage.setItem(COOKIE_CONSENT_KEY, "accepted");
-    } catch (e) {}
-
-    const banner = document.getElementById("cookie-consent-banner");
-    if (banner) banner.hidden = true;
-}
-
 export {
     setColumns,
     loadColumnPreference,
@@ -495,14 +474,11 @@ export {
     loadFromURL,
     confirmReset,
     showToast,
-    loadCookieConsent,
-    acceptCookieConsent,
     init,
 };
 
 function init() {
     buildChecklist();
-    loadCookieConsent();
 
     const versionEl = document.getElementById("version-indicator");
     if (versionEl) versionEl.textContent = "v" + VERSION;
@@ -519,7 +495,6 @@ if (typeof window !== "undefined") {
         setColumns,
         setSections,
         setMode,
-        acceptCookieConsent,
         handleCheck,
         handleResponse,
         handleReason,

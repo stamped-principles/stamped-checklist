@@ -28,23 +28,6 @@ test.describe("STAMPED Checklist App", () => {
         await expect(page.locator("h1")).toContainText("STAMPED Compliance Checklist");
     });
 
-    test("cookie consent banner can be accepted and stays hidden", async ({ browser }) => {
-        const context = await browser.newContext();
-        const page = await context.newPage();
-        await page.goto("/");
-
-        const banner = page.locator("#cookie-consent-banner");
-        await expect(banner).toBeVisible();
-
-        await page.locator("#cookie-consent-accept").click();
-        await expect(banner).toBeHidden();
-
-        await page.reload();
-        await expect(banner).toBeHidden();
-
-        await context.close();
-    });
-
     test("checklist cards are rendered", async ({ page }) => {
         await expect(page.locator(".principle-card")).toHaveCount(TOTAL_PRINCIPLES);
     });
