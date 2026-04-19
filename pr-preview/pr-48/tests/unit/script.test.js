@@ -4,15 +4,12 @@ import { DATA } from "../../checklist.js";
 // Set up a minimal DOM before importing script.js so that module-level
 // code that queries the DOM doesn't throw.
 function setupDOM() {
-    localStorage.clear();
     document.body.innerHTML = `
         <div id="app"></div>
         <div class="progress-bar" id="progressBar" style="width:0%"></div>
         <div id="progressText"></div>
         <div id="toast"></div>
         <div id="version-indicator"></div>
-        <div id="cookie-consent-banner" hidden></div>
-        <button id="cookie-consent-accept"></button>
     `;
 }
 
@@ -221,34 +218,5 @@ describe("setSections", () => {
         setSections("on");
         const container = document.getElementById("app");
         expect(container.classList.contains("flat-mode")).toBe(false);
-    });
-});
-
-describe("cookie consent banner", () => {
-    beforeEach(async () => {
-        setupDOM();
-        vi.resetModules();
-    });
-
-    it("shows banner when consent not yet accepted", async () => {
-        const { loadCookieConsent } = await import("../../script.js");
-        loadCookieConsent();
-        expect(document.getElementById("cookie-consent-banner").hidden).toBe(false);
-    });
-
-    it("accepting consent stores state and hides banner", async () => {
-        const { loadCookieConsent, acceptCookieConsent } = await import("../../script.js");
-        loadCookieConsent();
-        acceptCookieConsent();
-
-        expect(localStorage.getItem("stamped_cookie_consent")).toBe("accepted");
-        expect(document.getElementById("cookie-consent-banner").hidden).toBe(true);
-    });
-
-    it("keeps banner hidden when consent is already accepted", async () => {
-        localStorage.setItem("stamped_cookie_consent", "accepted");
-        const { loadCookieConsent } = await import("../../script.js");
-        loadCookieConsent();
-        expect(document.getElementById("cookie-consent-banner").hidden).toBe(true);
     });
 });
