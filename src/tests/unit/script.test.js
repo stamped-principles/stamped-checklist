@@ -62,6 +62,17 @@ describe("buildChecklist and state management", () => {
         expect(items.length).toBe(totalItems);
     });
 
+    it("renders inline markdown code spans for checklist text", () => {
+        const codeSpans = Array.from(document.querySelectorAll(".check-item .check-text code"));
+        expect(codeSpans.length).toBeGreaterThan(0);
+        expect(codeSpans.some((el) => el.textContent === "git")).toBe(true);
+
+        const rawBackticks = Array.from(document.querySelectorAll(".check-item .check-text")).some((el) =>
+            el.innerHTML.includes("`git`")
+        );
+        expect(rawBackticks).toBe(false);
+    });
+
     it("initial getState returns all false", () => {
         const state = script.getState();
         const allFalse = Object.values(state).every((v) => v === false);

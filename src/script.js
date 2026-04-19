@@ -10,6 +10,27 @@ const COOKIE_CONSENT_ACCEPTED = "accepted";
 const COOKIE_CONSENT_DECLINED = "declined";
 let analyticsInitialized = false;
 
+function escapeHtml(text) {
+    return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+}
+
+function renderInlineMarkdown(text) {
+    return String(text)
+        .split(/(`[^`]+`)/g)
+        .map((part) => {
+            if (part.startsWith("`") && part.endsWith("`") && part.length > 1) {
+                return `<code>${escapeHtml(part.slice(1, -1))}</code>`;
+            }
+            return escapeHtml(part);
+        })
+        .join("");
+}
+
 function setColumns(value) {
     const grids = document.querySelectorAll(".cards-grid");
     grids.forEach((g) => {
@@ -110,6 +131,8 @@ function buildChecklist() {
 
             const numItems = principle.items.length;
             const examplesURL = getPrincipleExamplesURL(principle);
+            const principleName = escapeHtml(principle.name);
+            const principleDescription = renderInlineMarkdown(principle.desc);
 
             const header = document.createElement("div");
             header.className = "principle-header";
@@ -118,17 +141,17 @@ function buildChecklist() {
         <span class="principle-code">${principle.code}</span>
         <div style="flex:1">
           <div class="principle-title-row">
-            <div class="principle-title">${principle.name}</div>
+            <div class="principle-title">${principleName}</div>
             <a
               class="principle-examples-link"
               href="${examplesURL}"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="View ${principle.name} examples"
-              title="View examples for ${principle.name}"
+              aria-label="View ${principleName} examples"
+              title="View examples for ${principleName}"
             >💡</a>
           </div>
-          <div style="font-size:0.76rem; color:var(--text-light); margin-top:0.1rem;">${principle.desc}</div>
+          <div style="font-size:0.76rem; color:var(--text-light); margin-top:0.1rem;">${principleDescription}</div>
         </div>
         <span class="principle-count" id="count_${si}_${pi}">0/${numItems}</span>
       `;
@@ -139,6 +162,7 @@ function buildChecklist() {
 
             principle.items.forEach((item, ii) => {
                 const id = generateId(si, pi, ii);
+                const itemText = renderInlineMarkdown(item);
                 totalItems++;
                 checkboxStates[id] = false;
                 responseStates[id] = { value: null, reason: "" };
@@ -149,11 +173,11 @@ function buildChecklist() {
           <input type="checkbox" id="${id}" onchange="handleCheck('${id}')">
           <label for="${id}">
             <span class="checkbox-custom">✓</span>
-            <span class="check-text">${item}</span>
+            <span class="check-text">${itemText}</span>
           </label>
           <div class="response-ui">
             <div class="response-row">
-              <span class="check-text">${item}</span>
+              <span class="check-text">${itemText}</span>
               <div class="response-btns">
                 <button type="button" class="response-btn yes-btn" id="yes_${id}" onclick="handleResponse('${id}', 'yes')">✓ Yes</button>
                 <button type="button" class="response-btn no-btn" id="no_${id}" onclick="handleResponse('${id}', 'no')">✗ No</button>
