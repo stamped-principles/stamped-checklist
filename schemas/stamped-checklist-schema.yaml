@@ -68,7 +68,7 @@ classes:
       A set of verification items associated with one or more STAMPED
       principles. Entries addressing multiple principles jointly list each
       principle's code in `principle_codes`.
-    class_uri: schema:ItemList
+    class_uri: stamped:ChecklistEntry
     attributes:
       principle_codes:
         description: >-
@@ -76,17 +76,47 @@ classes:
           `Principle.code` in the `stamped-principles` schema.
         range: Principle
         multivalued: true
+        inlined: false
         required: true
         minimum_cardinality: 1
       items:
         description: >-
-          Verification questions/items used to evaluate conformance with
-          the referenced principle(s). Item text is formatted as
-          [CommonMark](https://commonmark.org/) Markdown; consumers SHOULD
-          render accordingly, or display as plain text if rendering is
-          unavailable.
+          Verification items used to evaluate conformance with the
+          referenced principle(s).
         slot_uri: schema:itemListElement
-        range: string
+        range: ChecklistItem
         multivalued: true
+        inlined_as_list: true
         required: true
         minimum_cardinality: 1
+
+  ChecklistItem:
+    description: >-
+      A single verification item belonging to a ChecklistEntry. Each item
+      has a stable identifier so that conformance reports and tooling can
+      reference it unambiguously across checklist versions.
+    class_uri: stamped:ChecklistItem
+    attributes:
+      id:
+        description: >-
+          Stable identifier for this checklist item, unique within the
+          checklist. Convention: `stamped:check/<PRINCIPLE_CODE>/<ORDINAL>`
+          where `<PRINCIPLE_CODE>` matches a `Principle.code` associated
+          with the enclosing entry and `<ORDINAL>` is a positive integer
+          assigned in item order within the entry. For entries covering
+          multiple principles, use the first code listed in
+          `principle_codes`.
+        range: uriorcurie
+        identifier: true
+        required: true
+        pattern: "^stamped:check/[A-Z]\\.[1-9][0-9]*/[1-9][0-9]*$"
+      text:
+        description: >-
+          Verification question or statement, formatted as
+          [CommonMark](https://commonmark.org/) Markdown. Consumers SHOULD
+          render accordingly, or display as plain text if rendering is
+          unavailable.
+        slot_uri: schema:text
+        range: string
+        required: true
+        multivalued: false
