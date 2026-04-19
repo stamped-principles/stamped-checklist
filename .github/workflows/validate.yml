@@ -24,9 +24,9 @@ jobs:
               run: pip install linkml
 
             - name: Validate principles
-              run: |
-                  linkml-validate --schema schemas/stamped-principles-schema.yaml schemas/stamped-principles.json
+              working-directory: schemas
+              run: linkml-validate --schema ./stamped-principles-schema.yaml ./stamped-principles.json
 
             - name: Validate checklist
-              run: |
-                  linkml-validate --schema schemas/stamped-checklist-schema.yaml schemas/stamped-checklist.json
+              working-directory: schemas
+              run: linkml-validate --schema ./stamped-checklist-schema.yaml ./stamped-checklist.json
