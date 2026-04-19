@@ -25,8 +25,8 @@ jobs:
 
             - name: Validate principles
               run: |
-                  linkml-validate --schema schemas/stamped-principles-schema.yaml stamped-principles.json
+                  linkml-validate --schema schemas/stamped-principles-schema.yaml schemas/stamped-principles.json
 
             - name: Validate checklist
               run: |
-                  linkml-validate --schema schemas/stamped-checklist-schema.yaml stamped-checklist.json
+                  linkml-validate --schema schemas/stamped-checklist-schema.yaml schemas/stamped-checklist.json

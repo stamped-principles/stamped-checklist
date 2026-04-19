@@ -29,7 +29,13 @@
             "code": "T.4",
             "category": "tracked",
             "level": "should",
-            "statement": "Code-driven provenance SHOULD be recorded programmatically and MUST include the versions of all components involved."
+            "statement": "Code-driven provenance SHOULD be recorded programmatically."
+        },
+        {
+            "code": "T.5",
+            "category": "tracked",
+            "level": "must",
+            "statement": "Provenance records MUST include the versions of all components involved."
         },
         {
             "code": "A.1",
