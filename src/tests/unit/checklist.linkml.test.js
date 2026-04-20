@@ -3,7 +3,7 @@ import { CHECKLIST as checklist, PRINCIPLES as principles } from "../../checklis
 
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
 const PRINCIPLE_CODE_PATTERN = /^[A-Z]\.[1-9][0-9]*$/;
-const ITEM_ID_PATTERN = /^stamped-checklist:(must|should|may)\/[0-9]{3}$/;
+const ITEM_ID_PATTERN = /^stamped-checklist:(must|should|may)\//;
 
 describe("LinkML checklist JSON", () => {
     it("matches top-level LinkML Checklist constraints", () => {

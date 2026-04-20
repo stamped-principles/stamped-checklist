@@ -30,7 +30,9 @@ async function fetchLatestReleaseTag(repo) {
         let hint = "Check network connectivity and URL accessibility.";
         if (response.status === 404) hint = "Check that the upstream repository has at least one published release.";
         if (response.status === 403) hint = "Check access policy for github.com in your environment.";
-        throw new Error(`Failed to determine latest release for ${repo}: ${response.status} ${response.statusText}. ${hint}`);
+        throw new Error(
+            `Failed to determine latest release for ${repo}: ${response.status} ${response.statusText}. ${hint}`
+        );
     }
 
     const match = response.url.match(/\/releases\/tag\/([^/?#]+)/);
