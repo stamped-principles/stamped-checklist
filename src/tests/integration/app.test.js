@@ -29,6 +29,26 @@ test.describe("STAMPED Checklist App", () => {
         await expect(page.locator("h1")).toContainText("STAMPED Compliance Checklist");
     });
 
+    test("header includes GitHub nav icon link to this repository", async ({ page }) => {
+        const githubLink = page.locator(".header-actions .github-link");
+        await expect(githubLink).toBeVisible();
+        await expect(githubLink).toHaveAttribute("href", "https://github.com/stamped-principles/stamped-checklist");
+    });
+
+    test("theme defaults to browser preference and can be toggled", async ({ page }) => {
+        const prefersDark = await page.evaluate(
+            () => window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+        );
+        const expectedTheme = prefersDark ? "dark" : "light";
+        const html = page.locator("html");
+
+        await expect(html).toHaveAttribute("data-theme", expectedTheme);
+
+        await page.locator("#theme-toggle").click();
+
+        await expect(html).toHaveAttribute("data-theme", expectedTheme === "dark" ? "light" : "dark");
+    });
+
     test("cookie consent banner is shown before acceptance", async ({ page }) => {
         await expect(page.locator("#cookie-consent-banner")).toBeVisible();
     });

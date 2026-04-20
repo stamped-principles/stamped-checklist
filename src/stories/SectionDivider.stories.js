@@ -1,4 +1,5 @@
 import { DATA } from "../checklist.js";
+import { withTheme } from "./utils.js";
 
 /** Build a section divider element matching the structure in buildChecklist(). */
 function buildSectionDivider(section, si) {
@@ -33,4 +34,9 @@ export const ShouldDivider = {
 export const MayDivider = {
     name: "MAY section divider",
     render: () => buildSectionDivider(DATA[2], 2),
+};
+
+export const MustDividerDark = {
+    name: "MUST section divider (dark mode)",
+    render: () => withTheme(buildSectionDivider(DATA[0], 0), "dark"),
 };

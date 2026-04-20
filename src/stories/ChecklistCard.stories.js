@@ -1,4 +1,5 @@
 import { DATA } from "../checklist.js";
+import { withTheme } from "./utils.js";
 
 const section = DATA[0]; // must section
 const shouldSection = DATA[1]; // should section
@@ -116,4 +117,9 @@ export const CompleteCard = {
 export const InlineMarkdownCodeCard = {
     name: "Inline markdown code rendering",
     render: () => buildCard(section, section.principles[1], 0, 1),
+};
+
+export const MustCardDark = {
+    name: "MUST principle card (dark mode)",
+    render: () => withTheme(buildCard(section, section.principles[0], 0, 0), "dark"),
 };
