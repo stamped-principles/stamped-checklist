@@ -43,6 +43,39 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+.header-actions {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.8rem;
+    display: flex;
+    gap: 0.4rem;
+}
+
+.header-icon-button {
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.18);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.header-icon-button:hover {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.github-link svg {
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+}
+
 .header h1 {
     font-size: 1.3rem;
     font-weight: 700;
@@ -711,6 +744,59 @@ code {
     opacity: 0.5;
     z-index: 50;
     pointer-events: none;
+}
+
+[data-theme="dark"] {
+    --bg: #111821;
+    --card-bg: #1b2733;
+    --text: #e3eaf1;
+    --text-light: #aab7c4;
+    --border: #374a5c;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .toolbar,
+[data-theme="dark"] .toolbar button,
+[data-theme="dark"] .col-toggle,
+[data-theme="dark"] .response-btn,
+[data-theme="dark"] .cookie-consent-banner button.secondary,
+[data-theme="dark"] .modal-buttons button,
+[data-theme="dark"] .reason-input,
+[data-theme="dark"] .cookie-consent-banner,
+[data-theme="dark"] .modal,
+[data-theme="dark"] .intro-text {
+    background: var(--card-bg);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .toolbar button:hover,
+[data-theme="dark"] .response-btn:hover {
+    background: #263747;
+    border-color: #4a6074;
+}
+
+[data-theme="dark"] .check-item {
+    border-top-color: #2f4051;
+}
+
+[data-theme="dark"] code {
+    background: #2d3e4f;
+    color: #f5c47a;
+}
+
+[data-theme="dark"] .cookie-consent-banner button {
+    background: #2980b9;
+    border-color: #2980b9;
+}
+
+[data-theme="dark"] .header-icon-button {
+    border-color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.24);
+}
+
+[data-theme="dark"] .header-icon-button:hover {
+    background: rgba(255, 255, 255, 0.35);
 }
 
 @media print {

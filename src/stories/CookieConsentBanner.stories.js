@@ -1,3 +1,5 @@
+import { withTheme } from "./utils.js";
+
 function buildCookieConsentBanner() {
     const banner = document.createElement("div");
     banner.className = "cookie-consent-banner";
@@ -22,4 +24,9 @@ export default {
 export const Visible = {
     name: "Cookie consent banner",
     render: () => buildCookieConsentBanner(),
+};
+
+export const VisibleDark = {
+    name: "Cookie consent banner (dark mode)",
+    render: () => withTheme(buildCookieConsentBanner(), "dark"),
 };

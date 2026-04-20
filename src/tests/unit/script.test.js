@@ -14,6 +14,7 @@ function setupDOM() {
         <div id="cookie-consent-banner" class="cookie-consent-banner hidden"></div>
         <button id="cookie-consent-decline" type="button">Decline</button>
         <button id="cookie-consent-accept" type="button">Accept</button>
+        <button id="theme-toggle" type="button">☀️</button>
         <div id="version-indicator"></div>
     `;
 }
@@ -231,6 +232,43 @@ describe("cookie consent and analytics", () => {
         expect(localStorage.getItem("stamped_cookie_consent")).toBe("declined");
         expect(banner.classList.contains("hidden")).toBe(true);
         expect(analyticsScript).toBeNull();
+    });
+});
+
+describe("theme toggle", () => {
+    beforeEach(() => {
+        setupDOM();
+        localStorage.clear();
+        delete window.matchMedia;
+    });
+
+    it("defaults to light mode when browser preference API is unavailable", async () => {
+        vi.resetModules();
+        const script = await import("../../script.js");
+        script.init();
+
+        expect(document.documentElement.getAttribute("data-theme")).toBe("light");
+    });
+
+    it("defaults to dark mode when browser preference is dark", async () => {
+        window.matchMedia = vi.fn(() => ({ matches: true }));
+        vi.resetModules();
+        const script = await import("../../script.js");
+        script.init();
+
+        expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+    });
+
+    it("toggles theme and stores user preference", async () => {
+        window.matchMedia = vi.fn(() => ({ matches: false }));
+        vi.resetModules();
+        const script = await import("../../script.js");
+        script.init();
+
+        document.getElementById("theme-toggle").click();
+
+        expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+        expect(localStorage.getItem("stamped_theme")).toBe("dark");
     });
 });
 

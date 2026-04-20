@@ -8,6 +8,7 @@ let totalItems = 0;
 const COOKIE_CONSENT_KEY = "stamped_cookie_consent";
 const COOKIE_CONSENT_ACCEPTED = "accepted";
 const COOKIE_CONSENT_DECLINED = "declined";
+const THEME_KEY = "stamped_theme";
 let analyticsInitialized = false;
 
 function escapeHtml(text) {
@@ -95,6 +96,39 @@ function loadModePreference() {
         radio.checked = true;
         setMode(saved);
     }
+}
+
+function getPreferredTheme() {
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme === "light" || savedTheme === "dark") return savedTheme;
+    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
+    return "light";
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    const toggle = document.getElementById("theme-toggle");
+    if (toggle) {
+        const isDark = theme === "dark";
+        toggle.textContent = isDark ? "🌙" : "☀️";
+        toggle.setAttribute("aria-pressed", String(isDark));
+        toggle.setAttribute("title", isDark ? "Switch to light mode" : "Switch to dark mode");
+    }
+}
+
+function toggleTheme() {
+    const current = document.documentElement.getAttribute("data-theme");
+    const nextTheme = current === "dark" ? "light" : "dark";
+    applyTheme(nextTheme);
+    try {
+        localStorage.setItem(THEME_KEY, nextTheme);
+    } catch (e) {}
+}
+
+function setupThemeToggle() {
+    const toggle = document.getElementById("theme-toggle");
+    if (toggle) toggle.onclick = toggleTheme;
+    applyTheme(getPreferredTheme());
 }
 
 function generateId(sectionIdx, principleIdx, itemIdx) {
@@ -568,6 +602,7 @@ export {
 };
 
 function init() {
+    setupThemeToggle();
     buildChecklist();
     setupCookieConsent();
 
