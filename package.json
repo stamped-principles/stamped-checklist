@@ -14,6 +14,7 @@
         "pretest": "npm run sync:schemas",
         "test": "vitest run --config configs/vitest.config.js",
         "test:watch": "vitest --config configs/vitest.config.js",
+        "pretest:coverage": "npm run sync:schemas",
         "test:coverage": "vitest run --coverage --config configs/vitest.config.js",
         "pretest:e2e": "npm run sync:schemas",
         "test:e2e": "playwright test --config configs/playwright.config.js",
