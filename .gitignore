@@ -5,3 +5,4 @@ storybook-static/
 playwright-report/
 test-results/
 coverage/
+src/data/

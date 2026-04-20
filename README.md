@@ -4,28 +4,25 @@ An interactive checklist for compliance to STAMPED principles.
 
 ## Data model
 
-The checklist and principles are defined by [LinkML](https://linkml.io/) schemas (in YAML):
+The LinkML schemas and JSON instances are maintained in dedicated repositories:
 
--   [`schemas/stamped-checklist-schema.yaml`](schemas/stamped-checklist-schema.yaml) — schema for checklist items (tiered MUST/SHOULD/MAY, grouped under principles).
--   [`schemas/stamped-principles-schema.yaml`](schemas/stamped-principles-schema.yaml) — schema for the STAMPED principle definitions referenced by the checklist.
+-   Principles: <https://github.com/stamped-principles/stamped-principles-schema>
+-   Checklist: <https://github.com/stamped-principles/stamped-checklist-schema>
 
-These LinkML models are the source of truth for the data shape. The JSON files under `schemas/` (see below) are _instances_ that conform to these schemas and are what the web app actually loads at runtime.
+This app pulls the checklist and principle JSON instances from those repositories into `src/data/` via `npm run sync:schemas`.
 
 ## Editing the checklist
 
-Checklist entries are defined in [`schemas/stamped-checklist.json`](schemas/stamped-checklist.json)
-and principle definitions are in [`schemas/stamped-principles.json`](schemas/stamped-principles.json).
-The web app reads these LinkML JSON files through [`src/checklist.js`](src/checklist.js).
+Edit checklist and principle content in the schema repositories above. The web app reads those upstream JSON files through [`src/checklist.js`](src/checklist.js).
 
 ## Versioning
 
-The checklist version is defined by the `version` field in
-[`schemas/stamped-checklist.json`](schemas/stamped-checklist.json). It is
+The checklist version is defined by the `version` field in the upstream checklist JSON
+(in `stamped-principles/stamped-checklist-schema`). It is
 displayed in the bottom-left corner of the page (and on printed copies) so that
 a record is kept of which version of the checklist was used.
 
-When making meaningful changes to the checklist content, bump the `version` field in
-[`schemas/stamped-checklist.json`](schemas/stamped-checklist.json) following
+When making meaningful changes to the checklist content, bump that `version` field following
 [Semantic Versioning](https://semver.org/):
 
 -   **Patch** (e.g. `1.0.0` → `1.0.1`): typo fixes or minor wording edits that do not change the intent of any item.

@@ -1,5 +1,5 @@
-import checklist from "../schemas/stamped-checklist.json" with { type: "json" };
-import principlesSet from "../schemas/stamped-principles.json" with { type: "json" };
+import checklist from "./data/stamped-checklist.json" with { type: "json" };
+import principlesSet from "./data/stamped-principles.json" with { type: "json" };
 
 const CATEGORY_LABELS = {
     self_contained: "Self-containment",
@@ -44,4 +44,4 @@ const DATA = checklist.data.map((group) => ({
 
 const VERSION = checklist.version;
 
-export { VERSION, DATA };
+export { VERSION, DATA, checklist as CHECKLIST, principlesSet as PRINCIPLES };

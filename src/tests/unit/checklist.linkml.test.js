@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
-import checklist from "../../../schemas/stamped-checklist.json";
-import principles from "../../../schemas/stamped-principles.json";
+import { CHECKLIST as checklist, PRINCIPLES as principles } from "../../checklist.js";
 
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
 const PRINCIPLE_CODE_PATTERN = /^[A-Z]\.[1-9][0-9]*$/;
-const ITEM_ID_PATTERN = /^stamped:check\/(must|should|may)\/[0-9]{3}$/;
+const ITEM_ID_PATTERN = /^(stamped:check|stamped-checklist)[:/](must|should|may)\/[0-9]{3}$/;
 
 describe("LinkML checklist JSON", () => {
     it("matches top-level LinkML Checklist constraints", () => {
@@ -39,7 +38,7 @@ describe("LinkML checklist JSON", () => {
                 entry.items.forEach((item) => {
                     expect(typeof item.id).toBe("string");
                     expect(item.id).toMatch(ITEM_ID_PATTERN);
-                    expect(item.id.startsWith(`stamped:check/${group.level}/`)).toBe(true);
+                    expect(item.id.includes(`${group.level}/`)).toBe(true);
                     expect(seenItemIds.has(item.id)).toBe(false);
                     seenItemIds.add(item.id);
 

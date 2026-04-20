@@ -3,16 +3,23 @@
     "version": "1.0.0",
     "description": "An interactive checklist for compliance to STAMPED principles.",
     "scripts": {
+        "sync:schemas": "node src/scripts/pull-schemas.mjs",
+        "predev": "npm run sync:schemas",
         "dev": "vite --config configs/vite.config.js",
+        "prebuild": "npm run sync:schemas",
         "build": "vite build --config configs/vite.config.js",
         "preview": "vite preview --config configs/vite.config.js",
         "format": "prettier --config configs/prettier.config.cjs --write .",
         "format:check": "prettier --config configs/prettier.config.cjs --check .",
+        "pretest": "npm run sync:schemas",
         "test": "vitest run --config configs/vitest.config.js",
         "test:watch": "vitest --config configs/vitest.config.js",
         "test:coverage": "vitest run --coverage --config configs/vitest.config.js",
+        "pretest:e2e": "npm run sync:schemas",
         "test:e2e": "playwright test --config configs/playwright.config.js",
+        "prestorybook": "npm run sync:schemas",
         "storybook": "storybook dev -p 6006 --config-dir configs/storybook",
+        "prebuild-storybook": "npm run sync:schemas",
         "build-storybook": "storybook build --config-dir configs/storybook"
     },
     "repository": {
