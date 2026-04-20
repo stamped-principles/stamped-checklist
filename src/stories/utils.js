@@ -9,6 +9,7 @@ export function withTheme(element, theme) {
     wrapper.setAttribute("data-theme", theme);
     wrapper.style.padding = "0.5rem";
     wrapper.style.background = "var(--bg)";
+    wrapper.style.color = "var(--text)";
     wrapper.appendChild(element);
     return wrapper;
 }
