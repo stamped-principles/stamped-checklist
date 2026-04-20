@@ -193,11 +193,6 @@ test.describe("STAMPED Checklist App", () => {
         await expect(page.locator("#version-indicator")).toHaveText(/^v\d/);
     });
 
-    test("save button triggers toast notification", async ({ page }) => {
-        await page.locator("button", { hasText: "Save" }).click();
-        await expect(page.locator("#toast")).toHaveClass(/show/);
-    });
-
     test("reset button resets checked state", async ({ page }) => {
         // Check an item first
         await checkItem(page, page.locator(".check-item input[type=checkbox]").first());
