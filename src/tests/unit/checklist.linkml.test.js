@@ -3,7 +3,8 @@ import { CHECKLIST as checklist, PRINCIPLES as principles } from "../../checklis
 
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
 const PRINCIPLE_CODE_PATTERN = /^[A-Z]\.[1-9][0-9]*$/;
-const ITEM_ID_PATTERN = /^(stamped:check|stamped-checklist)[:/](must|should|may)\/[0-9]{3}$/;
+// Upstream checklist IDs use either stamped:check/<level>/<nnn> or stamped-checklist:<level>/<nnn>.
+const ITEM_ID_PATTERN = /^(stamped:check\/|stamped-checklist:)(must|should|may)\/[0-9]{3}$/;
 
 describe("LinkML checklist JSON", () => {
     it("matches top-level LinkML Checklist constraints", () => {
@@ -37,8 +38,9 @@ describe("LinkML checklist JSON", () => {
                 expect(entry.items.length).toBeGreaterThan(0);
                 entry.items.forEach((item) => {
                     expect(typeof item.id).toBe("string");
-                    expect(item.id).toMatch(ITEM_ID_PATTERN);
-                    expect(item.id.includes(`${group.level}/`)).toBe(true);
+                    const match = item.id.match(ITEM_ID_PATTERN);
+                    expect(match).not.toBeNull();
+                    expect(match[2]).toBe(group.level);
                     expect(seenItemIds.has(item.id)).toBe(false);
                     seenItemIds.add(item.id);
 

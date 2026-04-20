@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = resolve(__dirname, "..", "data");
+const JSON_INDENT = 4;
 
 const SCHEMAS = [
     {
@@ -19,15 +20,30 @@ const SCHEMAS = [
 async function downloadJSON(url) {
     const response = await fetch(url);
     if (!response.ok) {
-        throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
+        let hint = "Check network connectivity and URL accessibility.";
+        if (response.status === 404) hint = "Check that the upstream repository and file path exist.";
+        if (response.status === 403) hint = "Check access policy for raw.githubusercontent.com in your environment.";
+        throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}. ${hint}`);
     }
-    return response.json();
+    try {
+        return await response.json();
+    } catch (error) {
+        throw new Error(`Failed to parse JSON from ${url}: ${error instanceof Error ? error.message : String(error)}`);
+    }
 }
 
 await mkdir(DATA_DIR, { recursive: true });
 
 for (const schema of SCHEMAS) {
     const json = await downloadJSON(schema.url);
-    await writeFile(schema.output, `${JSON.stringify(json, null, 4)}\n`, "utf-8");
+    try {
+        await writeFile(schema.output, `${JSON.stringify(json, null, JSON_INDENT)}\n`, "utf-8");
+    } catch (error) {
+        throw new Error(
+            `Failed to write schema data from ${schema.url} to ${schema.output}: ${
+                error instanceof Error ? error.message : String(error)
+            }`
+        );
+    }
     console.log(`Synced ${schema.output}`);
 }
