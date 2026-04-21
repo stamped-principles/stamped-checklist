@@ -5,7 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 You MUST read `.github/copilot-instructions.md` before making any code changes, commits, or pull requests.
 
 Before committing any changes, you MUST:
-- To the best of your ability, ensure tests are passing
-- Follow assertion style (actual on left, expected on right)
-- Always mark AI-generated tests with `ai_generated` Pytest marker
-- Run pre-commit
+
+-   To the best of your ability, ensure tests are passing
+-   Follow assertion style (actual on left, expected on right)
+-   Always mark AI-generated tests with `ai_generated` Pytest marker
+-   Run pre-commit
