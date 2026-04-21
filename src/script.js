@@ -392,7 +392,8 @@ function shareURL() {
         params.set("responses", btoa(JSON.stringify(nonEmptyResponses)));
     }
 
-    const selectedColumns = document.querySelector('input[name="cols"]:checked')?.value || localStorage.getItem("stamped_cols");
+    const selectedColumns =
+        document.querySelector('input[name="cols"]:checked')?.value || localStorage.getItem("stamped_cols");
     if (selectedColumns && VALID_COLUMN_VALUES.has(selectedColumns)) {
         params.set("cols", selectedColumns);
     }
@@ -487,7 +488,9 @@ function loadFromURL() {
     if (sectionsParam && VALID_SECTION_VALUES.has(sectionsParam)) {
         cleanParams.set("sections", sectionsParam);
     }
-    const cleanURL = cleanParams.toString() ? `${window.location.pathname}?${cleanParams.toString()}` : window.location.pathname;
+    const cleanURL = cleanParams.toString()
+        ? `${window.location.pathname}?${cleanParams.toString()}`
+        : window.location.pathname;
     window.history.replaceState({}, "", cleanURL);
 }
 
