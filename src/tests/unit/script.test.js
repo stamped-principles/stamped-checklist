@@ -152,6 +152,8 @@ describe("URL state encoding/decoding", () => {
 
     beforeEach(async () => {
         setupDOM();
+        localStorage.clear();
+        window.history.replaceState({}, "", "/");
         vi.resetModules();
         script = await import("../../script.js");
         script.buildChecklist();
@@ -164,6 +166,34 @@ describe("URL state encoding/decoding", () => {
     it("loadFromURL handles missing URL params gracefully", () => {
         // Should not throw when there are no URL params
         expect(() => script.loadFromURL()).not.toThrow();
+    });
+
+    it("shareURL includes selected columns and sections view params", () => {
+        const writeText = vi.fn().mockResolvedValue(undefined);
+        Object.defineProperty(navigator, "clipboard", {
+            configurable: true,
+            value: { writeText },
+        });
+
+        script.setColumns("2");
+        script.setSections("on");
+        script.shareURL();
+
+        const sharedURL = new URL(writeText.mock.calls[0][0]);
+        expect(sharedURL.searchParams.get("cols")).toBe("2");
+        expect(sharedURL.searchParams.get("sections")).toBe("on");
+    });
+
+    it("loadFromURL applies view params and keeps them in URL", () => {
+        window.history.replaceState({}, "", "/?cols=1&sections=on");
+
+        script.loadFromURL();
+
+        const grid = document.querySelector(".cards-grid");
+        const app = document.getElementById("app");
+        expect(grid.classList.contains("cols-1")).toBe(true);
+        expect(app.classList.contains("flat-mode")).toBe(false);
+        expect(window.location.search).toBe("?cols=1&sections=on");
     });
 });
 

@@ -7,6 +7,8 @@ const COOKIE_CONSENT_KEY = "stamped_cookie_consent";
 const COOKIE_CONSENT_ACCEPTED = "accepted";
 const COOKIE_CONSENT_DECLINED = "declined";
 const THEME_KEY = "stamped_theme";
+const VALID_COLUMN_VALUES = new Set(["1", "2", "auto"]);
+const VALID_SECTION_VALUES = new Set(["on", "off"]);
 let analyticsInitialized = false;
 
 function escapeHtml(text) {
@@ -363,6 +365,8 @@ function autoSave() {
 
 // URL Sharing
 function shareURL() {
+    const params = new URLSearchParams();
+
     // Encode yes-response states as a compact bitstring (backward-compatible format)
     const state = getState();
     const bits = [];
@@ -375,7 +379,7 @@ function shareURL() {
         });
     });
     const encoded = btoa(bits.join(""));
-    let url = window.location.origin + window.location.pathname + "?state=" + encodeURIComponent(encoded);
+    params.set("state", encoded);
 
     // Encode non-empty response states (value + reason) as base64 JSON
     const nonEmptyResponses = {};
@@ -385,8 +389,21 @@ function shareURL() {
         }
     });
     if (Object.keys(nonEmptyResponses).length > 0) {
-        url += "&responses=" + encodeURIComponent(btoa(JSON.stringify(nonEmptyResponses)));
+        params.set("responses", btoa(JSON.stringify(nonEmptyResponses)));
     }
+
+    const selectedColumns = document.querySelector('input[name="cols"]:checked')?.value || localStorage.getItem("stamped_cols");
+    if (selectedColumns && VALID_COLUMN_VALUES.has(selectedColumns)) {
+        params.set("cols", selectedColumns);
+    }
+
+    const selectedSections =
+        document.querySelector('input[name="sections"]:checked')?.value || localStorage.getItem("stamped_sections");
+    if (selectedSections && VALID_SECTION_VALUES.has(selectedSections)) {
+        params.set("sections", selectedSections);
+    }
+
+    const url = window.location.origin + window.location.pathname + "?" + params.toString();
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard
@@ -410,8 +427,10 @@ function loadFromURL() {
     const params = new URLSearchParams(window.location.search);
     const stateParam = params.get("state");
     const responsesParam = params.get("responses");
+    const colsParam = params.get("cols");
+    const sectionsParam = params.get("sections");
 
-    if (!stateParam && !responsesParam) return;
+    if (!stateParam && !responsesParam && !colsParam && !sectionsParam) return;
 
     if (stateParam) {
         try {
@@ -448,8 +467,28 @@ function loadFromURL() {
         }
     }
 
-    // Clean URL
-    window.history.replaceState({}, "", window.location.pathname);
+    if (colsParam && VALID_COLUMN_VALUES.has(colsParam)) {
+        const columnRadio = document.querySelector(`input[name="cols"][value="${colsParam}"]`);
+        if (columnRadio) columnRadio.checked = true;
+        setColumns(colsParam);
+    }
+
+    if (sectionsParam && VALID_SECTION_VALUES.has(sectionsParam)) {
+        const sectionsRadio = document.querySelector(`input[name="sections"][value="${sectionsParam}"]`);
+        if (sectionsRadio) sectionsRadio.checked = true;
+        setSections(sectionsParam);
+    }
+
+    // Clean stateful URL params while keeping view-configuration params.
+    const cleanParams = new URLSearchParams();
+    if (colsParam && VALID_COLUMN_VALUES.has(colsParam)) {
+        cleanParams.set("cols", colsParam);
+    }
+    if (sectionsParam && VALID_SECTION_VALUES.has(sectionsParam)) {
+        cleanParams.set("sections", sectionsParam);
+    }
+    const cleanURL = cleanParams.toString() ? `${window.location.pathname}?${cleanParams.toString()}` : window.location.pathname;
+    window.history.replaceState({}, "", cleanURL);
 }
 
 // Reset
