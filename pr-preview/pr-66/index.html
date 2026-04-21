@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>STAMPED Compliance Checklist</title>
-      <script type="module" crossorigin src="./assets/index-De_nmj3-.js"></script>
+      <script type="module" crossorigin src="./assets/index-Bz_wuCGf.js"></script>
       <link rel="stylesheet" crossorigin href="./assets/index-CbhxJFhd.css">
     </head>
     <body>
@@ -41,7 +41,7 @@
                 <span class="icon">🔗</span> Share URL
             </button>
             <button onclick="window.print()" title="Print or save as PDF"><span class="icon">🖨️</span> Print</button>
-            <button class="danger" onclick="confirmReset()" title="Reset all checkboxes">
+            <button class="danger" onclick="confirmReset()" title="Reset all responses">
                 <span class="icon">🗑️</span> Reset
             </button>
             <div class="col-toggle" title="Number of columns">
@@ -65,22 +65,12 @@
                     <input type="radio" name="sections" value="off" onchange="setSections('off')" checked /> Off
                 </label>
             </div>
-            <div class="col-toggle" title="Switch between checkbox and Yes/No response mode">
-                <span class="col-toggle-label">Mode:</span>
-                <label class="col-toggle-option">
-                    <input type="radio" name="mode" value="checkboxes" onchange="setMode('checkboxes')" checked />
-                    Checkboxes
-                </label>
-                <label class="col-toggle-option">
-                    <input type="radio" name="mode" value="responses" onchange="setMode('responses')" /> Responses
-                </label>
-            </div>
         </div>
 
         <div class="container" id="app">
             <div class="intro-text">
                 This checklist helps you assess compliance with the <strong>STAMPED</strong> principles for
-                computational reproducibility. Check each item that your research object satisfies. Your progress is
+                computational reproducibility. Answer each item with Yes/No, and include a reason when needed. Your progress is
                 tracked above, and you can share or print your results at any time.
                 <div class="legend">
                     <div class="legend-item">
