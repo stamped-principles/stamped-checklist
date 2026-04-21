@@ -223,7 +223,7 @@ describe("URL state encoding/decoding", () => {
         expect(document.getElementById("app").classList.contains("flat-mode")).toBe(false);
     });
 
-    it("localStorage view preferences are still honored when URL has no view params", () => {
+    it("defaults columns to auto when URL has no cols param", () => {
         localStorage.setItem("stamped_cols", "2");
         localStorage.setItem("stamped_sections", "on");
         window.history.replaceState({}, "", "/");
@@ -232,7 +232,7 @@ describe("URL state encoding/decoding", () => {
         script.loadColumnPreference();
         script.loadSectionsPreference();
 
-        expect(document.querySelector(".cards-grid").classList.contains("cols-2")).toBe(true);
+        expect(document.querySelector(".cards-grid").classList.contains("cols-auto")).toBe(true);
         expect(document.getElementById("app").classList.contains("flat-mode")).toBe(false);
     });
 });

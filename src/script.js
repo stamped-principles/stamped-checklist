@@ -76,11 +76,11 @@ function setColumns(value, shouldSyncURL = true) {
 }
 
 function loadColumnPreference() {
-    const saved = localStorage.getItem("stamped_cols") || "auto";
-    const radio = document.querySelector(`input[name="cols"][value="${saved}"]`);
+    const defaultColumns = "auto";
+    const radio = document.querySelector(`input[name="cols"][value="${defaultColumns}"]`);
     if (radio) {
         radio.checked = true;
-        setColumns(saved, false);
+        setColumns(defaultColumns, false);
     }
 }
 
