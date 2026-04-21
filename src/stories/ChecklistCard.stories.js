@@ -67,11 +67,15 @@ function buildCard(sec, principle, si, pi) {
                 .map(
                     (item, ii) => `
                 <div class="check-item">
-                    <input type="checkbox" id="s${si}_p${pi}_i${ii}">
-                    <label for="s${si}_p${pi}_i${ii}">
-                        <span class="checkbox-custom">✓</span>
-                        <span class="check-text">${renderInlineMarkdown(item)}</span>
-                    </label>
+                    <div class="response-ui">
+                        <div class="response-row">
+                            <span class="check-text">${renderInlineMarkdown(item)}</span>
+                            <div class="response-btns">
+                                <button type="button" class="response-btn yes-btn">✓ Yes</button>
+                                <button type="button" class="response-btn no-btn">✗ No</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `
                 )
@@ -109,7 +113,7 @@ export const CompleteCard = {
         const n = section.principles[0].items.length;
         count.textContent = `${n}/${n}`;
         count.classList.add("done");
-        card.querySelectorAll("input[type=checkbox]").forEach((cb) => (cb.checked = true));
+        card.querySelectorAll(".response-btn.yes-btn").forEach((btn) => btn.classList.add("active"));
         return card;
     },
 };
