@@ -242,10 +242,18 @@ function buildChecklist() {
 
 function handleCheck(id) {
     const cb = document.getElementById(id);
-    checkboxStates[id] = cb.checked;
-    cb.closest(".check-item").classList.toggle("checked", cb.checked);
+    setCheckboxState(id, cb.checked);
     updateAllCounts();
     autoSave();
+}
+
+function setCheckboxState(id, value) {
+    checkboxStates[id] = value;
+    const cb = document.getElementById(id);
+    if (!cb) return;
+    cb.checked = value;
+    const checkItem = cb.closest(".check-item");
+    if (checkItem) checkItem.classList.toggle("checked", value);
 }
 
 function handleResponse(id, value) {
@@ -345,9 +353,7 @@ function getState() {
 function setState(state) {
     Object.keys(state).forEach((id) => {
         if (id in checkboxStates) {
-            checkboxStates[id] = !!state[id];
-            const cb = document.getElementById(id);
-            if (cb) cb.checked = !!state[id];
+            setCheckboxState(id, !!state[id]);
         }
     });
     updateAllCounts();
@@ -371,9 +377,7 @@ function loadFromLocalStorage() {
                 // New format
                 Object.keys(parsed.checkboxes || {}).forEach((id) => {
                     if (id in checkboxStates) {
-                        checkboxStates[id] = !!parsed.checkboxes[id];
-                        const cb = document.getElementById(id);
-                        if (cb) cb.checked = !!parsed.checkboxes[id];
+                        setCheckboxState(id, !!parsed.checkboxes[id]);
                     }
                 });
                 Object.keys(parsed.responses || {}).forEach((id) => {
@@ -493,9 +497,7 @@ function loadFromURL() {
 function confirmReset() {
     if (confirm("Are you sure you want to reset all checkboxes? This cannot be undone.")) {
         Object.keys(checkboxStates).forEach((id) => {
-            checkboxStates[id] = false;
-            const cb = document.getElementById(id);
-            if (cb) cb.checked = false;
+            setCheckboxState(id, false);
         });
         Object.keys(responseStates).forEach((id) => {
             responseStates[id] = { value: null, reason: "" };

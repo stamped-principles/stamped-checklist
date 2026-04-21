@@ -194,14 +194,18 @@ test.describe("STAMPED Checklist App", () => {
     });
 
     test("reset button resets checked state", async ({ page }) => {
+        const firstItem = page.locator(".check-item").first();
+
         // Check an item first
         await checkItem(page, page.locator(".check-item input[type=checkbox]").first());
+        await expect(firstItem).toHaveClass(/checked/);
         await expect(page.locator("#count_0_0")).toContainText("1/");
 
         // Accept the reset confirmation dialog
         page.on("dialog", (dialog) => dialog.accept());
         await page.locator("button.danger").click();
 
+        await expect(firstItem).not.toHaveClass(/checked/);
         await expect(page.locator("#count_0_0")).toContainText("0/");
     });
 
