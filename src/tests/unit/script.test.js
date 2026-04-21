@@ -169,6 +169,9 @@ describe("URL state encoding/decoding", () => {
     });
 
     it("first-time navigation fills URL with default view params", () => {
+        window.history.replaceState({}, "", "/");
+        document.getElementById("app").innerHTML = "";
+        script.buildChecklist();
         expect(window.location.search).toBe("?cols=auto&sections=off");
     });
 
