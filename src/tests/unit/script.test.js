@@ -168,6 +168,10 @@ describe("URL state encoding/decoding", () => {
         expect(typeof script.loadFromURL).toBe("function");
     });
 
+    it("first-time navigation fills URL with default view params", () => {
+        expect(window.location.search).toBe("?cols=auto&sections=off");
+    });
+
     it("loadFromURL handles missing URL params gracefully", () => {
         // Should not throw when there are no URL params
         expect(() => script.loadFromURL()).not.toThrow();

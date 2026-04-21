@@ -251,6 +251,7 @@ function buildChecklist() {
     loadColumnPreference();
     loadSectionsPreference();
     loadModePreference();
+    syncViewConfigURL();
 }
 
 function handleResponse(id, value) {
