@@ -405,7 +405,7 @@ describe("setSections", () => {
         expect(window.location.search).toBe("?sections=on");
     });
 
-    it("keeps both cols and sections params while toggling layout options", async () => {
+    it("preserves both cols and sections params in URL when both settings are applied", async () => {
         const { setColumns, setSections } = await import("../../script.js");
         document.getElementById("app").innerHTML = `<div class="cards-grid cols-auto"></div>`;
         setColumns(1);

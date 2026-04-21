@@ -34,6 +34,9 @@ function renderInlineMarkdown(text) {
         .join("");
 }
 
+// Keep URL view params (cols/sections) in sync with current toolbar selections.
+// This reads saved values from localStorage so both toggles remain represented in the URL,
+// while dropping one-time share-import params (state/responses) during interactive changes.
 function syncViewConfigURL() {
     const params = new URLSearchParams(window.location.search);
     const savedColumns = localStorage.getItem("stamped_cols");
@@ -51,6 +54,8 @@ function syncViewConfigURL() {
         params.delete("sections");
     }
 
+    // These share-state params are intentionally one-time import params and should not persist
+    // when users are interactively changing view-only toolbar settings.
     params.delete("state");
     params.delete("responses");
 
