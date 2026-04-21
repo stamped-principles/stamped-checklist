@@ -76,11 +76,12 @@ function setColumns(value, shouldSyncURL = true) {
 }
 
 function loadColumnPreference() {
-    const defaultColumns = "auto";
-    const radio = document.querySelector(`input[name="cols"][value="${defaultColumns}"]`);
+    const urlColumns = new URLSearchParams(window.location.search).get("cols");
+    const columns = urlColumns && VALID_COLUMN_VALUES.has(urlColumns) ? urlColumns : "auto";
+    const radio = document.querySelector(`input[name="cols"][value="${columns}"]`);
     if (radio) {
         radio.checked = true;
-        setColumns(defaultColumns, false);
+        setColumns(columns, false);
     }
 }
 
