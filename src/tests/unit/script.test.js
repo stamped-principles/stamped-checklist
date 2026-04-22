@@ -22,6 +22,7 @@ function setupDOM() {
         <button id="theme-toggle" type="button">☀️</button>
         <div id="version-indicator"></div>
     `;
+    window.history.replaceState({}, "", "/");
 }
 
 describe("generateId", () => {
@@ -111,6 +112,16 @@ describe("buildChecklist and state management", () => {
         expect(script.getState()).toEqual(initialState);
     });
 
+    it("loadFromLocalStorage does not migrate legacy checkbox payloads", () => {
+        const id = script.generateId(0, 0, 0);
+        localStorage.setItem("stamped_checklist", JSON.stringify({ checkboxes: { [id]: true } }));
+
+        script.loadFromLocalStorage();
+
+        expect(script.getState()[id]).toBe(false);
+        expect(document.getElementById(`yes_${id}`).classList.contains("active")).toBe(false);
+    });
+
     it("updateAllCounts reflects yes responses", () => {
         const id = script.generateId(0, 0, 0);
         script.handleResponse(id, "yes");
@@ -172,7 +183,7 @@ describe("URL state encoding/decoding", () => {
         window.history.replaceState({}, "", "/");
         document.getElementById("app").innerHTML = "";
         script.buildChecklist();
-        expect(window.location.search).toBe("?cols=auto&sections=off");
+        expect(window.location.search.startsWith("?cols=auto&sections=off&state=")).toBe(true);
     });
 
     it("loadFromURL handles missing URL params gracefully", () => {
@@ -180,20 +191,13 @@ describe("URL state encoding/decoding", () => {
         expect(() => script.loadFromURL()).not.toThrow();
     });
 
-    it("shareURL includes selected columns and sections view params", () => {
-        const writeText = vi.fn().mockResolvedValue(undefined);
-        Object.defineProperty(navigator, "clipboard", {
-            configurable: true,
-            value: { writeText },
-        });
+    it("URL params keep cols and sections first while state is persisted", () => {
+        document.getElementById("app").innerHTML = `<div class="cards-grid cols-auto"></div>`;
+        script.setColumns(2);
+        script.setSections("on");
 
-        document.querySelector('input[name="cols"][value="2"]').checked = true;
-        document.querySelector('input[name="sections"][value="on"]').checked = true;
-        script.shareURL();
-
-        const sharedURL = new URL(writeText.mock.calls[0][0]);
-        expect(sharedURL.searchParams.get("cols")).toBe("2");
-        expect(sharedURL.searchParams.get("sections")).toBe("on");
+        const search = window.location.search;
+        expect(search.startsWith("?cols=2&sections=on&state=")).toBe(true);
     });
 
     it("loadFromURL applies view params and keeps them in URL", () => {
@@ -205,14 +209,14 @@ describe("URL state encoding/decoding", () => {
         const app = document.getElementById("app");
         expect(grid.classList.contains("cols-1")).toBe(true);
         expect(app.classList.contains("flat-mode")).toBe(false);
-        expect(window.location.search).toBe("?cols=1&sections=on");
+        expect(window.location.search.startsWith("?cols=1&sections=on&state=")).toBe(true);
     });
 
     it("loadFromURL ignores invalid view params and removes them from URL", () => {
         window.history.replaceState({}, "", "/?cols=3&sections=invalid");
 
         expect(() => script.loadFromURL()).not.toThrow();
-        expect(window.location.search).toBe("");
+        expect(window.location.search.startsWith("?cols=auto&sections=off&state=")).toBe(true);
         expect(document.querySelector(".cards-grid").classList.contains("cols-auto")).toBe(true);
         expect(document.getElementById("app").classList.contains("flat-mode")).toBe(true);
     });
@@ -228,6 +232,22 @@ describe("URL state encoding/decoding", () => {
         expect(localStorage.getItem("stamped_sections")).toBe("on");
         expect(document.querySelector(".cards-grid").classList.contains("cols-2")).toBe(true);
         expect(document.getElementById("app").classList.contains("flat-mode")).toBe(false);
+    });
+
+    it("response and reason changes immediately persist to URL params", () => {
+        const id = script.generateId(0, 0, 0);
+        script.handleResponse(id, "no");
+        script.handleReason(id, "Missing provenance metadata");
+
+        const params = new URLSearchParams(window.location.search);
+        expect(params.get("cols")).toBe("auto");
+        expect(params.get("sections")).toBe("off");
+        expect(params.get("state")).not.toBeNull();
+
+        const encodedResponses = params.get("responses");
+        expect(encodedResponses).not.toBeNull();
+        const decodedResponses = JSON.parse(atob(encodedResponses));
+        expect(decodedResponses[id]).toEqual({ value: "no", reason: "Missing provenance metadata" });
     });
 
     it("defaults columns to auto when URL has no cols param and still loads sections preference", () => {
@@ -390,7 +410,7 @@ describe("setColumns", () => {
     it("updates URL in real time when columns change", async () => {
         const { setColumns } = await import("../../script.js");
         setColumns(2);
-        expect(window.location.search).toBe("?cols=2");
+        expect(window.location.search.startsWith("?cols=2&sections=off&state=")).toBe(true);
     });
 });
 
@@ -420,7 +440,7 @@ describe("setSections", () => {
     it("updates URL in real time when sections change", async () => {
         const { setSections } = await import("../../script.js");
         setSections("on");
-        expect(window.location.search).toBe("?sections=on");
+        expect(window.location.search.startsWith("?cols=auto&sections=on&state=")).toBe(true);
     });
 
     it("preserves both cols and sections params in URL when both settings are applied", async () => {
@@ -428,6 +448,6 @@ describe("setSections", () => {
         document.getElementById("app").innerHTML = `<div class="cards-grid cols-auto"></div>`;
         setColumns(1);
         setSections("on");
-        expect(window.location.search).toBe("?cols=1&sections=on");
+        expect(window.location.search.startsWith("?cols=1&sections=on&state=")).toBe(true);
     });
 });

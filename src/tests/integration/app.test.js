@@ -144,6 +144,10 @@ test.describe("STAMPED Checklist App", () => {
         await expect(page.locator("#progressText")).not.toContainText("(0%)");
     });
 
+    test("toolbar does not render a Share URL button", async ({ page }) => {
+        await expect(page.locator("button", { hasText: "Share URL" })).toHaveCount(0);
+    });
+
     test("columns toggle changes grid layout", async ({ page }) => {
         const grid = page.locator(".cards-grid").first();
 
