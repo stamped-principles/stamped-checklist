@@ -34,33 +34,48 @@ function renderInlineMarkdown(text) {
         .join("");
 }
 
-// Keep URL view params (cols/sections) in sync with current toolbar selections.
-// This reads saved values from localStorage so both toggles remain represented in the URL,
-// while dropping one-time share-import params (state/responses) during interactive changes.
-function syncViewConfigURL() {
-    const params = new URLSearchParams(window.location.search);
-    const savedColumns = localStorage.getItem("stamped_cols");
-    const savedSections = localStorage.getItem("stamped_sections");
+function getEncodedStateBits() {
+    // Encode each checklist item to one bit in DATA traversal order:
+    // sections -> principles -> items, where getState() true => 1 and false => 0.
+    const state = getState();
+    const bits = [];
+    DATA.forEach((section, si) => {
+        section.principles.forEach((principle, pi) => {
+            principle.items.forEach((_, ii) => {
+                const id = generateId(si, pi, ii);
+                bits.push(state[id] ? "1" : "0");
+            });
+        });
+    });
+    return btoa(bits.join(""));
+}
 
-    if (savedColumns && VALID_COLUMN_VALUES.has(savedColumns)) {
-        params.set("cols", savedColumns);
-    } else {
-        params.delete("cols");
+function getSelectedOrDefaultView(name, validValues, fallback) {
+    const saved = localStorage.getItem(`stamped_${name}`);
+    if (saved && validValues.has(saved)) return saved;
+    const selected = document.querySelector(`input[name="${name}"]:checked`)?.value;
+    if (selected && validValues.has(selected)) return selected;
+    return fallback;
+}
+
+function syncPersistentURL() {
+    const params = new URLSearchParams();
+
+    params.set("cols", getSelectedOrDefaultView("cols", VALID_COLUMN_VALUES, "auto"));
+    params.set("sections", getSelectedOrDefaultView("sections", VALID_SECTION_VALUES, "off"));
+    params.set("state", getEncodedStateBits());
+
+    const nonEmptyResponses = {};
+    Object.entries(responseStates).forEach(([id, rs]) => {
+        if (rs.value !== null || rs.reason) {
+            nonEmptyResponses[id] = rs;
+        }
+    });
+    if (Object.keys(nonEmptyResponses).length > 0) {
+        params.set("responses", btoa(JSON.stringify(nonEmptyResponses)));
     }
 
-    if (savedSections && VALID_SECTION_VALUES.has(savedSections)) {
-        params.set("sections", savedSections);
-    } else {
-        params.delete("sections");
-    }
-
-    // These share-state params are intentionally one-time import params and should not persist
-    // when users are interactively changing view-only toolbar settings.
-    params.delete("state");
-    params.delete("responses");
-
-    const nextURL = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
-    window.history.replaceState({}, "", nextURL);
+    window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
 }
 
 function setColumns(value, shouldSyncURL = true) {
@@ -71,7 +86,7 @@ function setColumns(value, shouldSyncURL = true) {
     });
     try {
         localStorage.setItem("stamped_cols", String(value));
-        if (shouldSyncURL) syncViewConfigURL();
+        if (shouldSyncURL) syncPersistentURL();
     } catch (e) {}
 }
 
@@ -94,7 +109,7 @@ function setSections(value, shouldSyncURL = true) {
     }
     try {
         localStorage.setItem("stamped_sections", String(value));
-        if (shouldSyncURL) syncViewConfigURL();
+        if (shouldSyncURL) syncPersistentURL();
     } catch (e) {}
 }
 
@@ -246,12 +261,15 @@ function buildChecklist() {
     container.appendChild(cardsGrid);
 
     loadFromURL();
-    loadFromLocalStorage();
+    // URL state is authoritative when present; localStorage only hydrates when URL has no encoded state.
+    if (!new URLSearchParams(window.location.search).has("state")) {
+        loadFromLocalStorage();
+    }
     updateAllCounts();
     loadColumnPreference();
     loadSectionsPreference();
     loadModePreference();
-    syncViewConfigURL();
+    syncPersistentURL();
 }
 
 function handleResponse(id, value) {
@@ -376,16 +394,6 @@ function loadFromLocalStorage() {
                         applyResponseState(id);
                     }
                 });
-                Object.keys(parsed.checkboxes || {}).forEach((id) => {
-                    // Backward compatibility: migrate legacy checkbox-only saved states to yes responses.
-                    if (id in responseStates && parsed.checkboxes[id] && responseStates[id].value === null) {
-                        responseStates[id].value = "yes";
-                        applyResponseState(id);
-                    }
-                });
-            } else {
-                // Old format: direct checkbox states
-                setState(parsed);
             }
             updateAllCounts();
         } catch (e) {}
@@ -394,65 +402,7 @@ function loadFromLocalStorage() {
 
 function autoSave() {
     localStorage.setItem("stamped_checklist", JSON.stringify({ responses: responseStates }));
-}
-
-// URL Sharing
-function shareURL() {
-    const params = new URLSearchParams();
-
-    // Encode yes-response states as a compact bitstring (backward-compatible format)
-    const state = getState();
-    const bits = [];
-    DATA.forEach((section, si) => {
-        section.principles.forEach((principle, pi) => {
-            principle.items.forEach((_, ii) => {
-                const id = generateId(si, pi, ii);
-                bits.push(state[id] ? "1" : "0");
-            });
-        });
-    });
-    const encoded = btoa(bits.join(""));
-    params.set("state", encoded);
-
-    // Encode non-empty response states (value + reason) as base64 JSON
-    const nonEmptyResponses = {};
-    Object.entries(responseStates).forEach(([id, rs]) => {
-        if (rs.value !== null || rs.reason) {
-            nonEmptyResponses[id] = rs;
-        }
-    });
-    if (Object.keys(nonEmptyResponses).length > 0) {
-        params.set("responses", btoa(JSON.stringify(nonEmptyResponses)));
-    }
-
-    const selectedColumns = document.querySelector('input[name="cols"]:checked')?.value;
-    if (selectedColumns && VALID_COLUMN_VALUES.has(selectedColumns)) {
-        params.set("cols", selectedColumns);
-    }
-
-    const selectedSections = document.querySelector('input[name="sections"]:checked')?.value;
-    if (selectedSections && VALID_SECTION_VALUES.has(selectedSections)) {
-        params.set("sections", selectedSections);
-    }
-
-    const url = window.location.origin + window.location.pathname + "?" + params.toString();
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard
-            .writeText(url)
-            .then(() => {
-                showToast("🔗 Shareable URL copied to clipboard!");
-            })
-            .catch(() => {
-                showPromptURL(url);
-            });
-    } else {
-        showPromptURL(url);
-    }
-}
-
-function showPromptURL(url) {
-    prompt("Copy this shareable URL:", url);
+    syncPersistentURL();
 }
 
 function checkRadioByValue(name, value) {
@@ -516,18 +466,7 @@ function loadFromURL() {
         setSections(validSectionsParam, false);
     }
 
-    // Clean stateful URL params while keeping view-configuration params.
-    const cleanParams = new URLSearchParams();
-    if (validColsParam) {
-        cleanParams.set("cols", validColsParam);
-    }
-    if (validSectionsParam) {
-        cleanParams.set("sections", validSectionsParam);
-    }
-    const cleanURL = cleanParams.toString()
-        ? `${window.location.pathname}?${cleanParams.toString()}`
-        : window.location.pathname;
-    window.history.replaceState({}, "", cleanURL);
+    syncPersistentURL();
 }
 
 // Reset
@@ -628,8 +567,6 @@ export {
     saveToLocalStorage,
     loadFromLocalStorage,
     autoSave,
-    shareURL,
-    showPromptURL,
     loadFromURL,
     confirmReset,
     showToast,
@@ -651,7 +588,6 @@ function init() {
 if (typeof window !== "undefined") {
     Object.assign(window, {
         saveToLocalStorage,
-        shareURL,
         confirmReset,
         setColumns,
         setSections,
