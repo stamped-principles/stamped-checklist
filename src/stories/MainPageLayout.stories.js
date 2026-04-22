@@ -52,6 +52,27 @@ function buildMainPageLayout() {
                     <div class="legend-item"><div class="legend-dot may"></div>MAY — Optional</div>
                 </div>
             </div>
+            <div class="cards-grid cols-auto">
+                <div class="principle-card must">
+                    <div class="principle-header">
+                        <div class="principle-header-main">
+                            <span class="level-badge must">MUST</span>
+                            <span class="principle-code">T.1 + T.3 + T.5</span>
+                            <div class="principle-heading">
+                                <div class="principle-title-row">
+                                    <div class="principle-title">Tracking</div>
+                                    <a class="principle-examples-link" href="#" aria-label="View Tracking examples">💡</a>
+                                </div>
+                            </div>
+                            <span class="principle-count">0/3</span>
+                        </div>
+                        <div class="principle-description">
+                            Persistent content identification MUST be recorded for all components. Provenance of all
+                            modifications MUST be recorded.
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     `;
     return root;
