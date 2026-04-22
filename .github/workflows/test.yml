@@ -56,8 +56,20 @@ jobs:
             - name: Install Playwright browsers
               run: npx playwright install chromium --with-deps
 
-            - name: Run integration tests
-              run: npm run test:e2e
+            - name: Run integration tests with coverage
+              run: npm run test:e2e:coverage
+
+            - name: Build integration coverage report
+              run: npm run coverage:integration
+
+            - name: Upload integration coverage to Codecov
+              uses: codecov/codecov-action@v5
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  files: ./coverage/integration/lcov.info
+                  flags: integration
+                  fail_ci_if_error: false
+                  verbose: true
 
             - name: Upload Playwright report
               if: always()

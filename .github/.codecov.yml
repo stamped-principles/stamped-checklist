@@ -28,3 +28,7 @@ flags:
         paths:
             - src/
         carryforward: false
+    integration:
+        paths:
+            - src/
+        carryforward: false

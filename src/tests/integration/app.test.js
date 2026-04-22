@@ -1,8 +1,37 @@
-import { test, expect } from "@playwright/test";
+import { test as base, expect } from "@playwright/test";
+import { createHash } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { DATA } from "../../checklist.js";
 import { GA_MEASUREMENT_ID } from "../../analytics.js";
 
 const TOTAL_PRINCIPLES = DATA.flatMap((s) => s.principles).length;
+const COVERAGE_ENABLED = process.env.PW_COVERAGE === "1";
+const COVERAGE_RAW_OUTPUT_DIR = resolve(process.cwd(), "coverage", "integration", "raw");
+
+const test = COVERAGE_ENABLED
+    ? base.extend({
+          page: async ({ page }, use, testInfo) => {
+              if (typeof page.coverage?.startJSCoverage !== "function") {
+                  await use(page);
+                  return;
+              }
+
+              await page.coverage.startJSCoverage({ resetOnNavigation: false });
+              try {
+                  await use(page);
+              } finally {
+                  const coverage = await page.coverage.stopJSCoverage();
+                  if (coverage.length === 0) return;
+
+                  await mkdir(COVERAGE_RAW_OUTPUT_DIR, { recursive: true });
+                  const fileHash = createHash("sha1").update(testInfo.testId).digest("hex");
+                  const outputFile = resolve(COVERAGE_RAW_OUTPUT_DIR, `${fileHash}.json`);
+                  await writeFile(outputFile, JSON.stringify(coverage));
+              }
+          },
+      })
+    : base;
 
 async function answerYes(page, yesButtonLocator) {
     await yesButtonLocator.click();
