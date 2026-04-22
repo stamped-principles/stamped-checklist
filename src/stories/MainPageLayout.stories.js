@@ -38,9 +38,9 @@ function buildMainPageLayout({
                 </div>
             </div>
             <div class="progress-text" id="progressText">
-                <span class="progress-value pass">${passingCount}</span> /
-                <span class="progress-value fail">${failingCount}</span> /
-                <span class="progress-value incomplete">${incompleteCount}</span>
+                <span class="progress-value pass" data-progress-value="passing" aria-label="passing items">${passingCount}</span> /
+                <span class="progress-value fail" data-progress-value="failing" aria-label="failing items">${failingCount}</span> /
+                <span class="progress-value incomplete" data-progress-value="incomplete" aria-label="incomplete items">${incompleteCount}</span>
             </div>
         </div>
         <div class="toolbar">

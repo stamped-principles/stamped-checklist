@@ -19,8 +19,9 @@ function setupDOM() {
             <div class="progress-segment incomplete" data-progress-segment="incomplete" style="width:100%"></div>
         </div>
         <div class="progress-text" id="progressText">
-            <span class="progress-value pass">0</span> / <span class="progress-value fail">0</span> /
-            <span class="progress-value incomplete">0</span>
+            <span class="progress-value pass" data-progress-value="passing" aria-label="passing items">0</span> /
+            <span class="progress-value fail" data-progress-value="failing" aria-label="failing items">0</span> /
+            <span class="progress-value incomplete" data-progress-value="incomplete" aria-label="incomplete items">0</span>
         </div>
         <div id="toast"></div>
         <div id="cookie-consent-banner" class="cookie-consent-banner hidden"></div>
