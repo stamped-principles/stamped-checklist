@@ -553,6 +553,18 @@ body {
     background: white;
 }
 
+.reason-counter {
+    display: none;
+    margin-top: 0.2rem;
+    text-align: right;
+    font-size: 0.7rem;
+    color: var(--text-light);
+}
+
+.reason-counter.visible {
+    display: block;
+}
+
 code {
     background: #f0f0f0;
     padding: 0.1rem 0.35rem;

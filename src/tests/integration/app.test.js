@@ -222,6 +222,23 @@ test.describe("STAMPED Checklist App", () => {
         await expect(page.locator(".reason-input").first()).toHaveClass(/visible/);
     });
 
+    test("reason textarea enforces 250 character max length", async ({ page }) => {
+        await page.locator(".no-btn").first().click();
+        const reasonInput = page.locator(".reason-input").first();
+        await expect(reasonInput).toHaveAttribute("maxlength", "250");
+        await reasonInput.fill("x".repeat(300));
+        await expect(reasonInput).toHaveValue("x".repeat(250));
+    });
+
+    test("reason textarea shows live character counter", async ({ page }) => {
+        await page.locator(".no-btn").first().click();
+        const reasonInput = page.locator(".reason-input").first();
+        const reasonCounter = page.locator(".reason-counter").first();
+        await expect(reasonCounter).toHaveText("0/250");
+        await reasonInput.fill("abc");
+        await expect(reasonCounter).toHaveText("3/250");
+    });
+
     // Use a fresh browser context (not affected by addInitScript) to verify
     // that autoSave persists state across page loads.
     test("state persists in localStorage after answering yes", async ({ browser }) => {

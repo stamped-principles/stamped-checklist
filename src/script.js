@@ -9,7 +9,19 @@ const COOKIE_CONSENT_DECLINED = "declined";
 const THEME_KEY = "stamped_theme";
 const VALID_COLUMN_VALUES = new Set(["1", "2", "auto"]);
 const VALID_SECTION_VALUES = new Set(["on", "off"]);
+const MAX_REASON_LENGTH = 250;
 let analyticsInitialized = false;
+
+function normalizeReason(value) {
+    return String(value || "").slice(0, MAX_REASON_LENGTH);
+}
+
+function updateReasonCounter(id, reasonValue = "") {
+    const counterEl = document.getElementById(`reason_count_${id}`);
+    if (counterEl) {
+        counterEl.textContent = `${normalizeReason(reasonValue).length}/${MAX_REASON_LENGTH}`;
+    }
+}
 
 function escapeHtml(text) {
     return String(text)
@@ -247,7 +259,8 @@ function buildChecklist() {
                 <button type="button" class="response-btn no-btn" id="no_${id}" onclick="handleResponse('${id}', 'no')">✗ No</button>
               </div>
             </div>
-            <textarea class="reason-input" id="reason_${id}" placeholder="Reason for not meeting requirement..." rows="2" oninput="handleReason('${id}', this.value)"></textarea>
+            <textarea class="reason-input" id="reason_${id}" placeholder="Reason for not meeting requirement..." rows="2" maxlength="${MAX_REASON_LENGTH}" oninput="handleReason('${id}', this.value)"></textarea>
+            <div class="reason-counter" id="reason_count_${id}">0/${MAX_REASON_LENGTH}</div>
           </div>
         `;
                 checklist.appendChild(checkItem);
@@ -285,9 +298,12 @@ function handleResponse(id, value) {
     if (reasonEl) {
         const showReason = responseStates[id].value === "no";
         reasonEl.classList.toggle("visible", showReason);
+        const counterEl = document.getElementById(`reason_count_${id}`);
+        if (counterEl) counterEl.classList.toggle("visible", showReason);
         if (!showReason) {
             responseStates[id].reason = "";
             reasonEl.value = "";
+            updateReasonCounter(id, "");
         }
     }
 
@@ -296,7 +312,13 @@ function handleResponse(id, value) {
 }
 
 function handleReason(id, value) {
-    responseStates[id].reason = value;
+    const normalizedValue = normalizeReason(value);
+    responseStates[id].reason = normalizedValue;
+    const reasonEl = document.getElementById(`reason_${id}`);
+    if (reasonEl && reasonEl.value !== normalizedValue) {
+        reasonEl.value = normalizedValue;
+    }
+    updateReasonCounter(id, normalizedValue);
     autoSave();
 }
 
@@ -310,7 +332,13 @@ function applyResponseState(id) {
     if (noBtn) noBtn.classList.toggle("active", state.value === "no");
     if (reasonEl) {
         reasonEl.classList.toggle("visible", state.value === "no");
-        reasonEl.value = state.reason || "";
+        state.reason = normalizeReason(state.reason);
+        reasonEl.value = state.reason;
+        updateReasonCounter(id, state.reason);
+    }
+    const counterEl = document.getElementById(`reason_count_${id}`);
+    if (counterEl) {
+        counterEl.classList.toggle("visible", state.value === "no");
     }
 }
 

@@ -70,6 +70,16 @@ describe("buildChecklist and state management", () => {
         expect(items.length).toBe(totalItems);
     });
 
+    it("reason textareas enforce a 250 character maximum", () => {
+        const reasonInput = document.querySelector(".reason-input");
+        expect(reasonInput.getAttribute("maxlength")).toBe("250");
+    });
+
+    it("reason textareas include a character counter", () => {
+        const reasonCounter = document.querySelector(".reason-counter");
+        expect(reasonCounter.textContent).toBe("0/250");
+    });
+
     it("renders inline markdown code spans for checklist text", () => {
         const codeSpans = Array.from(document.querySelectorAll(".check-item .check-text code"));
         expect(codeSpans.length).toBeGreaterThan(0);
@@ -250,6 +260,32 @@ describe("URL state encoding/decoding", () => {
         expect(encodedResponses).not.toBeNull();
         const decodedResponses = JSON.parse(atob(encodedResponses));
         expect(decodedResponses[id]).toEqual({ value: "no", reason: "Missing provenance metadata" });
+    });
+
+    it("reason values are truncated to 250 characters when persisted", () => {
+        const id = script.generateId(0, 0, 0);
+        const longReason = "x".repeat(300);
+        script.handleResponse(id, "no");
+        script.handleReason(id, longReason);
+
+        const reasonEl = document.getElementById(`reason_${id}`);
+        const reasonCounterEl = document.getElementById(`reason_count_${id}`);
+        expect(reasonEl.value.length).toBe(250);
+        expect(reasonCounterEl.textContent).toBe("250/250");
+
+        const params = new URLSearchParams(window.location.search);
+        const decodedResponses = JSON.parse(atob(params.get("responses")));
+        expect(decodedResponses[id]).toEqual({ value: "no", reason: "x".repeat(250) });
+    });
+
+    it("reason counter resets when no response is cleared", () => {
+        const id = script.generateId(0, 0, 0);
+        script.handleResponse(id, "no");
+        script.handleReason(id, "abc");
+        script.handleResponse(id, "no");
+
+        const reasonCounterEl = document.getElementById(`reason_count_${id}`);
+        expect(reasonCounterEl.textContent).toBe("0/250");
     });
 
     it("all no responses with reasons are encoded and produce a long URL", () => {
