@@ -4,6 +4,7 @@ function buildMainPageLayout({
     progressState = "incomplete",
     progressWidth = "0%",
     progressLabel = "0 / 0 items",
+    modeLabel = "meeting requirements",
 } = {}) {
     const root = document.createElement("div");
     root.innerHTML = `
@@ -30,7 +31,7 @@ function buildMainPageLayout({
             <div class="progress-bar-container">
                 <div class="progress-bar ${progressState}" id="progressBar" style="width:${progressWidth}"></div>
             </div>
-            <div class="progress-text ${progressState}" id="progressText">${progressLabel} meeting requirements</div>
+            <div class="progress-text ${progressState}" id="progressText">${progressLabel} ${modeLabel}</div>
         </div>
         <div class="toolbar">
             <button type="button"><span class="icon">🖨️</span> Print</button>
