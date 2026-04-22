@@ -3,23 +3,25 @@
       <span style="font-weight:600; font-size:0.95rem;">${e.level===`must`?`Required`:e.level===`should`?`Recommended`:`Optional`} Requirements</span>
       <span class="section-progress" id="sectionProgress_${n}"></span>
     `,t.appendChild(r),e.principles.forEach((r,i)=>{let a=document.createElement(`div`);a.className=`principle-card ${e.level}`,a.id=`card_${n}_${i}`;let o=r.items.length,l=F(r),u=y(r.name),d=b(r.desc),f=document.createElement(`div`);f.className=`principle-header`,f.innerHTML=`
-        <span class="level-badge ${e.level}">${e.label}</span>
-        <span class="principle-code">${r.code}</span>
-        <div style="flex:1">
-          <div class="principle-title-row">
-            <div class="principle-title">${u}</div>
-            <a
-              class="principle-examples-link"
-              href="${l}"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="View ${u} examples"
-              title="View examples for ${u}"
-            >💡</a>
+        <div class="principle-header-main">
+          <span class="level-badge ${e.level}">${e.label}</span>
+          <span class="principle-code">${r.code}</span>
+          <div class="principle-heading">
+            <div class="principle-title-row">
+              <div class="principle-title">${u}</div>
+              <a
+                class="principle-examples-link"
+                href="${l}"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="View ${u} examples"
+                title="View examples for ${u}"
+              >💡</a>
+            </div>
           </div>
-          <div style="font-size:0.76rem; color:var(--text-light); margin-top:0.1rem;">${d}</div>
+          <span class="principle-count" id="count_${n}_${i}">0/${o}</span>
         </div>
-        <span class="principle-count" id="count_${n}_${i}">0/${o}</span>
+        <div class="principle-description">${d}</div>
       `,a.appendChild(f);let p=document.createElement(`div`);p.className=`checklist`,r.items.forEach((e,t)=>{let r=P(n,i,t),a=b(e);c++,s[r]={value:null,reason:``};let o=document.createElement(`div`);o.className=`check-item`,o.innerHTML=`
           <div class="response-ui">
             <div class="response-row">
