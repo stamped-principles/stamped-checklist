@@ -1008,13 +1008,35 @@ code {
         color: #555;
     }
 
-    /* Hide progress bar in print */
+    /* Show progress bar in print */
     .progress-bar-container {
-        display: none;
+        display: block;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .progress-segment {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .progress-segment.pass {
+        background: #2ecc71 !important;
+    }
+
+    .progress-segment.fail {
+        background: #ff6b6b !important;
+    }
+
+    .progress-segment.incomplete {
+        background: #7f8c8d !important;
+        background-image: none !important;
     }
 
     .progress-text {
-        display: none;
+        display: inline-block;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
     }
 }
 
