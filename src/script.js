@@ -349,7 +349,7 @@ function applyResponseState(id) {
         state.reason = normalizeReason(state.reason);
         reasonEl.value = state.reason;
         updateReasonCounter(id, state.reason);
-        autoResizeTextarea(reasonEl);
+        requestAnimationFrame(() => autoResizeTextarea(reasonEl));
     }
     const counterEl = document.getElementById(`reason_count_${id}`);
     if (counterEl) {

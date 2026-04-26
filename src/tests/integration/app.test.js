@@ -375,6 +375,42 @@ test.describe("STAMPED Checklist App", () => {
     });
 
     // Use a fresh browser context (not affected by addInitScript) to verify
+    // that the reason textarea auto-resizes correctly on fresh page load.
+    test("reason textarea height reflects saved content on page reload", async ({ browser }) => {
+        const context = await browser.newContext();
+        const page = await context.newPage();
+
+        await page.goto("/");
+
+        const noBtn = page.locator(".no-btn").first();
+        const reasonInput = page.locator(".reason-input").first();
+
+        await noBtn.click();
+        // Fill with enough text to require multiple lines
+        await reasonInput.fill("line one\nline two\nline three");
+
+        const heightAfterFill = await reasonInput.evaluate((el) => el.getBoundingClientRect().height);
+
+        // Open a new page in the same context — localStorage is shared within a context
+        const page2 = await context.newPage();
+        await page2.goto("/");
+
+        const reasonInput2 = page2.locator(".reason-input").first();
+        await expect(reasonInput2).toHaveClass(/visible/);
+
+        // Wait for requestAnimationFrame to fire
+        await page2.waitForFunction(() => {
+            const el = document.querySelector(".reason-input.visible");
+            return el && el.style.height && el.style.height !== "auto";
+        });
+
+        const heightOnReload = await reasonInput2.evaluate((el) => el.getBoundingClientRect().height);
+        expect(heightOnReload).toBeGreaterThanOrEqual(heightAfterFill);
+
+        await context.close();
+    });
+
+    // Use a fresh browser context (not affected by addInitScript) to verify
     // that autoSave persists state across page loads.
     test("state persists in localStorage after answering yes", async ({ browser }) => {
         const context = await browser.newContext();
