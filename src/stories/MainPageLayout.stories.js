@@ -1,13 +1,35 @@
 import { withTheme } from "./utils.js";
 
-function buildMainPageLayout({
-    passingWidth = "0%",
-    failingWidth = "0%",
-    incompleteWidth = "100%",
-    passingCount = 0,
-    failingCount = 0,
-    incompleteCount = 0,
-} = {}) {
+function buildLevelStatRow({ level, label, passingWidth, failingWidth, incompleteWidth, passing, failing, total }) {
+    const incomplete = total - passing - failing;
+    const pct = total > 0 ? Math.round((passing / total) * 100) : 0;
+    return `
+        <div class="level-stat-row" data-level-stat="${level}">
+            <span class="section-badge ${level}">${label}</span>
+            <div class="level-stat-bar-container">
+                <div class="level-stat-bar">
+                    <div class="progress-segment pass" style="width:${passingWidth}"></div>
+                    <div class="progress-segment fail" style="width:${failingWidth}"></div>
+                    <div class="progress-segment incomplete" style="width:${incompleteWidth}"></div>
+                </div>
+            </div>
+            <span class="level-stat-counts">
+                <span class="pass">${passing}✓</span>
+                <span class="fail"> ${failing}✗</span>
+                <span class="incomplete"> ${incomplete}?</span>
+                <span class="level-stat-pct"> ${pct}%</span>
+            </span>
+        </div>
+    `;
+}
+
+function buildMainPageLayout({ totalPassing = 0, totalFailing = 0, totalCount = 30 } = {}) {
+    const totalIncomplete = totalCount - totalPassing - totalFailing;
+    const totalPct = totalCount > 0 ? Math.round((totalPassing / totalCount) * 100) : 0;
+    const passingPct = totalCount > 0 ? (totalPassing / totalCount) * 100 : 0;
+    const failingPct = totalCount > 0 ? (totalFailing / totalCount) * 100 : 0;
+    const incompletePct = totalCount > 0 ? (totalIncomplete / totalCount) * 100 : 100;
+
     const root = document.createElement("div");
     root.innerHTML = `
         <div class="header">
@@ -30,17 +52,47 @@ function buildMainPageLayout({
             </div>
             <h1>📋 STAMPED Compliance Checklist</h1>
             <p>Assess your research objects against the STAMPED principles</p>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progressBar">
-                    <div class="progress-segment pass" data-progress-segment="passing" style="width:${passingWidth}"></div>
-                    <div class="progress-segment fail" data-progress-segment="failing" style="width:${failingWidth}"></div>
-                    <div class="progress-segment incomplete" data-progress-segment="incomplete" style="width:${incompleteWidth}"></div>
-                </div>
-            </div>
-            <div class="progress-text" id="progressText">
-                <span class="progress-value pass" data-progress-value="passing" aria-label="passing items">${passingCount}</span> /
-                <span class="progress-value fail" data-progress-value="failing" aria-label="failing items">${failingCount}</span> /
-                <span class="progress-value incomplete" data-progress-value="incomplete" aria-label="incomplete items">${incompleteCount}</span>
+            <div class="level-stats" id="levelStats">
+                ${buildLevelStatRow({
+                    level: "total",
+                    label: "Total",
+                    passingWidth: `${passingPct}%`,
+                    failingWidth: `${failingPct}%`,
+                    incompleteWidth: `${incompletePct}%`,
+                    passing: totalPassing,
+                    failing: totalFailing,
+                    total: totalCount,
+                })}
+                ${buildLevelStatRow({
+                    level: "must",
+                    label: "MUST",
+                    passingWidth: "0%",
+                    failingWidth: "0%",
+                    incompleteWidth: "100%",
+                    passing: 0,
+                    failing: 0,
+                    total: 17,
+                })}
+                ${buildLevelStatRow({
+                    level: "should",
+                    label: "SHOULD",
+                    passingWidth: "0%",
+                    failingWidth: "0%",
+                    incompleteWidth: "100%",
+                    passing: 0,
+                    failing: 0,
+                    total: 8,
+                })}
+                ${buildLevelStatRow({
+                    level: "may",
+                    label: "MAY",
+                    passingWidth: "0%",
+                    failingWidth: "0%",
+                    incompleteWidth: "100%",
+                    passing: 0,
+                    failing: 0,
+                    total: 5,
+                })}
             </div>
         </div>
         <div class="toolbar">
@@ -106,12 +158,9 @@ export const Passing = {
     name: "Main page layout (passing)",
     render: () =>
         buildMainPageLayout({
-            passingWidth: "100%",
-            failingWidth: "0%",
-            incompleteWidth: "0%",
-            passingCount: 3,
-            failingCount: 0,
-            incompleteCount: 0,
+            totalPassing: 30,
+            totalFailing: 0,
+            totalCount: 30,
         }),
 };
 
@@ -119,12 +168,9 @@ export const Failed = {
     name: "Main page layout (failed)",
     render: () =>
         buildMainPageLayout({
-            passingWidth: "34%",
-            failingWidth: "33%",
-            incompleteWidth: "33%",
-            passingCount: 1,
-            failingCount: 1,
-            incompleteCount: 1,
+            totalPassing: 10,
+            totalFailing: 10,
+            totalCount: 30,
         }),
 };
 

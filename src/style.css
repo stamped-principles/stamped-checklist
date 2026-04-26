@@ -10,6 +10,7 @@
     --may-bg: #eafaf1;
     --may-border: #2ecc71;
     --check-color: #2ecc71;
+    --total-color: #2c3e50;
     --bg: #f8f9fa;
     --card-bg: #ffffff;
     --text: #2c3e50;
@@ -88,24 +89,6 @@ body {
     opacity: 0.85;
 }
 
-.progress-bar-container {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
-    height: 8px;
-    margin-top: 0.5rem;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-    overflow: hidden;
-}
-
-.progress-bar {
-    display: flex;
-    height: 100%;
-    border-radius: 20px;
-    overflow: hidden;
-}
-
 .progress-segment {
     height: 100%;
     transition: width 0.4s ease;
@@ -130,28 +113,82 @@ body {
     );
 }
 
-.progress-text {
-    font-size: 1.68rem;
-    margin-top: 0.25rem;
-    opacity: 0.9;
-    font-weight: 600;
-    color: white;
-    background: #000;
-    display: inline-block;
-    padding: 0.05rem 0.35rem;
-    border-radius: 0.25rem;
+.level-stats {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    column-gap: 0.5rem;
+    row-gap: 0.3rem;
+    margin-top: 0.4rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
 }
 
-.progress-text .progress-value.pass {
+.level-stat-row {
+    display: contents;
+}
+
+.level-stat-row .section-badge {
+    justify-self: center;
+    font-size: 0.62rem;
+    padding: 0.1rem 0.4rem;
+    min-width: 3.4rem;
+    text-align: center;
+}
+
+.level-stat-row[data-level-stat="total"] .section-badge {
+    font-size: 0.93rem;
+    padding: 0.15rem 0.6rem;
+    min-width: 5.1rem;
+}
+
+.level-stat-row[data-level-stat="total"] .level-stat-bar-container {
+    height: 7.5px;
+}
+
+.level-stat-row[data-level-stat="total"] .level-stat-counts {
+    font-size: 1.08rem;
+}
+
+.level-stat-bar-container {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    height: 5px;
+    overflow: hidden;
+}
+
+.level-stat-bar {
+    display: flex;
+    height: 100%;
+}
+
+.level-stat-counts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.level-stat-counts .pass {
     color: var(--check-color);
 }
 
-.progress-text .progress-value.fail {
+.level-stat-counts .fail {
     color: var(--progress-fail-color);
 }
 
-.progress-text .progress-value.incomplete {
+.level-stat-counts .incomplete {
     color: #cfd8dc;
+}
+
+.level-stat-pct {
+    color: rgba(255, 255, 255, 0.75);
 }
 
 .toolbar {
@@ -338,6 +375,9 @@ body {
 }
 .section-badge.may {
     background: var(--may-color);
+}
+.section-badge.total {
+    background: var(--total-color);
 }
 
 .section-progress {
@@ -1011,9 +1051,25 @@ code {
         color: #555;
     }
 
-    /* Show progress bar in print */
-    .progress-bar-container {
+    /* Show level stats (including Total row) in print */
+    .level-stats {
+        display: grid;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .level-stat-bar-container {
         display: block;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .section-badge {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .level-stat-counts {
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
     }
@@ -1034,12 +1090,6 @@ code {
     .progress-segment.incomplete {
         background: #7f8c8d !important;
         background-image: none !important;
-    }
-
-    .progress-text {
-        display: inline-block;
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
     }
 }
 

@@ -360,49 +360,84 @@ function applyResponseState(id) {
     }
 }
 
-function ensureProgressSegments(progressBar) {
-    const segmentDefinitions = [
-        ["passing", "pass"],
-        ["failing", "fail"],
-        ["incomplete", "incomplete"],
-    ];
-    const segments = {};
-
-    segmentDefinitions.forEach(([key, className]) => {
-        let segment = progressBar.querySelector(`[data-progress-segment="${key}"]`);
-        if (!segment) {
-            segment = document.createElement("div");
-            segment.className = `progress-segment ${className}`;
-            segment.setAttribute("data-progress-segment", key);
-            progressBar.appendChild(segment);
-        }
-        segments[key] = segment;
-    });
-
-    return segments;
-}
-
-function renderProgressValues(progressText, totalPassing, totalFailing, totalIncomplete) {
-    const valueDefinitions = [
-        { key: "passing", className: "pass", label: "passing items", value: totalPassing },
-        { key: "failing", className: "fail", label: "failing items", value: totalFailing },
-        { key: "incomplete", className: "incomplete", label: "incomplete items", value: totalIncomplete },
-    ];
+function renderLevelStats(levelStats, totalStats) {
+    const container = document.getElementById("levelStats");
+    if (!container) return;
 
     const fragment = document.createDocumentFragment();
-    valueDefinitions.forEach(({ key, className, label, value }, index) => {
-        const valueEl = document.createElement("span");
-        valueEl.className = `progress-value ${className}`;
-        valueEl.setAttribute("data-progress-value", key);
-        valueEl.setAttribute("aria-label", label);
-        valueEl.textContent = String(value);
-        fragment.appendChild(valueEl);
+    const allEntries = [["total", { label: "Total", ...totalStats }], ...Object.entries(levelStats)];
+    allEntries.forEach(([level, { label, passing, failing, total }]) => {
+        const incomplete = total - passing - failing;
+        const passingPctRounded = total > 0 ? Math.round((passing / total) * 100) : 0;
+        const passingPctRaw = total > 0 ? (passing / total) * 100 : 0;
+        const failingPctRaw = total > 0 ? (failing / total) * 100 : 0;
+        const incompletePctRaw = total > 0 ? (incomplete / total) * 100 : 100;
 
-        if (index < valueDefinitions.length - 1) {
-            fragment.appendChild(document.createTextNode(" / "));
-        }
+        const row = document.createElement("div");
+        row.className = "level-stat-row";
+        row.setAttribute("data-level-stat", level);
+
+        const badge = document.createElement("span");
+        badge.className = `section-badge ${level}`;
+        badge.textContent = label;
+        row.appendChild(badge);
+
+        const barContainer = document.createElement("div");
+        barContainer.className = "level-stat-bar-container";
+
+        const bar = document.createElement("div");
+        bar.className = "level-stat-bar";
+
+        const passSegment = document.createElement("div");
+        passSegment.className = "progress-segment pass";
+        passSegment.style.width = `${passingPctRaw}%`;
+        bar.appendChild(passSegment);
+
+        const failSegment = document.createElement("div");
+        failSegment.className = "progress-segment fail";
+        failSegment.style.width = `${failingPctRaw}%`;
+        bar.appendChild(failSegment);
+
+        const incompleteSegment = document.createElement("div");
+        incompleteSegment.className = "progress-segment incomplete";
+        incompleteSegment.style.width = `${incompletePctRaw}%`;
+        bar.appendChild(incompleteSegment);
+
+        barContainer.appendChild(bar);
+        row.appendChild(barContainer);
+
+        const counts = document.createElement("span");
+        counts.className = "level-stat-counts";
+        counts.setAttribute(
+            "aria-label",
+            `${passing} passing, ${failing} failing, ${incomplete} incomplete, ${passingPctRounded}% passing`
+        );
+
+        const passSpan = document.createElement("span");
+        passSpan.className = "pass";
+        passSpan.textContent = `${passing}✓`;
+        counts.appendChild(passSpan);
+
+        const failSpan = document.createElement("span");
+        failSpan.className = "fail";
+        failSpan.textContent = `${failing}✗`;
+        counts.appendChild(failSpan);
+
+        const incompleteSpan = document.createElement("span");
+        incompleteSpan.className = "incomplete";
+        incompleteSpan.textContent = `${incomplete}?`;
+        counts.appendChild(incompleteSpan);
+
+        const pctSpan = document.createElement("span");
+        pctSpan.className = "level-stat-pct";
+        pctSpan.textContent = `${passingPctRounded}%`;
+        counts.appendChild(pctSpan);
+
+        row.appendChild(counts);
+        fragment.appendChild(row);
     });
-    progressText.replaceChildren(fragment);
+
+    container.replaceChildren(fragment);
 }
 
 function updateAllCounts() {
@@ -410,8 +445,16 @@ function updateAllCounts() {
     let totalPassing = 0;
     let totalFailing = 0;
 
+    const levelStats = {};
+    DATA.forEach((section) => {
+        if (!levelStats[section.level]) {
+            levelStats[section.level] = { label: section.label, passing: 0, failing: 0, total: 0 };
+        }
+    });
+
     DATA.forEach((section, si) => {
         let sectionChecked = 0;
+        let sectionFailing = 0;
         let sectionTotal = 0;
 
         section.principles.forEach((principle, pi) => {
@@ -429,6 +472,7 @@ function updateAllCounts() {
                 if (responseValue === "no") {
                     failed = true;
                     totalFailing++;
+                    sectionFailing++;
                 }
             });
 
@@ -448,25 +492,15 @@ function updateAllCounts() {
         });
 
         const sp = document.getElementById(`sectionProgress_${si}`);
-        sp.textContent = `${sectionChecked}/${sectionTotal}`;
+        const sectionPct = sectionTotal > 0 ? Math.round((sectionChecked / sectionTotal) * 100) : 0;
+        sp.textContent = `${sectionChecked}/${sectionTotal} (${sectionPct}%)`;
+
+        levelStats[section.level].passing += sectionChecked;
+        levelStats[section.level].failing += sectionFailing;
+        levelStats[section.level].total += sectionTotal;
     });
 
-    const totalIncomplete = totalItems - totalPassing - totalFailing;
-    const passingPct = totalItems > 0 ? (totalPassing / totalItems) * 100 : 0;
-    const failingPct = totalItems > 0 ? (totalFailing / totalItems) * 100 : 0;
-    const incompletePct = totalItems > 0 ? (totalIncomplete / totalItems) * 100 : 0;
-    const progressBar = document.getElementById("progressBar");
-    const progressSegments = ensureProgressSegments(progressBar);
-    progressSegments.passing.style.width = `${passingPct}%`;
-    progressSegments.failing.style.width = `${failingPct}%`;
-    progressSegments.incomplete.style.width = `${incompletePct}%`;
-
-    const progressText = document.getElementById("progressText");
-    renderProgressValues(progressText, totalPassing, totalFailing, totalIncomplete);
-    progressText.setAttribute(
-        "aria-label",
-        `${totalPassing} passing, ${totalFailing} failing, ${totalIncomplete} incomplete`
-    );
+    renderLevelStats(levelStats, { passing: totalPassing, failing: totalFailing, total: totalItems });
 }
 
 function getState() {
@@ -672,6 +706,7 @@ export {
     handleReason,
     applyResponseState,
     updateAllCounts,
+    renderLevelStats,
     getState,
     setState,
     saveToLocalStorage,
