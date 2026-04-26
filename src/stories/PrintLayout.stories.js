@@ -56,9 +56,9 @@ function buildLevelStatRow({ level, label, passing, failing, total }) {
             </div>
             <span class="level-stat-counts">
                 <span class="pass">${passing}✓</span>
-                <span class="fail"> ${failing}✗</span>
-                <span class="incomplete"> ${incomplete}?</span>
-                <span class="level-stat-pct"> ${pct}%</span>
+                <span class="fail">${failing}✗</span>
+                <span class="incomplete">${incomplete}?</span>
+                <span class="level-stat-pct">${pct}%</span>
             </span>
         </div>
     `;

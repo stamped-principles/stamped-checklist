@@ -28,7 +28,7 @@ export function withPrintStyles(element) {
         style.textContent = `
             .print-preview .toolbar { display: none !important; }
             .print-preview .level-stats {
-                display: flex !important;
+                display: grid !important;
                 print-color-adjust: exact;
                 -webkit-print-color-adjust: exact;
             }
