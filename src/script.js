@@ -284,6 +284,10 @@ function buildChecklist() {
 
     container.appendChild(cardsGrid);
 
+    // Enable response mode before loading state so that .response-ui is visible
+    // when applyResponseState calls autoResizeTextarea (display:none parent yields
+    // scrollHeight=0, which would collapse all reason textareas on load).
+    loadModePreference();
     loadFromURL();
     // URL state is authoritative when present; localStorage only hydrates when URL has no encoded state.
     if (!new URLSearchParams(window.location.search).has("state")) {
@@ -292,7 +296,6 @@ function buildChecklist() {
     updateAllCounts();
     loadColumnPreference();
     loadSectionsPreference();
-    loadModePreference();
     syncPersistentURL();
 }
 

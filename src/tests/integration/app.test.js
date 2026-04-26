@@ -427,4 +427,35 @@ test.describe("STAMPED Checklist App", () => {
 
         await context.close();
     });
+
+    // Regression test: reason textarea must auto-resize to fit saved content on fresh page load.
+    test("reason textarea auto-resizes to fit saved content on fresh navigation", async ({ browser }) => {
+        const context = await browser.newContext();
+        const page = await context.newPage();
+
+        await page.goto("/");
+
+        await page.locator(".no-btn").first().click();
+        const reasonInput = page.locator(".reason-input").first();
+        // Fill with enough text to span multiple lines
+        const longText = "This is a long reason that should cause the textarea to expand beyond one row. ".repeat(3);
+        await reasonInput.fill(longText);
+
+        // Capture the expanded height from the first visit
+        const heightAfterFill = await reasonInput.evaluate((el) => el.offsetHeight);
+
+        // Open a new page in the same context so localStorage is shared
+        const page2 = await context.newPage();
+        await page2.goto("/");
+
+        const reasonInput2 = page2.locator(".reason-input").first();
+        await expect(reasonInput2).toBeVisible();
+
+        // The textarea height on reload should match the expanded height from the first visit,
+        // not collapse to a single-row height.
+        const heightOnReload = await reasonInput2.evaluate((el) => el.offsetHeight);
+        expect(heightOnReload).toBeGreaterThanOrEqual(heightAfterFill);
+
+        await context.close();
+    });
 });
