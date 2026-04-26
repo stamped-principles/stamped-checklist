@@ -163,7 +163,7 @@ body {
     background: white;
     border-bottom: 1px solid var(--border);
     position: sticky;
-    top: 0;
+    top: var(--header-height, 0px);
     z-index: 99;
 }
 
@@ -789,6 +789,9 @@ code {
     font-size: 0.82rem;
     color: var(--text-light);
     line-height: 1.5;
+    position: sticky;
+    top: var(--toolbar-offset, 0px);
+    z-index: 98;
 }
 
 .legend {

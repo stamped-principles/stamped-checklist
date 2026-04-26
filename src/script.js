@@ -677,8 +677,18 @@ export {
     loadFromURL,
     confirmReset,
     showToast,
+    updateHeaderHeight,
     init,
 };
+
+function updateHeaderHeight() {
+    const header = document.querySelector(".header");
+    const toolbar = document.querySelector(".toolbar");
+    const headerHeight = header ? header.offsetHeight : 0;
+    const toolbarHeight = toolbar ? toolbar.offsetHeight : 0;
+    document.documentElement.style.setProperty("--header-height", `${headerHeight}px`);
+    document.documentElement.style.setProperty("--toolbar-offset", `${headerHeight + toolbarHeight}px`);
+}
 
 function init() {
     setupThemeToggle();
@@ -687,6 +697,16 @@ function init() {
 
     const versionEl = document.getElementById("version-indicator");
     if (versionEl) versionEl.textContent = "v" + VERSION;
+
+    updateHeaderHeight();
+    if (typeof ResizeObserver !== "undefined") {
+        // The observers intentionally run for the page lifetime; no cleanup needed.
+        const ro = new ResizeObserver(updateHeaderHeight);
+        const header = document.querySelector(".header");
+        const toolbar = document.querySelector(".toolbar");
+        if (header) ro.observe(header);
+        if (toolbar) ro.observe(toolbar);
+    }
 }
 
 // Expose functions to the global scope for inline DOM event handlers in index.html
