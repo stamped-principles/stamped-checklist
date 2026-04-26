@@ -154,6 +154,69 @@ body {
     color: #cfd8dc;
 }
 
+.level-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.4rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+.level-stat-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.level-stat-row .section-badge {
+    font-size: 0.62rem;
+    padding: 0.1rem 0.4rem;
+    min-width: 3.4rem;
+    text-align: center;
+}
+
+.level-stat-bar-container {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    height: 5px;
+    overflow: hidden;
+}
+
+.level-stat-bar {
+    display: flex;
+    height: 100%;
+}
+
+.level-stat-counts {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    min-width: 9rem;
+    text-align: right;
+}
+
+.level-stat-counts .pass {
+    color: var(--check-color);
+}
+
+.level-stat-counts .fail {
+    color: var(--progress-fail-color);
+}
+
+.level-stat-counts .incomplete {
+    color: #cfd8dc;
+}
+
+.level-stat-pct {
+    color: rgba(255, 255, 255, 0.75);
+    margin-left: 0.25rem;
+}
+
 .toolbar {
     display: flex;
     flex-wrap: wrap;

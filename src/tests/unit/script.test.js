@@ -23,6 +23,7 @@ function setupDOM() {
             <span class="progress-value fail" data-progress-value="failing" aria-label="failing items">0</span> /
             <span class="progress-value incomplete" data-progress-value="incomplete" aria-label="incomplete items">0</span>
         </div>
+        <div class="level-stats" id="levelStats"></div>
         <div id="toast"></div>
         <div id="cookie-consent-banner" class="cookie-consent-banner hidden"></div>
         <button id="cookie-consent-decline" type="button">Decline</button>
@@ -257,6 +258,58 @@ describe("buildChecklist and state management", () => {
         expect(parseFloat(incompleteSegment.style.width)).toBeGreaterThan(0);
         expect(progressText.querySelector(".progress-value.pass").textContent).toBe("0");
         expect(progressText.querySelector(".progress-value.fail").textContent).toBe("1");
+    });
+
+    it("updateAllCounts renders a level-stat-row for each data level", () => {
+        script.updateAllCounts();
+
+        const rows = document.querySelectorAll("#levelStats .level-stat-row");
+        expect(rows.length).toBe(DATA.length);
+        const levels = Array.from(rows).map((r) => r.getAttribute("data-level-stat"));
+        expect(levels).toEqual(DATA.map((s) => s.level));
+    });
+
+    it("updateAllCounts level stats show zero passing and failing on fresh state", () => {
+        script.updateAllCounts();
+
+        const rows = document.querySelectorAll("#levelStats .level-stat-row");
+        rows.forEach((row) => {
+            const counts = row.querySelector(".level-stat-counts");
+            expect(counts.querySelector(".pass").textContent).toBe("0✓");
+            expect(counts.querySelector(".fail").textContent).toBe("0✗");
+            expect(counts.querySelector(".level-stat-pct").textContent).toBe("0%");
+        });
+    });
+
+    it("updateAllCounts level stats reflect yes answers in the correct level row", () => {
+        const firstLevelSection = DATA[0];
+        firstLevelSection.principles.forEach((principle, pi) => {
+            principle.items.forEach((_, ii) => {
+                const id = script.generateId(0, pi, ii);
+                script.handleResponse(id, "yes");
+            });
+        });
+        script.updateAllCounts();
+
+        const firstRow = document.querySelector(
+            `#levelStats .level-stat-row[data-level-stat="${firstLevelSection.level}"]`
+        );
+        const counts = firstRow.querySelector(".level-stat-counts");
+        const expectedPassing = firstLevelSection.principles.flatMap((p) => p.items).length;
+        expect(counts.querySelector(".pass").textContent).toBe(`${expectedPassing}✓`);
+        expect(counts.querySelector(".fail").textContent).toBe("0✗");
+        expect(counts.querySelector(".level-stat-pct").textContent).toBe("100%");
+    });
+
+    it("updateAllCounts level stats reflect no answers in the correct level row", () => {
+        const id = script.generateId(0, 0, 0);
+        script.handleResponse(id, "no");
+        script.updateAllCounts();
+
+        const firstLevelRow = document.querySelector(`#levelStats .level-stat-row[data-level-stat="${DATA[0].level}"]`);
+        const counts = firstLevelRow.querySelector(".level-stat-counts");
+        expect(counts.querySelector(".fail").textContent).toBe("1✗");
+        expect(counts.querySelector(".pass").textContent).toBe("0✓");
     });
 });
 

@@ -237,6 +237,41 @@ test.describe("STAMPED Checklist App", () => {
         await expect(page.locator("#progressText .progress-value.incomplete")).toHaveText("0");
     });
 
+    test("level stats container renders one row per requirement level", async ({ page }) => {
+        const rows = page.locator("#levelStats .level-stat-row");
+        await expect(rows).toHaveCount(DATA.length);
+        for (const section of DATA) {
+            await expect(page.locator(`#levelStats .level-stat-row[data-level-stat="${section.level}"]`)).toHaveCount(
+                1
+            );
+        }
+    });
+
+    test("level stats show 0% passing on initial load", async ({ page }) => {
+        const rows = page.locator("#levelStats .level-stat-row");
+        const count = await rows.count();
+        for (let i = 0; i < count; i++) {
+            await expect(rows.nth(i).locator(".level-stat-pct")).toHaveText("0%");
+        }
+    });
+
+    test("level stats update passing count when yes is answered", async ({ page }) => {
+        await answerYes(page, page.locator(".yes-btn").first());
+        const firstLevelRow = page.locator(`#levelStats .level-stat-row[data-level-stat="${DATA[0].level}"]`);
+        await expect(firstLevelRow.locator(".level-stat-counts .pass")).not.toHaveText("0✓");
+    });
+
+    test("level stats show 100% for a level when all its items are answered yes", async ({ page }) => {
+        const firstLevel = DATA[0].level;
+        const firstLevelYesButtons = page.locator(`.principle-card.${firstLevel} .yes-btn`);
+        const count = await firstLevelYesButtons.count();
+        for (let i = 0; i < count; i++) {
+            await answerYes(page, firstLevelYesButtons.nth(i));
+        }
+        const firstLevelRow = page.locator(`#levelStats .level-stat-row[data-level-stat="${firstLevel}"]`);
+        await expect(firstLevelRow.locator(".level-stat-pct")).toHaveText("100%");
+    });
+
     test("toolbar does not render a Share URL button", async ({ page }) => {
         await expect(page.locator("button", { hasText: "Share URL" })).toHaveCount(0);
     });
