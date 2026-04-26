@@ -1,6 +1,13 @@
 import { withTheme } from "./utils.js";
 
-function buildMainPageLayout() {
+function buildMainPageLayout({
+    passingWidth = "0%",
+    failingWidth = "0%",
+    incompleteWidth = "100%",
+    passingCount = 0,
+    failingCount = 0,
+    incompleteCount = 0,
+} = {}) {
     const root = document.createElement("div");
     root.innerHTML = `
         <div class="header">
@@ -24,9 +31,17 @@ function buildMainPageLayout() {
             <h1>📋 STAMPED Compliance Checklist</h1>
             <p>Assess your research objects against the STAMPED principles</p>
             <div class="progress-bar-container">
-                <div class="progress-bar" id="progressBar"></div>
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-segment pass" data-progress-segment="passing" style="width:${passingWidth}"></div>
+                    <div class="progress-segment fail" data-progress-segment="failing" style="width:${failingWidth}"></div>
+                    <div class="progress-segment incomplete" data-progress-segment="incomplete" style="width:${incompleteWidth}"></div>
+                </div>
             </div>
-            <div class="progress-text" id="progressText">0 / 0 items checked (0%)</div>
+            <div class="progress-text" id="progressText">
+                <span class="progress-value pass" data-progress-value="passing" aria-label="passing items">${passingCount}</span> /
+                <span class="progress-value fail" data-progress-value="failing" aria-label="failing items">${failingCount}</span> /
+                <span class="progress-value incomplete" data-progress-value="incomplete" aria-label="incomplete items">${incompleteCount}</span>
+            </div>
         </div>
         <div class="toolbar">
             <button type="button"><span class="icon">🖨️</span> Print</button>
@@ -83,11 +98,37 @@ export default {
 };
 
 export const Default = {
-    name: "Main page layout",
+    name: "Main page layout (incomplete)",
     render: () => buildMainPageLayout(),
 };
 
+export const Passing = {
+    name: "Main page layout (passing)",
+    render: () =>
+        buildMainPageLayout({
+            passingWidth: "100%",
+            failingWidth: "0%",
+            incompleteWidth: "0%",
+            passingCount: 3,
+            failingCount: 0,
+            incompleteCount: 0,
+        }),
+};
+
+export const Failed = {
+    name: "Main page layout (failed)",
+    render: () =>
+        buildMainPageLayout({
+            passingWidth: "34%",
+            failingWidth: "33%",
+            incompleteWidth: "33%",
+            passingCount: 1,
+            failingCount: 1,
+            incompleteCount: 1,
+        }),
+};
+
 export const DefaultDark = {
-    name: "Main page layout (dark mode)",
+    name: "Main page layout (dark mode, incomplete)",
     render: () => withTheme(buildMainPageLayout(), "dark"),
 };

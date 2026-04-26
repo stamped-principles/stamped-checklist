@@ -1,5 +1,6 @@
 :root {
     --must-color: #c0392b;
+    --progress-fail-color: #ff6b6b;
     --must-bg: #fdedec;
     --must-border: #e74c3c;
     --should-color: #d4880f;
@@ -33,7 +34,7 @@ body {
 }
 
 .header {
-    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    background: linear-gradient(135deg, #3a536b 0%, #4aa8ef 100%);
     color: white;
     padding: 0.8rem 1.5rem;
     text-align: center;
@@ -99,18 +100,58 @@ body {
 }
 
 .progress-bar {
-    background: var(--check-color);
+    display: flex;
     height: 100%;
     border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-segment {
+    height: 100%;
     transition: width 0.4s ease;
-    width: 0%;
+}
+
+.progress-segment.pass {
+    background: var(--check-color);
+}
+
+.progress-segment.fail {
+    background: var(--progress-fail-color);
+}
+
+.progress-segment.incomplete {
+    background-color: var(--text-light);
+    background-image: repeating-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.24) 0,
+        rgba(255, 255, 255, 0.24) 6px,
+        rgba(255, 255, 255, 0.06) 6px,
+        rgba(255, 255, 255, 0.06) 12px
+    );
 }
 
 .progress-text {
-    font-size: 0.78rem;
+    font-size: 1.68rem;
     margin-top: 0.25rem;
     opacity: 0.9;
     font-weight: 600;
+    color: white;
+    background: #000;
+    display: inline-block;
+    padding: 0.05rem 0.35rem;
+    border-radius: 0.25rem;
+}
+
+.progress-text .progress-value.pass {
+    color: var(--check-color);
+}
+
+.progress-text .progress-value.fail {
+    color: var(--progress-fail-color);
+}
+
+.progress-text .progress-value.incomplete {
+    color: #cfd8dc;
 }
 
 .toolbar {
@@ -414,6 +455,10 @@ body {
 
 .principle-count.done {
     color: var(--check-color);
+}
+
+.principle-count.failed {
+    color: var(--must-color);
 }
 
 .checklist {

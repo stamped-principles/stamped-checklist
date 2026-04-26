@@ -153,10 +153,15 @@ test.describe("STAMPED Checklist App", () => {
         await expect(codeSpans.filter({ hasText: "git" }).first()).toBeVisible();
     });
 
-    test("initial progress shows 0 items checked", async ({ page }) => {
-        const progressText = page.locator("#progressText");
-        await expect(progressText).toContainText("0 /");
-        await expect(progressText).toContainText("(0%)");
+    test("initial progress shows all items as incomplete", async ({ page }) => {
+        const passingSegment = page.locator('#progressBar [data-progress-segment="passing"]');
+        const failingSegment = page.locator('#progressBar [data-progress-segment="failing"]');
+        const incompleteSegment = page.locator('#progressBar [data-progress-segment="incomplete"]');
+        await expect(passingSegment).toHaveCSS("width", "0px");
+        await expect(failingSegment).toHaveCSS("width", "0px");
+        await expect(incompleteSegment).not.toHaveCSS("width", "0px");
+        await expect(page.locator("#progressText .progress-value.pass")).toHaveText("0");
+        await expect(page.locator("#progressText .progress-value.fail")).toHaveText("0");
     });
 
     test("answering yes updates the principle counter", async ({ page }) => {
@@ -170,7 +175,9 @@ test.describe("STAMPED Checklist App", () => {
 
     test("checking all items in a principle marks it complete", async ({ page }) => {
         const firstCard = page.locator("#card_0_0");
+        const firstCounter = page.locator("#count_0_0");
         await expect(firstCard).not.toHaveClass(/complete/);
+        await expect(firstCounter).not.toHaveClass(/done/);
 
         const yesButtons = firstCard.locator(".yes-btn");
         const count = await yesButtons.count();
@@ -179,11 +186,55 @@ test.describe("STAMPED Checklist App", () => {
         }
 
         await expect(firstCard).toHaveClass(/complete/);
+        await expect(firstCounter).toHaveClass(/done/);
+        await expect(firstCounter).not.toHaveClass(/failed/);
     });
 
-    test("progress bar percentage updates after checking items", async ({ page }) => {
+    test("answering no marks the principle counter failed", async ({ page }) => {
+        const firstCounter = page.locator("#count_0_0");
+        await expect(firstCounter).not.toHaveClass(/done/);
+        await expect(firstCounter).not.toHaveClass(/failed/);
+
+        await page.locator(".no-btn").first().click();
+
+        await expect(firstCounter).toHaveClass(/failed/);
+        await expect(firstCounter).not.toHaveClass(/done/);
+    });
+
+    test("answering yes adds proportional passing fill", async ({ page }) => {
         await answerYes(page, page.locator(".yes-btn").first());
-        await expect(page.locator("#progressText")).not.toContainText("(0%)");
+        await expect(page.locator('#progressBar [data-progress-segment="passing"]')).not.toHaveCSS("width", "0px");
+        await expect(page.locator('#progressBar [data-progress-segment="failing"]')).toHaveCSS("width", "0px");
+        await expect(page.locator("#progressText .progress-value.pass")).toHaveText("1");
+    });
+
+    test("answering no adds proportional failing fill after any passing fill", async ({ page }) => {
+        await answerYes(page, page.locator(".yes-btn").first());
+        await page.locator(".no-btn").nth(1).click();
+
+        const segmentOrder = await page
+            .locator("#progressBar .progress-segment")
+            .evaluateAll((segments) => segments.map((segment) => segment.getAttribute("data-progress-segment")));
+        expect(segmentOrder).toEqual(["passing", "failing", "incomplete"]);
+        await expect(page.locator('#progressBar [data-progress-segment="passing"]')).not.toHaveCSS("width", "0px");
+        await expect(page.locator('#progressBar [data-progress-segment="failing"]')).not.toHaveCSS("width", "0px");
+        await expect(page.locator("#progressText .progress-value.pass")).toHaveText("1");
+        await expect(page.locator("#progressText .progress-value.fail")).toHaveText("1");
+    });
+
+    test("answering yes on every item fills progress with passing only", async ({ page }) => {
+        const yesButtons = page.locator(".yes-btn");
+        const count = await yesButtons.count();
+
+        for (let i = 0; i < count; i++) {
+            await answerYes(page, yesButtons.nth(i));
+        }
+
+        await expect(page.locator('#progressBar [data-progress-segment="passing"]')).not.toHaveCSS("width", "0px");
+        await expect(page.locator('#progressBar [data-progress-segment="failing"]')).toHaveCSS("width", "0px");
+        await expect(page.locator('#progressBar [data-progress-segment="incomplete"]')).toHaveCSS("width", "0px");
+        await expect(page.locator("#progressText .progress-value.fail")).toHaveText("0");
+        await expect(page.locator("#progressText .progress-value.incomplete")).toHaveText("0");
     });
 
     test("toolbar does not render a Share URL button", async ({ page }) => {
