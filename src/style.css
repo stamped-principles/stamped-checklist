@@ -10,6 +10,7 @@
     --may-bg: #eafaf1;
     --may-border: #2ecc71;
     --check-color: #2ecc71;
+    --total-color: #5c748a;
     --bg: #f8f9fa;
     --card-bg: #ffffff;
     --text: #2c3e50;
@@ -88,24 +89,6 @@ body {
     opacity: 0.85;
 }
 
-.progress-bar-container {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
-    height: 8px;
-    margin-top: 0.5rem;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-    overflow: hidden;
-}
-
-.progress-bar {
-    display: flex;
-    height: 100%;
-    border-radius: 20px;
-    overflow: hidden;
-}
-
 .progress-segment {
     height: 100%;
     transition: width 0.4s ease;
@@ -128,26 +111,6 @@ body {
         rgba(255, 255, 255, 0.06) 6px,
         rgba(255, 255, 255, 0.06) 12px
     );
-}
-
-.progress-text {
-    font-size: 0.82rem;
-    margin-top: 0.25rem;
-    font-weight: 600;
-    color: white;
-    white-space: nowrap;
-}
-
-.progress-text .progress-value.pass {
-    color: var(--check-color);
-}
-
-.progress-text .progress-value.fail {
-    color: var(--progress-fail-color);
-}
-
-.progress-text .progress-value.incomplete {
-    color: #cfd8dc;
 }
 
 .level-stats {
@@ -395,6 +358,9 @@ body {
 }
 .section-badge.may {
     background: var(--may-color);
+}
+.section-badge.total {
+    background: var(--total-color);
 }
 
 .section-progress {
@@ -1065,9 +1031,25 @@ code {
         color: #555;
     }
 
-    /* Show progress bar in print */
-    .progress-bar-container {
+    /* Show level stats (including Total row) in print */
+    .level-stats {
+        display: flex;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .level-stat-bar-container {
         display: block;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .section-badge {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .level-stat-counts {
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
     }
@@ -1088,12 +1070,6 @@ code {
     .progress-segment.incomplete {
         background: #7f8c8d !important;
         background-image: none !important;
-    }
-
-    .progress-text {
-        display: inline-block;
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
     }
 }
 

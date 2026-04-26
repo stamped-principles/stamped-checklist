@@ -38,13 +38,36 @@ function buildCheckItem({ text, state = null, reason = "" }) {
     `;
 }
 
+function buildLevelStatRow({ level, label, passing, failing, total }) {
+    const incomplete = total - passing - failing;
+    const pct = total > 0 ? Math.round((passing / total) * 100) : 0;
+    const passingPct = total > 0 ? (passing / total) * 100 : 0;
+    const failingPct = total > 0 ? (failing / total) * 100 : 0;
+    const incompletePct = total > 0 ? (incomplete / total) * 100 : 100;
+    return `
+        <div class="level-stat-row" data-level-stat="${level}">
+            <span class="section-badge ${level}">${label}</span>
+            <div class="level-stat-bar-container">
+                <div class="level-stat-bar">
+                    <div class="progress-segment pass" style="width:${passingPct}%"></div>
+                    <div class="progress-segment fail" style="width:${failingPct}%"></div>
+                    <div class="progress-segment incomplete" style="width:${incompletePct}%"></div>
+                </div>
+            </div>
+            <span class="level-stat-counts">
+                <span class="pass">${passing}✓</span>
+                <span class="fail"> ${failing}✗</span>
+                <span class="incomplete"> ${incomplete}?</span>
+                <span class="level-stat-pct"> ${pct}%</span>
+            </span>
+        </div>
+    `;
+}
+
 function buildPrintLayout({
-    passingWidth = "0%",
-    failingWidth = "0%",
-    incompleteWidth = "100%",
-    passingCount = 0,
-    failingCount = 0,
-    incompleteCount = 0,
+    totalPassing = 0,
+    totalFailing = 0,
+    totalCount = 3,
     checkItems = [],
     principleCount = "0/3",
 } = {}) {
@@ -56,17 +79,23 @@ function buildPrintLayout({
             </div>
             <h1>📋 STAMPED Compliance Checklist</h1>
             <p>Assess your research objects against the STAMPED principles</p>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progressBar">
-                    <div class="progress-segment pass" data-progress-segment="passing" style="width:${passingWidth}"></div>
-                    <div class="progress-segment fail" data-progress-segment="failing" style="width:${failingWidth}"></div>
-                    <div class="progress-segment incomplete" data-progress-segment="incomplete" style="width:${incompleteWidth}"></div>
-                </div>
-            </div>
-            <div class="progress-text" id="progressText">
-                <span class="progress-value pass" data-progress-value="passing" aria-label="passing items">${passingCount}</span> /
-                <span class="progress-value fail" data-progress-value="failing" aria-label="failing items">${failingCount}</span> /
-                <span class="progress-value incomplete" data-progress-value="incomplete" aria-label="incomplete items">${incompleteCount}</span>
+            <div class="level-stats" id="levelStats">
+                ${buildLevelStatRow({
+                    level: "total",
+                    label: "Total",
+                    passing: totalPassing,
+                    failing: totalFailing,
+                    total: totalCount,
+                })}
+                ${buildLevelStatRow({
+                    level: "must",
+                    label: "MUST",
+                    passing: totalPassing,
+                    failing: totalFailing,
+                    total: totalCount,
+                })}
+                ${buildLevelStatRow({ level: "should", label: "SHOULD", passing: 0, failing: 0, total: 0 })}
+                ${buildLevelStatRow({ level: "may", label: "MAY", passing: 0, failing: 0, total: 0 })}
             </div>
         </div>
         <div class="toolbar">
@@ -131,12 +160,9 @@ export const Passing = {
     name: "Print layout (passing)",
     render: () =>
         buildPrintLayout({
-            passingWidth: "100%",
-            failingWidth: "0%",
-            incompleteWidth: "0%",
-            passingCount: 3,
-            failingCount: 0,
-            incompleteCount: 0,
+            totalPassing: 3,
+            totalFailing: 0,
+            totalCount: 3,
             checkItems: [
                 {
                     text: "A persistent identifier (e.g. DOI, RRID) is recorded for every software dependency.",
@@ -153,12 +179,9 @@ export const Mixed = {
     name: "Print layout (mixed results)",
     render: () =>
         buildPrintLayout({
-            passingWidth: "34%",
-            failingWidth: "33%",
-            incompleteWidth: "33%",
-            passingCount: 1,
-            failingCount: 1,
-            incompleteCount: 1,
+            totalPassing: 1,
+            totalFailing: 1,
+            totalCount: 3,
             checkItems: [
                 {
                     text: "A persistent identifier (e.g. DOI, RRID) is recorded for every software dependency.",

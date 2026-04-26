@@ -357,34 +357,13 @@ function applyResponseState(id) {
     }
 }
 
-function ensureProgressSegments(progressBar) {
-    const segmentDefinitions = [
-        ["passing", "pass"],
-        ["failing", "fail"],
-        ["incomplete", "incomplete"],
-    ];
-    const segments = {};
-
-    segmentDefinitions.forEach(([key, className]) => {
-        let segment = progressBar.querySelector(`[data-progress-segment="${key}"]`);
-        if (!segment) {
-            segment = document.createElement("div");
-            segment.className = `progress-segment ${className}`;
-            segment.setAttribute("data-progress-segment", key);
-            progressBar.appendChild(segment);
-        }
-        segments[key] = segment;
-    });
-
-    return segments;
-}
-
-function renderLevelStats(levelStats) {
+function renderLevelStats(levelStats, totalStats) {
     const container = document.getElementById("levelStats");
     if (!container) return;
 
     const fragment = document.createDocumentFragment();
-    Object.entries(levelStats).forEach(([level, { label, passing, failing, total }]) => {
+    const allEntries = [["total", { label: "Total", ...totalStats }], ...Object.entries(levelStats)];
+    allEntries.forEach(([level, { label, passing, failing, total }]) => {
         const incomplete = total - passing - failing;
         const passingPctRounded = total > 0 ? Math.round((passing / total) * 100) : 0;
         const passingPctRaw = total > 0 ? (passing / total) * 100 : 0;
@@ -464,29 +443,6 @@ function renderLevelStats(levelStats) {
     container.replaceChildren(fragment);
 }
 
-function renderProgressValues(progressText, totalPassing, totalFailing, totalIncomplete) {
-    const valueDefinitions = [
-        { key: "passing", className: "pass", label: "passing items", value: totalPassing },
-        { key: "failing", className: "fail", label: "failing items", value: totalFailing },
-        { key: "incomplete", className: "incomplete", label: "incomplete items", value: totalIncomplete },
-    ];
-
-    const fragment = document.createDocumentFragment();
-    valueDefinitions.forEach(({ key, className, label, value }, index) => {
-        const valueEl = document.createElement("span");
-        valueEl.className = `progress-value ${className}`;
-        valueEl.setAttribute("data-progress-value", key);
-        valueEl.setAttribute("aria-label", label);
-        valueEl.textContent = String(value);
-        fragment.appendChild(valueEl);
-
-        if (index < valueDefinitions.length - 1) {
-            fragment.appendChild(document.createTextNode(" / "));
-        }
-    });
-    progressText.replaceChildren(fragment);
-}
-
 function updateAllCounts() {
     const totalItems = DATA.flatMap((section) => section.principles).flatMap((principle) => principle.items).length;
     let totalPassing = 0;
@@ -547,24 +503,7 @@ function updateAllCounts() {
         levelStats[section.level].total += sectionTotal;
     });
 
-    const totalIncomplete = totalItems - totalPassing - totalFailing;
-    const passingPct = totalItems > 0 ? (totalPassing / totalItems) * 100 : 0;
-    const failingPct = totalItems > 0 ? (totalFailing / totalItems) * 100 : 0;
-    const incompletePct = totalItems > 0 ? (totalIncomplete / totalItems) * 100 : 0;
-    const progressBar = document.getElementById("progressBar");
-    const progressSegments = ensureProgressSegments(progressBar);
-    progressSegments.passing.style.width = `${passingPct}%`;
-    progressSegments.failing.style.width = `${failingPct}%`;
-    progressSegments.incomplete.style.width = `${incompletePct}%`;
-
-    const progressText = document.getElementById("progressText");
-    renderProgressValues(progressText, totalPassing, totalFailing, totalIncomplete);
-    progressText.setAttribute(
-        "aria-label",
-        `${totalPassing} passing, ${totalFailing} failing, ${totalIncomplete} incomplete`
-    );
-
-    renderLevelStats(levelStats);
+    renderLevelStats(levelStats, { passing: totalPassing, failing: totalFailing, total: totalItems });
 }
 
 function getState() {

@@ -27,8 +27,21 @@ export function withPrintStyles(element) {
         style.id = "story-print-override";
         style.textContent = `
             .print-preview .toolbar { display: none !important; }
-            .print-preview .progress-bar-container {
+            .print-preview .level-stats {
+                display: flex !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            .print-preview .level-stat-bar-container {
                 display: block !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            .print-preview .section-badge {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            .print-preview .level-stat-counts {
                 print-color-adjust: exact;
                 -webkit-print-color-adjust: exact;
             }
@@ -38,7 +51,6 @@ export function withPrintStyles(element) {
                 background: #7f8c8d !important;
                 background-image: none !important;
             }
-            .print-preview .progress-text { display: inline-block !important; }
             .print-preview .cards-grid,
             .print-preview .cards-grid.cols-auto {
                 columns: auto !important;
