@@ -68,6 +68,24 @@ test.describe("STAMPED Checklist App", () => {
         await expect(page.locator(".legend .legend-item")).toHaveCount(3);
     });
 
+    test("toolbar sticks below header when scrolling", async ({ page }) => {
+        // --header-height CSS variable must be set to the header's rendered height
+        const headerHeight = await page.evaluate(() => {
+            const header = document.querySelector(".header");
+            return header ? header.offsetHeight : 0;
+        });
+        expect(headerHeight).toBeGreaterThan(0);
+
+        const cssVar = await page.evaluate(() =>
+            getComputedStyle(document.documentElement).getPropertyValue("--header-height").trim()
+        );
+        expect(cssVar).toBe(`${headerHeight}px`);
+
+        // Toolbar must use that variable as its sticky top offset
+        const toolbarTop = await page.evaluate(() => getComputedStyle(document.querySelector(".toolbar")).top);
+        expect(toolbarTop).toBe(`${headerHeight}px`);
+    });
+
     test("header includes GitHub nav icon link to this repository", async ({ page }) => {
         const githubLink = page.locator(".header-actions .github-link");
         await expect(githubLink).toBeVisible();

@@ -677,8 +677,16 @@ export {
     loadFromURL,
     confirmReset,
     showToast,
+    updateHeaderHeight,
     init,
 };
+
+function updateHeaderHeight() {
+    const header = document.querySelector(".header");
+    if (header) {
+        document.documentElement.style.setProperty("--header-height", `${header.offsetHeight}px`);
+    }
+}
 
 function init() {
     setupThemeToggle();
@@ -687,6 +695,12 @@ function init() {
 
     const versionEl = document.getElementById("version-indicator");
     if (versionEl) versionEl.textContent = "v" + VERSION;
+
+    updateHeaderHeight();
+    const header = document.querySelector(".header");
+    if (header && typeof ResizeObserver !== "undefined") {
+        new ResizeObserver(updateHeaderHeight).observe(header);
+    }
 }
 
 // Expose functions to the global scope for inline DOM event handlers in index.html
