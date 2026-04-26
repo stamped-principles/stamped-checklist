@@ -1,5 +1,6 @@
 :root {
     --must-color: #c0392b;
+    --progress-fail-color: #ff6b6b;
     --must-bg: #fdedec;
     --must-border: #e74c3c;
     --should-color: #d4880f;
@@ -115,7 +116,7 @@ body {
 }
 
 .progress-segment.fail {
-    background: var(--must-color);
+    background: var(--progress-fail-color);
 }
 
 .progress-segment.incomplete {
@@ -142,7 +143,7 @@ body {
 }
 
 .progress-text .progress-value.fail {
-    color: var(--must-color);
+    color: var(--progress-fail-color);
 }
 
 .progress-text .progress-value.incomplete {
