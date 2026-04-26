@@ -4,8 +4,8 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>STAMPED Compliance Checklist</title>
-      <script type="module" crossorigin src="./assets/index-C7FInWKP.js"></script>
-      <link rel="stylesheet" crossorigin href="./assets/index-D4dV4alR.css">
+      <script type="module" crossorigin src="./assets/index-BA0IWvbC.js"></script>
+      <link rel="stylesheet" crossorigin href="./assets/index-VNyh-luy.css">
     </head>
     <body>
         <div class="header">
@@ -31,9 +31,23 @@
             <h1>📋 STAMPED Compliance Checklist</h1>
             <p>Assess your research objects against the STAMPED principles</p>
             <div class="progress-bar-container">
-                <div class="progress-bar" id="progressBar"></div>
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-segment pass" data-progress-segment="passing" style="width: 0%"></div>
+                    <div class="progress-segment fail" data-progress-segment="failing" style="width: 0%"></div>
+                    <div
+                        class="progress-segment incomplete"
+                        data-progress-segment="incomplete"
+                        style="width: 100%"
+                    ></div>
+                </div>
             </div>
-            <div class="progress-text" id="progressText">0 / 0 items checked (0%)</div>
+            <div class="progress-text" id="progressText">
+                <span class="progress-value pass" data-progress-value="passing" aria-label="passing items">0</span> /
+                <span class="progress-value fail" data-progress-value="failing" aria-label="failing items">0</span> /
+                <span class="progress-value incomplete" data-progress-value="incomplete" aria-label="incomplete items"
+                    >0</span
+                >
+            </div>
         </div>
 
         <div class="toolbar">
