@@ -415,21 +415,15 @@ function renderLevelStats(levelStats, totalStats) {
         passSpan.textContent = `${passing}✓`;
         counts.appendChild(passSpan);
 
-        counts.appendChild(document.createTextNode(" "));
-
         const failSpan = document.createElement("span");
         failSpan.className = "fail";
         failSpan.textContent = `${failing}✗`;
         counts.appendChild(failSpan);
 
-        counts.appendChild(document.createTextNode(" "));
-
         const incompleteSpan = document.createElement("span");
         incompleteSpan.className = "incomplete";
         incompleteSpan.textContent = `${incomplete}?`;
         counts.appendChild(incompleteSpan);
-
-        counts.appendChild(document.createTextNode(" "));
 
         const pctSpan = document.createElement("span");
         pctSpan.className = "level-stat-pct";
