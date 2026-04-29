@@ -876,6 +876,25 @@ code {
     pointer-events: none;
 }
 
+.branding-indicator {
+    position: fixed;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    z-index: 50;
+    opacity: 0.5;
+    line-height: 0;
+    transition: opacity 0.2s;
+}
+
+.branding-indicator:hover {
+    opacity: 0.85;
+}
+
+.branding-logo {
+    height: 1.6rem;
+    width: auto;
+}
+
 [data-theme="dark"] {
     --bg: #111821;
     --card-bg: #1b2733;
@@ -1049,6 +1068,18 @@ code {
         opacity: 1;
         font-size: 0.6rem;
         color: #555;
+    }
+
+    /* Branding indicator */
+    .branding-indicator {
+        position: fixed;
+        bottom: 0.25rem;
+        right: 0.25rem;
+        opacity: 1;
+    }
+
+    .branding-logo {
+        height: 1.4rem;
     }
 
     /* Show level stats (including Total row) in print */
