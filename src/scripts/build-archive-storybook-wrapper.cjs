@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-'use strict';
+"use strict";
 
 /**
  * Wrapper for build-archive-storybook that restores npm-intercepted CLI args.
@@ -11,20 +11,30 @@
  * before delegating to the real build-archive-storybook binary.
  */
 
-const { spawnSync } = require('child_process');
-const path = require('path');
+const { spawnSync } = require("child_process");
+const path = require("path");
 
 const args = process.argv.slice(2);
 
-if (process.env.npm_config_output_dir && !args.some((a) => a.startsWith('--output-dir'))) {
-    args.push('--output-dir=' + process.env.npm_config_output_dir);
+if (process.env.npm_config_output_dir && !args.some((a) => a.startsWith("--output-dir"))) {
+    args.push("--output-dir=" + process.env.npm_config_output_dir);
 }
-if (process.env.npm_config_stats_json && !args.some((a) => a.startsWith('--stats-json'))) {
-    args.push('--stats-json=' + process.env.npm_config_stats_json);
+if (process.env.npm_config_stats_json && !args.some((a) => a.startsWith("--stats-json"))) {
+    args.push("--stats-json=" + process.env.npm_config_stats_json);
 }
 
-const pkgDir = path.dirname(require.resolve('@chromatic-com/playwright/package.json'));
-const realBin = path.join(pkgDir, 'dist/bin/build-archive-storybook.js');
+// __dirname resolves to the real path of this file after following symlinks.
+// This file lives at src/scripts/, so two levels up is the project root.
+const projectRoot = path.resolve(__dirname, "..", "..");
+const realBin = path.join(
+    projectRoot,
+    "node_modules",
+    "@chromatic-com",
+    "playwright",
+    "dist",
+    "bin",
+    "build-archive-storybook.js"
+);
 
-const result = spawnSync(process.execPath, [realBin, ...args], { stdio: 'inherit' });
-process.exit(result.status ?? 0);
+const result = spawnSync(process.execPath, [realBin, ...args], { stdio: "inherit" });
+process.exit(result.status ?? (result.error ? 1 : 0));
