@@ -20,9 +20,12 @@ jobs:
               run: npx playwright install --with-deps
             - name: Run Playwright tests
               run: npm run test:chromatic
+            - name: Build archive storybook
+              run: npx build-archive-storybook
             - name: Run Chromatic
               uses: chromaui/action@latest
               with:
                   projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
                   onlyChanged: true
+                  storybookBuildDir: storybook-static
                   playwright: true
