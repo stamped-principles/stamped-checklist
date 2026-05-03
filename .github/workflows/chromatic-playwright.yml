@@ -1,0 +1,32 @@
+name: Chromatic (Playwright)
+
+on: push
+
+jobs:
+    chromatic-playwright:
+        name: Run Chromatic (Playwright)
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+            - uses: actions/setup-node@v6
+              with:
+                  node-version: 24.14.0
+            - name: Install dependencies
+              run: npm ci
+            - name: Install build-archive-storybook wrapper
+              run: |
+                  chmod +x src/scripts/build-archive-storybook-wrapper.cjs
+                  rm node_modules/.bin/build-archive-storybook
+                  ln -sf ../../src/scripts/build-archive-storybook-wrapper.cjs node_modules/.bin/build-archive-storybook
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps
+            - name: Run Playwright tests
+              run: npm run test:chromatic
+            - name: Run Chromatic
+              uses: chromaui/action@latest
+              with:
+                  projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+                  playwright: true
