@@ -28,5 +28,5 @@ jobs:
             - name: Run Chromatic
               uses: chromaui/action@latest
               with:
-                  projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+                  projectToken: ${{ secrets.CHROMATIC_PLAYWRIGHT_PROJECT_TOKEN }}
                   playwright: true
