@@ -20,5 +20,12 @@ module.exports = {
                 tabWidth: 2,
             },
         },
+        {
+            // Executable scripts must use LF; CRLF breaks the shebang on Linux
+            files: ["../src/scripts/*.cjs"],
+            options: {
+                endOfLine: "lf",
+            },
+        },
     ],
 };

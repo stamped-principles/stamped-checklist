@@ -18,6 +18,8 @@
         "test:coverage": "vitest run --coverage --config configs/vitest.config.js",
         "pretest:e2e": "npm run sync:schemas",
         "test:e2e": "playwright test --config configs/playwright.config.js",
+        "pretest:chromatic": "npm run sync:schemas",
+        "test:chromatic": "playwright test --config configs/playwright.chromatic.config.js",
         "pretest:e2e:coverage": "npm run sync:schemas",
         "test:e2e:coverage": "PW_COVERAGE=1 playwright test --config configs/playwright.config.js",
         "coverage:integration": "node src/scripts/build-integration-coverage.mjs",
@@ -39,6 +41,7 @@
     },
     "homepage": "https://github.com/stamped-principles/checklist#readme",
     "devDependencies": {
+        "@chromatic-com/playwright": "^0.13.2",
         "@playwright/test": "^1.59.1",
         "@storybook/html-vite": "^10.3.5",
         "@vitest/coverage-v8": "^4.1.4",
