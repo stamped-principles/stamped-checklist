@@ -23,8 +23,11 @@ if (process.env.npm_config_stats_json && !args.some((a) => a.startsWith("--stats
     args.push("--stats-json=" + process.env.npm_config_stats_json);
 }
 
-// __dirname resolves to the real path of this file after following symlinks.
-// This file lives at src/scripts/, so two levels up is the project root.
+// Use __dirname (the real path of this file after following symlinks) to compute
+// the project root rather than require.resolve, because require.resolve needs the
+// package to already be installed in the calling module's node_modules search path,
+// which can fail in development environments where @chromatic-com/playwright is not
+// yet installed. __dirname is always available and correctly points to src/scripts/.
 const projectRoot = path.resolve(__dirname, "..", "..");
 const realBin = path.join(
     projectRoot,
