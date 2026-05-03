@@ -25,7 +25,11 @@ jobs:
               run: npx playwright install --with-deps
             - name: Run Playwright tests
               run: npm run test:chromatic
-            - name: Run Chromatic
+            - name: Run Chromatic (Storybook stories)
+              uses: chromaui/action@latest
+              with:
+                  projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+            - name: Run Chromatic (Playwright visual tests)
               uses: chromaui/action@latest
               with:
                   projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
