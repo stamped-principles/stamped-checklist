@@ -18,6 +18,8 @@
         "test:coverage": "vitest run --coverage --config configs/vitest.config.js",
         "pretest:e2e": "npm run sync:schemas",
         "test:e2e": "playwright test --config configs/playwright.config.js",
+        "pretest:chromatic": "npm run sync:schemas",
+        "test:chromatic": "playwright test --config configs/playwright.chromatic.config.js",
         "pretest:e2e:coverage": "npm run sync:schemas",
         "test:e2e:coverage": "PW_COVERAGE=1 playwright test --config configs/playwright.config.js",
         "coverage:integration": "node src/scripts/build-integration-coverage.mjs",
