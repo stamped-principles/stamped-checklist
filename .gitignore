@@ -3,6 +3,7 @@ src/nohup.out
 dist/
 storybook-static/
 playwright-report/
+playwright-report-chromatic/
 test-results/
 coverage/
 src/data/
