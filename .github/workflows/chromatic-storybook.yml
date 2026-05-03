@@ -20,3 +20,4 @@ jobs:
               uses: chromaui/action@latest
               with:
                   projectToken: ${{ secrets.CHROMATIC_STORYBOOK_PROJECT_TOKEN }}
+                  onlyChanged: true
