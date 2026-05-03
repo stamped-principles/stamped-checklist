@@ -19,4 +19,4 @@ jobs:
             - name: Run Chromatic
               uses: chromaui/action@latest
               with:
-                  projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+                  projectToken: ${{ secrets.CHROMATIC_STORYBOOK_PROJECT_TOKEN }}
