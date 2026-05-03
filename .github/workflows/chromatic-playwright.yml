@@ -30,3 +30,4 @@ jobs:
               with:
                   projectToken: ${{ secrets.CHROMATIC_PLAYWRIGHT_PROJECT_TOKEN }}
                   playwright: true
+                  onlyChanged: true
