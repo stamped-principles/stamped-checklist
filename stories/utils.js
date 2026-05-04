@@ -27,6 +27,12 @@ export function withPrintStyles(element) {
         style.id = "story-print-override";
         style.textContent = `
             .print-preview .toolbar { display: none !important; }
+            .print-preview #theme-toggle { display: none !important; }
+            .print-preview .header {
+                background: linear-gradient(135deg, #3a536b 0%, #4aa8ef 100%) !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
             .print-preview .level-stats {
                 display: grid !important;
                 print-color-adjust: exact;

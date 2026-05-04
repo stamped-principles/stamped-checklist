@@ -1007,6 +1007,12 @@ code {
     /* Hide UI chrome */
     .header {
         position: relative;
+        background: linear-gradient(135deg, #3a536b 0%, #4aa8ef 100%) !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+    #theme-toggle {
+        display: none !important;
     }
     .toolbar {
         display: none !important;

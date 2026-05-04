@@ -186,6 +186,16 @@ function setupThemeToggle() {
     applyTheme(getPreferredTheme());
 }
 
+function setupPrintTitle() {
+    const originalTitle = document.title;
+    window.addEventListener("beforeprint", () => {
+        document.title = "";
+    });
+    window.addEventListener("afterprint", () => {
+        document.title = originalTitle;
+    });
+}
+
 function generateId(sectionIdx, principleIdx, itemIdx) {
     return `s${sectionIdx}_p${principleIdx}_i${itemIdx}`;
 }
@@ -730,6 +740,7 @@ function updateHeaderHeight() {
 
 function init() {
     setupThemeToggle();
+    setupPrintTitle();
     buildChecklist();
     setupCookieConsent();
 
