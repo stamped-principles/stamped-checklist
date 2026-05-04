@@ -1017,7 +1017,8 @@ code {
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
     }
-    #theme-toggle {
+    #theme-toggle,
+    .github-link {
         display: none !important;
     }
     .toolbar {
