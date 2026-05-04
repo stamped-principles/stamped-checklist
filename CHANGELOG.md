@@ -2,7 +2,7 @@
 
 ## Upcoming
 
--   Fixed PDF printout top banner: preserved header dark gradient background, hid theme-toggle icon, and cleared page title during print to remove redundant browser-generated header text ([#106](https://github.com/stamped-principles/stamped-checklist/pull/106))
+-   Fixed PDF printout top banner: preserved header dark gradient background, hid theme-toggle icon, cleared page title during print, and removed browser-generated URL/date/page-number margin strip via `@page { margin: 0 }` ([#106](https://github.com/stamped-principles/stamped-checklist/pull/106))
 -   Added per-row colour tints (MUST/SHOULD/MAY) and a vertical divider between counters and percentage in the header progress block ([#103](https://github.com/stamped-principles/stamped-checklist/pull/103))
 -   Added version-check CI workflow and agent instructions ([#101](https://github.com/stamped-principles/stamped-checklist/pull/101))
 

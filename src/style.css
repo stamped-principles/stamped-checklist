@@ -968,6 +968,12 @@ code {
     background: rgba(255, 255, 255, 0.35);
 }
 
+@page {
+    /* Setting margins to 0 removes the browser-generated header/footer strip
+       (URL, date, page numbers). Content padding is handled on body/container. */
+    margin: 0;
+}
+
 @media print {
     /* Force single-column layout for print — multi-column breaks pagination */
     .cards-grid,
@@ -1029,7 +1035,11 @@ code {
 
     body {
         background: white;
-        padding: 0;
+        padding: 1.5cm;
+    }
+
+    .header {
+        margin: -1.5cm -1.5cm 0;
     }
 
     .container {
