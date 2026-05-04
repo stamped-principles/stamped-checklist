@@ -1,6 +1,6 @@
 import { beforeEach, describe, it, expect, vi } from "vitest";
-import { DATA } from "../../checklist.js";
-import { GA_MEASUREMENT_ID } from "../../analytics.js";
+import { DATA } from "../../src/checklist.js";
+import { GA_MEASUREMENT_ID } from "../../src/analytics.js";
 
 // Set up a minimal DOM before importing script.js so that module-level
 // code that queries the DOM doesn't throw.
@@ -27,7 +27,7 @@ function setupDOM() {
 describe("generateId", () => {
     it("returns expected id format", async () => {
         setupDOM();
-        const { generateId } = await import("../../script.js");
+        const { generateId } = await import("../../src/script.js");
         expect(generateId(0, 0, 0)).toBe("s0_p0_i0");
         expect(generateId(1, 2, 3)).toBe("s1_p2_i3");
         expect(generateId(0, 1, 10)).toBe("s0_p1_i10");
@@ -41,7 +41,7 @@ describe("buildChecklist and state management", () => {
         setupDOM();
         localStorage.clear();
         vi.resetModules();
-        script = await import("../../script.js");
+        script = await import("../../src/script.js");
         script.buildChecklist();
     });
 
@@ -310,7 +310,7 @@ describe("section dividers", () => {
     beforeEach(async () => {
         setupDOM();
         vi.resetModules();
-        const script = await import("../../script.js");
+        const script = await import("../../src/script.js");
         script.buildChecklist();
     });
 
@@ -334,7 +334,7 @@ describe("URL state encoding/decoding", () => {
         localStorage.clear();
         window.history.replaceState({}, "", "/");
         vi.resetModules();
-        script = await import("../../script.js");
+        script = await import("../../src/script.js");
         script.buildChecklist();
     });
 
@@ -509,19 +509,19 @@ describe("showToast", () => {
     beforeEach(async () => {
         setupDOM();
         vi.resetModules();
-        const script = await import("../../script.js");
+        const script = await import("../../src/script.js");
         script.buildChecklist();
     });
 
     it("sets toast text content", async () => {
-        const { showToast } = await import("../../script.js");
+        const { showToast } = await import("../../src/script.js");
         showToast("Test message");
         const toast = document.getElementById("toast");
         expect(toast.textContent).toBe("Test message");
     });
 
     it("adds show class to toast", async () => {
-        const { showToast } = await import("../../script.js");
+        const { showToast } = await import("../../src/script.js");
         showToast("Test");
         const toast = document.getElementById("toast");
         expect(toast.classList.contains("show")).toBe(true);
@@ -535,7 +535,7 @@ describe("cookie consent and analytics", () => {
         setupDOM();
         localStorage.clear();
         vi.resetModules();
-        script = await import("../../script.js");
+        script = await import("../../src/script.js");
     });
 
     it("shows cookie banner when consent is missing", () => {
@@ -582,7 +582,7 @@ describe("theme toggle", () => {
 
     it("defaults to light mode when browser preference API is unavailable", async () => {
         vi.resetModules();
-        const script = await import("../../script.js");
+        const script = await import("../../src/script.js");
         script.init();
 
         expect(document.documentElement.getAttribute("data-theme")).toBe("light");
@@ -591,7 +591,7 @@ describe("theme toggle", () => {
     it("defaults to dark mode when browser preference is dark", async () => {
         window.matchMedia = vi.fn(() => ({ matches: true }));
         vi.resetModules();
-        const script = await import("../../script.js");
+        const script = await import("../../src/script.js");
         script.init();
 
         expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
@@ -600,7 +600,7 @@ describe("theme toggle", () => {
     it("toggles theme and stores user preference", async () => {
         window.matchMedia = vi.fn(() => ({ matches: false }));
         vi.resetModules();
-        const script = await import("../../script.js");
+        const script = await import("../../src/script.js");
         script.init();
 
         document.getElementById("theme-toggle").click();
@@ -621,7 +621,7 @@ describe("setColumns", () => {
     });
 
     it("sets the correct column class", async () => {
-        const { setColumns } = await import("../../script.js");
+        const { setColumns } = await import("../../src/script.js");
         setColumns(1);
         const grid = document.querySelector(".cards-grid");
         expect(grid.classList.contains("cols-1")).toBe(true);
@@ -629,7 +629,7 @@ describe("setColumns", () => {
     });
 
     it("removes previous column class when switching", async () => {
-        const { setColumns } = await import("../../script.js");
+        const { setColumns } = await import("../../src/script.js");
         setColumns(2);
         setColumns("auto");
         const grid = document.querySelector(".cards-grid");
@@ -638,7 +638,7 @@ describe("setColumns", () => {
     });
 
     it("updates URL in real time when columns change", async () => {
-        const { setColumns } = await import("../../script.js");
+        const { setColumns } = await import("../../src/script.js");
         setColumns(2);
         expect(window.location.search.startsWith("?cols=2&sections=off&state=")).toBe(true);
     });
@@ -653,14 +653,14 @@ describe("setSections", () => {
     });
 
     it("adds flat-mode class when sections off", async () => {
-        const { setSections } = await import("../../script.js");
+        const { setSections } = await import("../../src/script.js");
         setSections("off");
         const container = document.getElementById("app");
         expect(container.classList.contains("flat-mode")).toBe(true);
     });
 
     it("removes flat-mode class when sections on", async () => {
-        const { setSections } = await import("../../script.js");
+        const { setSections } = await import("../../src/script.js");
         setSections("off");
         setSections("on");
         const container = document.getElementById("app");
@@ -668,13 +668,13 @@ describe("setSections", () => {
     });
 
     it("updates URL in real time when sections change", async () => {
-        const { setSections } = await import("../../script.js");
+        const { setSections } = await import("../../src/script.js");
         setSections("on");
         expect(window.location.search.startsWith("?cols=auto&sections=on&state=")).toBe(true);
     });
 
     it("preserves both cols and sections params in URL when both settings are applied", async () => {
-        const { setColumns, setSections } = await import("../../script.js");
+        const { setColumns, setSections } = await import("../../src/script.js");
         document.getElementById("app").innerHTML = `<div class="cards-grid cols-auto"></div>`;
         setColumns(1);
         setSections("on");

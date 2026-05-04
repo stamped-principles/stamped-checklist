@@ -2,8 +2,8 @@ import { test as base, expect } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { DATA } from "../../checklist.js";
-import { GA_MEASUREMENT_ID } from "../../analytics.js";
+import { DATA } from "../../src/checklist.js";
+import { GA_MEASUREMENT_ID } from "../../src/analytics.js";
 
 const TOTAL_PRINCIPLES = DATA.flatMap((s) => s.principles).length;
 const COVERAGE_ENABLED = process.env.PW_COVERAGE === "1";

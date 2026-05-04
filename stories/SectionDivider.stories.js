@@ -1,4 +1,4 @@
-import { DATA } from "../checklist.js";
+import { DATA } from "../src/checklist.js";
 import { withTheme } from "./utils.js";
 
 /** Build a section divider element matching the structure in buildChecklist(). */
