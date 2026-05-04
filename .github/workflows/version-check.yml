@@ -6,8 +6,6 @@ on:
             - main
         paths:
             - "src/**"
-            - "!tests/**"
-            - "!stories/**"
             - "configs/**"
             - "package.json"
             - "package-lock.json"
