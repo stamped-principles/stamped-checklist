@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { VERSION, DATA } from "../../checklist.js";
+import { VERSION, DATA } from "../../src/checklist.js";
 
 describe("VERSION", () => {
     it("follows semantic versioning format (x.y.z)", () => {

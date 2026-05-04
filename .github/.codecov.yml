@@ -16,8 +16,8 @@ coverage:
         patch: off
 
 ignore:
-    - "src/tests/**"
-    - "src/stories/**"
+    - "tests/**"
+    - "stories/**"
     - "src/data/**"
     - "configs/**"
     - "dist/**"

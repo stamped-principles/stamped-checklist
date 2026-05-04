@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CHECKLIST as checklist, PRINCIPLES as principles } from "../../checklist.js";
+import { CHECKLIST as checklist, PRINCIPLES as principles } from "../../src/checklist.js";
 
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
 const PRINCIPLE_CODE_PATTERN = /^[A-Z]\.[1-9][0-9]*$/;

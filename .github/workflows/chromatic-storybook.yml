@@ -4,7 +4,7 @@ on: push
 
 jobs:
     chromatic:
-        name: Run Chromatic
+        name: Run Chromatic (Storybook)
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
@@ -20,3 +20,4 @@ jobs:
               uses: chromaui/action@latest
               with:
                   projectToken: ${{ secrets.CHROMATIC_STORYBOOK_PROJECT_TOKEN }}
+                  onlyChanged: true
