@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>STAMPED Compliance Checklist</title>
+      <script type="module" crossorigin src="./assets/index-BX5A3jq0.js"></script>
+      <link rel="stylesheet" crossorigin href="./assets/index-CmocPQi-.css">
+    </head>
+    <body>
+        <div class="header">
+            <div class="header-actions">
+                <button id="theme-toggle" class="header-icon-button" type="button" aria-label="Toggle dark mode">
+                    ☀️
+                </button>
+                <a
+                    class="header-icon-button github-link"
+                    href="https://github.com/stamped-principles/stamped-checklist"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Open stamped-checklist on GitHub"
+                    title="View repository on GitHub"
+                >
+                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8a8.01 8.01 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.62 7.62 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+                        ></path>
+                    </svg>
+                </a>
+            </div>
+            <h1>📋 STAMPED Compliance Checklist</h1>
+            <p>Assess your research objects against the STAMPED principles</p>
+            <div class="level-stats" id="levelStats"></div>
+        </div>
+
+        <div class="toolbar">
+            <button onclick="window.print()" title="Print or save as PDF"><span class="icon">🖨️</span> Print</button>
+            <button class="danger" onclick="confirmReset()" title="Reset all responses">
+                <span class="icon">🗑️</span> Reset
+            </button>
+            <div class="col-toggle" title="Number of columns">
+                <span class="col-toggle-label">Columns:</span>
+                <label class="col-toggle-option">
+                    <input type="radio" name="cols" value="1" onchange="setColumns(1)" /> 1
+                </label>
+                <label class="col-toggle-option">
+                    <input type="radio" name="cols" value="2" onchange="setColumns(2)" /> 2
+                </label>
+                <label class="col-toggle-option">
+                    <input type="radio" name="cols" value="auto" onchange="setColumns('auto')" checked /> Auto
+                </label>
+            </div>
+            <div class="col-toggle" title="Show or hide section grouping">
+                <span class="col-toggle-label">Sections:</span>
+                <label class="col-toggle-option">
+                    <input type="radio" name="sections" value="on" onchange="setSections('on')" /> On
+                </label>
+                <label class="col-toggle-option">
+                    <input type="radio" name="sections" value="off" onchange="setSections('off')" checked /> Off
+                </label>
+            </div>
+        </div>
+
+        <div class="container" id="app">
+            <div class="intro-text">
+                This checklist helps you assess compliance with the <strong>STAMPED</strong> principles for
+                computational reproducibility. Answer each item with Yes/No, and include a reason when needed. Your
+                progress is tracked above, and you can print your results at any time.
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-dot must"></div>
+                        MUST — Required
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot should"></div>
+                        SHOULD — Recommended
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot may"></div>
+                        MAY — Optional
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+        <div
+            class="cookie-consent-banner hidden"
+            id="cookie-consent-banner"
+            role="dialog"
+            aria-live="polite"
+            aria-label="Cookie consent"
+        >
+            <span>This site uses Google Analytics to improve the checklist experience.</span>
+            <div class="cookie-consent-actions">
+                <button id="cookie-consent-decline" type="button" class="secondary">Decline</button>
+                <button id="cookie-consent-accept" type="button">Accept</button>
+            </div>
+        </div>
+
+        <div class="version-indicator" id="version-indicator"></div>
+
+        <a
+            class="branding-indicator"
+            href="https://centerforopenneuroscience.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Center for Open Neuroscience"
+            title="Center for Open Neuroscience"
+        >
+            <img src="./assets/con-logo-F8_OuRqh.png" alt="Center for Open Neuroscience logo" class="branding-logo" />
+        </a>
+
+    </body>
+</html>
