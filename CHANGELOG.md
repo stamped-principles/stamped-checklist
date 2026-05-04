@@ -2,6 +2,7 @@
 
 ## Upcoming
 
+-   Added per-row colour tints (MUST/SHOULD/MAY) and a vertical divider between counters and percentage in the header progress block ([#103](https://github.com/stamped-principles/stamped-checklist/pull/103))
 -   Added version-check CI workflow and agent instructions ([#101](https://github.com/stamped-principles/stamped-checklist/pull/101))
 
 ## 1.0.0

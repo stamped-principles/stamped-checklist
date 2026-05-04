@@ -127,7 +127,24 @@ body {
 }
 
 .level-stat-row {
-    display: contents;
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    align-items: center;
+    border-radius: 4px;
+    padding: 2px 3px;
+}
+
+.level-stat-row[data-level-stat="must"] {
+    background: rgba(192, 57, 43, 0.18);
+}
+
+.level-stat-row[data-level-stat="should"] {
+    background: rgba(212, 136, 15, 0.18);
+}
+
+.level-stat-row[data-level-stat="may"] {
+    background: rgba(39, 174, 96, 0.18);
 }
 
 .level-stat-row .section-badge {
@@ -189,6 +206,9 @@ body {
 
 .level-stat-pct {
     color: rgba(255, 255, 255, 0.75);
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    padding-left: 0.35rem;
+    margin-left: 0.1rem;
 }
 
 .toolbar {
