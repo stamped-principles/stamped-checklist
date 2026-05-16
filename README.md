@@ -13,10 +13,10 @@ This app pulls the checklist and principle JSON instances from those repositorie
 
 ## Licensing
 
-This project is licensed under the [ISC License](LICENSE) and follows the [REUSE specification](https://reuse.software/) for machine-readable copyright and licensing information.
+This project is licensed under [CC-BY-4.0](LICENSE) and follows the [REUSE specification](https://reuse.software/) for machine-readable copyright and licensing information.
 
--   Full license text: `LICENSES/ISC.txt` (the root `LICENSE` is a symlink)
--   Per-file declarations: `REUSE.toml` (single catch-all block — everything is licensed under ISC)
+-   Full license text: `LICENSES/CC-BY-4.0.txt` (the root `LICENSE` is a symlink)
+-   Per-file declarations: `REUSE.toml` (single catch-all block — everything is licensed under CC-BY-4.0)
 -   Verification: `pre-commit run reuse --all-files`, or install [`reuse`](https://github.com/fsfe/reuse-tool) and run `reuse lint`
 
 <!-- REUSE-IgnoreStart -->

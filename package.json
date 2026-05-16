@@ -1,6 +1,6 @@
 {
     "name": "checklist",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "An interactive checklist for compliance to STAMPED principles.",
     "scripts": {
         "sync:schemas": "node src/scripts/pull-schemas.mjs",
@@ -34,7 +34,7 @@
     },
     "keywords": [],
     "author": "",
-    "license": "ISC",
+    "license": "CC-BY-4.0",
     "type": "module",
     "bugs": {
         "url": "https://github.com/stamped-principles/checklist/issues"
