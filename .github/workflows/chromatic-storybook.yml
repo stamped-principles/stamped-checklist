@@ -3,7 +3,7 @@ name: Chromatic (Storybook)
 on: push
 
 permissions:
-  contents: read
+    contents: read
 
 jobs:
     chromatic:
