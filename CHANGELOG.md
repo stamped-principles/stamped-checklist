@@ -12,6 +12,7 @@
 
 #### 🏠 Internal
 
+-   Bumped `esbuild` to 0.28.1 via an npm override to fix a Windows dev-server path-traversal vulnerability ([GHSA-g7r4-m6w7-qqqr](https://github.com/advisories/GHSA-g7r4-m6w7-qqqr)) ([#121](https://github.com/stamped-principles/stamped-checklist/pull/121))
 -   Changed project licensing from ISC to CC-BY-4.0 to align with other STAMPED repositories ([#110](https://github.com/stamped-principles/stamped-checklist/pull/110))
 -   Added version-check CI workflow and agent instructions ([#101](https://github.com/stamped-principles/stamped-checklist/pull/101))
 -   Introduced REUSE specification compliance (initial ISC setup): added `LICENSES/ISC.txt`, root `LICENSE` symlink, `REUSE.toml`, pre-commit hook, and CI workflow
