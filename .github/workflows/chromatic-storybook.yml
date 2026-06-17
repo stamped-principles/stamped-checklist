@@ -2,6 +2,9 @@ name: Chromatic (Storybook)
 
 on: push
 
+permissions:
+    contents: read
+
 jobs:
     chromatic:
         name: Run Chromatic (Storybook)
