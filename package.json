@@ -40,6 +40,9 @@
         "url": "https://github.com/stamped-principles/checklist/issues"
     },
     "homepage": "https://github.com/stamped-principles/checklist#readme",
+    "overrides": {
+        "esbuild": "^0.28.1"
+    },
     "devDependencies": {
         "@chromatic-com/playwright": "^0.13.2",
         "@playwright/test": "^1.59.1",
