@@ -59,18 +59,37 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
-            # Cache the downloaded browser binaries so re-runs don't re-download
-            # them, and bound the install step so a hung apt/download fails fast
-            # and surfaces as a re-runnable failure instead of a 6-hour hang.
+            # Cache the downloaded browser binaries so re-runs skip the download
+            # entirely once a cache is populated.
             - name: Cache Playwright browsers
               uses: actions/cache@v4
               with:
                   path: ~/.cache/ms-playwright
                   key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
-            - name: Install Playwright browsers
-              timeout-minutes: 8
-              run: npx playwright install chromium --with-deps
+            # System dependencies are reliable; install them separately so the
+            # retry loop below only re-runs the flaky part.
+            - name: Install Playwright system dependencies
+              timeout-minutes: 5
+              run: npx playwright install-deps chromium
+
+            # Downloads from cdn.playwright.dev intermittently complete the first
+            # artifact then stall indefinitely. Bound each attempt and retry so a
+            # stalled connection is killed and re-tried on a fresh one instead of
+            # hanging until the job-level timeout. On a cache hit this is a no-op.
+            - name: Install Playwright browser
+              timeout-minutes: 12
+              run: |
+                  for attempt in 1 2 3; do
+                      echo "Playwright browser install attempt ${attempt}..."
+                      if timeout 180 npx playwright install chromium; then
+                          exit 0
+                      fi
+                      echo "::warning::Playwright browser download stalled or failed on attempt ${attempt}; retrying"
+                      sleep 5
+                  done
+                  echo "::error::Playwright browser download failed after 3 attempts"
+                  exit 1
 
             - name: Run integration tests with coverage
               run: npm run test:e2e:coverage
