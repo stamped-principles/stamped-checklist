@@ -4,8 +4,6 @@ on:
     workflow_dispatch:
     pull_request:
 
-# Cancel superseded runs on the same ref so stale, hung runs don't pile up
-# and keep occupying runners while a newer commit is already being tested.
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
     cancel-in-progress: true
