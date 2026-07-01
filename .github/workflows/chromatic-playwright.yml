@@ -8,6 +8,9 @@ permissions:
 jobs:
     chromatic-playwright:
         name: Run Chromatic (Playwright)
+        # Dependabot-triggered runs cannot read Actions secrets, so the
+        # Chromatic project token is unavailable; skip instead of failing.
+        if: github.actor != 'dependabot[bot]'
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
