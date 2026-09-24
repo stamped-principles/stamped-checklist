@@ -4,6 +4,7 @@
 
 #### 🚀 Enhancement
 
+-   Kept card border colors tied to MUST, SHOULD, or MAY when answers change ([#135](https://github.com/stamped-principles/stamped-checklist/pull/135))
 -   Added per-row colour tints (MUST/SHOULD/MAY) and a vertical divider between counters and percentage in the header progress block ([#103](https://github.com/stamped-principles/stamped-checklist/pull/103))
 
 #### 🐛 Bug Fix
