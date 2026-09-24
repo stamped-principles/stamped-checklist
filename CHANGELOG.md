@@ -4,11 +4,10 @@
 
 #### 🚀 Enhancement
 
+-   Kept card border colors tied to MUST, SHOULD, or MAY when answers change ([#135](https://github.com/stamped-principles/stamped-checklist/pull/135))
 -   Added per-row colour tints (MUST/SHOULD/MAY) and a vertical divider between counters and percentage in the header progress block ([#103](https://github.com/stamped-principles/stamped-checklist/pull/103))
 
 #### 🐛 Bug Fix
-
--   Kept card border colors tied to MUST, SHOULD, or MAY when answers change ([#135](https://github.com/stamped-principles/stamped-checklist/pull/135))
 
 -   Fixed PDF printout top banner: preserved header dark gradient background, hid theme-toggle icon and GitHub link, cleared page title during print, removed browser-generated URL/date/page-number margin strip via `@page { margin: 0 }`, and added vertical gap between header and intro-text box ([#106](https://github.com/stamped-principles/stamped-checklist/pull/106))
 
