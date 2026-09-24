@@ -6,14 +6,18 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = resolve(__dirname, "..", "data");
 const JSON_INDENT = 4;
 
+// Upstream release tags are pinned explicitly so that a new upstream release cannot silently change (or break) the
+// app; bump a tag here deliberately, alongside any code changes the new version requires.
 const SCHEMAS = [
     {
         repo: "stamped-principles/stamped-checklist-schema",
+        tag: "v0.1.0",
         path: "stamped-checklist.json",
         output: resolve(DATA_DIR, "stamped-checklist.json"),
     },
     {
         repo: "stamped-principles/stamped-principles-schema",
+        tag: "v0.1.0",
         path: "stamped-principles.json",
         output: resolve(DATA_DIR, "stamped-principles.json"),
     },
@@ -23,30 +27,11 @@ function schemaRawUrl(repo, tag, path) {
     return `https://raw.githubusercontent.com/${repo}/${tag}/${path}`;
 }
 
-async function fetchLatestReleaseTag(repo) {
-    const url = `https://github.com/${repo}/releases/latest`;
-    const response = await fetch(url);
-    if (!response.ok) {
-        let hint = "Check network connectivity and URL accessibility.";
-        if (response.status === 404) hint = "Check that the upstream repository has at least one published release.";
-        if (response.status === 403) hint = "Check access policy for github.com in your environment.";
-        throw new Error(
-            `Failed to determine latest release for ${repo}: ${response.status} ${response.statusText}. ${hint}`
-        );
-    }
-
-    const match = response.url.match(/\/releases\/tag\/([^/?#]+)/);
-    if (!match) {
-        throw new Error(`Failed to determine latest release for ${repo}: unexpected redirect URL ${response.url}.`);
-    }
-    return decodeURIComponent(match[1]);
-}
-
 async function downloadJSON(url) {
     const response = await fetch(url);
     if (!response.ok) {
         let hint = "Check network connectivity and URL accessibility.";
-        if (response.status === 404) hint = "Check that the upstream repository and file path exist.";
+        if (response.status === 404) hint = "Check that the upstream repository, pinned tag, and file path exist.";
         if (response.status === 403) hint = "Check access policy for raw.githubusercontent.com in your environment.";
         throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}. ${hint}`);
     }
@@ -60,8 +45,7 @@ async function downloadJSON(url) {
 await mkdir(DATA_DIR, { recursive: true });
 
 for (const schema of SCHEMAS) {
-    const tag = await fetchLatestReleaseTag(schema.repo);
-    const url = schemaRawUrl(schema.repo, tag, schema.path);
+    const url = schemaRawUrl(schema.repo, schema.tag, schema.path);
     const json = await downloadJSON(url);
     try {
         await writeFile(schema.output, `${JSON.stringify(json, null, JSON_INDENT)}\n`, "utf-8");
@@ -72,5 +56,5 @@ for (const schema of SCHEMAS) {
             }`
         );
     }
-    console.log(`Synced ${schema.output} from ${schema.repo}@${tag}`);
+    console.log(`Synced ${schema.output} from ${schema.repo}@${schema.tag}`);
 }
