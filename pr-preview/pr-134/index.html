@@ -4,8 +4,8 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>STAMPED Compliance Checklist</title>
-      <script type="module" crossorigin src="./assets/index-BqDAet2-.js"></script>
-      <link rel="stylesheet" crossorigin href="./assets/index-931Bm8GH.css">
+      <script type="module" crossorigin src="./assets/index-C1XiLdr9.js"></script>
+      <link rel="stylesheet" crossorigin href="./assets/index-r8-hZHCe.css">
     </head>
     <body>
         <div class="header">
@@ -34,6 +34,14 @@
         </div>
 
         <div class="toolbar">
+            <label class="col-toggle"
+                >Checklist version:
+                <select
+                    id="checklist-version"
+                    aria-label="Checklist version"
+                    onchange="selectChecklistVersion(this.value)"
+                ></select>
+            </label>
             <button onclick="window.print()" title="Print or save as PDF"><span class="icon">🖨️</span> Print</button>
             <button class="danger" onclick="confirmReset()" title="Reset all responses">
                 <span class="icon">🗑️</span> Reset
