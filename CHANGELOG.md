@@ -13,6 +13,7 @@
 
 #### 🏠 Internal
 
+-   Pinned upstream checklist and principles schema versions explicitly instead of always pulling the latest release, so upgrades are deliberate ([#138](https://github.com/stamped-principles/stamped-checklist/pull/138))
 -   Bumped `esbuild` to 0.28.1 via an npm override to fix a Windows dev-server path-traversal vulnerability ([GHSA-g7r4-m6w7-qqqr](https://github.com/advisories/GHSA-g7r4-m6w7-qqqr)) ([#121](https://github.com/stamped-principles/stamped-checklist/pull/121))
 -   Changed project licensing from ISC to CC-BY-4.0 to align with other STAMPED repositories ([#110](https://github.com/stamped-principles/stamped-checklist/pull/110))
 -   Added version-check CI workflow and agent instructions ([#101](https://github.com/stamped-principles/stamped-checklist/pull/101))
