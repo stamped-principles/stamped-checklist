@@ -7,8 +7,8 @@ const ITEM_ID_PATTERN = /^stamped-checklist:(must|should|may)\//;
 
 describe("LinkML checklist JSON", () => {
     it("matches top-level LinkML Checklist constraints", () => {
-        expect(typeof checklist.version).toBe("string");
-        expect(checklist.version).toMatch(SEMVER_PATTERN);
+        expect(typeof checklist.checklist_version).toBe("string");
+        expect(checklist.checklist_version).toMatch(SEMVER_PATTERN);
         expect(typeof checklist.principles_version).toBe("string");
         expect(checklist.principles_version).toMatch(SEMVER_PATTERN);
         expect(Array.isArray(checklist.data)).toBe(true);
