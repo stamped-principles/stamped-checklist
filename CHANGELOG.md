@@ -8,6 +8,8 @@
 
 #### 🐛 Bug Fix
 
+-   Kept card border colors tied to MUST, SHOULD, or MAY when answers change
+
 -   Fixed PDF printout top banner: preserved header dark gradient background, hid theme-toggle icon and GitHub link, cleared page title during print, removed browser-generated URL/date/page-number margin strip via `@page { margin: 0 }`, and added vertical gap between header and intro-text box ([#106](https://github.com/stamped-principles/stamped-checklist/pull/106))
 
 #### 🏠 Internal

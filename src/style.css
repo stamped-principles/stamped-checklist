@@ -431,10 +431,6 @@ body {
     border-left-color: var(--may-border);
 }
 
-.principle-card.complete {
-    border-left-color: var(--check-color) !important;
-}
-
 .principle-header {
     padding: 0.6rem 0.9rem;
     display: flex;
