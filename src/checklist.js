@@ -43,6 +43,6 @@ const DATA = checklist.data.map((group) => ({
     }),
 }));
 
-const VERSION = checklist.version;
+const VERSION = checklist.checklist_version ?? checklist.version;
 
 export { VERSION, DATA, checklist as CHECKLIST, principlesSet as PRINCIPLES };

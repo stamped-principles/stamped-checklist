@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { VERSION, DATA } from "../../src/checklist.js";
+import { describe, it, expect, vi } from "vitest";
+import { VERSION, DATA, CHECKLIST } from "../../src/checklist.js";
 
 describe("VERSION", () => {
     it("follows semantic versioning format (x.y.z)", () => {
@@ -113,4 +113,20 @@ describe("DATA content", () => {
             }
         }
     });
+});
+
+// The next checklist release renames version to checklist_version.
+it("reads the new checklist version field when upgrading the pinned data", async () => {
+    const { version, ...checklist } = CHECKLIST;
+    vi.resetModules();
+    vi.doMock("../../src/data/stamped-checklist.json", () => ({
+        default: { ...checklist, checklist_version: "0.3.0" },
+    }));
+    try {
+        const updated = await import("../../src/checklist.js");
+        expect(updated.VERSION).toBe("0.3.0");
+    } finally {
+        vi.doUnmock("../../src/data/stamped-checklist.json");
+        vi.resetModules();
+    }
 });

@@ -9,7 +9,7 @@
 
 #### 🐛 Bug Fix
 
--   Preserved saved answers when adding M.4 using stable item IDs and a fixed migration for pre-M.4 browser saves and links ([#132](https://github.com/stamped-principles/stamped-checklist/pull/132))
+-   Preserved saved answers when adding M.4 using stable item IDs and a fixed migration for pre-M.4 browser saves and links ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
 
 -   Fixed PDF printout top banner: preserved header dark gradient background, hid theme-toggle icon and GitHub link, cleared page title during print, removed browser-generated URL/date/page-number margin strip via `@page { margin: 0 }`, and added vertical gap between header and intro-text box ([#106](https://github.com/stamped-principles/stamped-checklist/pull/106))
 
