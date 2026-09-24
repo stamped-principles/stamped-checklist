@@ -302,7 +302,7 @@ test.describe("STAMPED Checklist App", () => {
     });
 
     test("version indicator is populated", async ({ page }) => {
-        await expect(page.locator("#version-indicator")).toHaveText(/^v\d/);
+        await expect(page.locator("#version-indicator")).toHaveText(/^Checklist v\d/);
     });
 
     test("reset button resets responses", async ({ page }) => {
@@ -451,7 +451,7 @@ test.describe("STAMPED Checklist App", () => {
 });
 
 // Real-browser smoke test for the one supported pre-M.4 migration.
-test("legacy response links become stable-ID links and browser saves", async ({ browser }) => {
+test("old response links retain their checklist version in links and browser saves", async ({ browser }) => {
     const context = await browser.newContext();
     const page = await context.newPage();
     const legacy = Buffer.from(
@@ -466,6 +466,8 @@ test("legacy response links become stable-ID links and browser saves", async ({ 
     expect(new URL(sharedURL).searchParams.get("format")).toBe("2");
     expect(new URL(sharedURL).searchParams.has("state")).toBe(false);
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("stamped_checklist")));
+    expect(saved.checklist_version).toBe("0.1.0");
+    expect(new URL(sharedURL).searchParams.get("checklist")).toBe("0.1.0");
     expect(saved.responses["stamped-checklist:should/004"]).toEqual({
         value: "no",
         reason: "Rebuild required — café 🔬",

@@ -1122,3 +1122,14 @@ code {
         padding: 0 0.7rem 0.5rem;
     }
 }
+
+#checklist-version {
+    font: inherit;
+    color: var(--text);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+.version-error {
+    padding: 1rem;
+}

@@ -1,10 +1,11 @@
-import { VERSION, DATA } from "./checklist.js";
+import { VERSION, DATA, DEFAULT_VERSION, ORIGINAL_VERSION, AVAILABLE_VERSIONS, selectChecklist } from "./checklist.js";
 import { PERSISTENCE_FORMAT, readResponses, readLegacyState } from "./persistence.js";
 
 let responseStates = {};
 let totalItems = 0;
 let stableIds = new Map();
 let persistenceBlocked = false;
+let versionUnavailable = false;
 const THEME_KEY = "stamped_theme";
 const VALID_COLUMN_VALUES = new Set(["1", "2", "auto"]);
 const VALID_SECTION_VALUES = new Set(["on", "off"]);
@@ -53,6 +54,71 @@ function renderInlineMarkdown(text) {
         .join("");
 }
 
+function savedVersion(saved) {
+    return saved.checklist_version ?? ORIGINAL_VERSION;
+}
+
+function requestedVersion() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("checklist")) return params.get("checklist");
+    if (params.has("state") || params.has("responses") || params.has("format")) return ORIGINAL_VERSION;
+    const saved = JSON.parse(localStorage.getItem("stamped_checklist") || "null");
+    return saved && saved.responses !== undefined ? savedVersion(saved) : DEFAULT_VERSION;
+}
+
+function storageKey() {
+    return `stamped_checklist:${VERSION}`;
+}
+
+function writeSavedAssessment() {
+    // Preserve the previous assessment before changing the last-opened pointer,
+    // including old saves that predate the per-version storage keys.
+    const previous = localStorage.getItem("stamped_checklist");
+    if (previous) {
+        try {
+            const parsed = JSON.parse(previous);
+            const key = `stamped_checklist:${savedVersion(parsed)}`;
+            if (!localStorage.getItem(key)) localStorage.setItem(key, previous);
+        } catch {
+            /* Unreadable saves are handled when loading the assessment. */
+        }
+    }
+    const saved = JSON.stringify({
+        format: PERSISTENCE_FORMAT,
+        checklist_version: VERSION,
+        responses: savedResponses(),
+    });
+    localStorage.setItem(storageKey(), saved);
+    // Remember which assessment to reopen on a plain visit to the site.
+    localStorage.setItem("stamped_checklist", saved);
+}
+
+function selectChecklistVersion(version) {
+    const params = new URLSearchParams(window.location.search);
+    params.delete("state");
+    params.delete("responses");
+    params.delete("format");
+    params.set("checklist", version);
+    window.location.assign(`${window.location.pathname}?${params}`);
+}
+
+function updateVersionDisplay() {
+    const versionEl = document.getElementById("version-indicator");
+    if (versionEl) versionEl.textContent = `Checklist v${VERSION}`;
+    const select = document.getElementById("checklist-version");
+    if (select) {
+        select.replaceChildren(
+            ...AVAILABLE_VERSIONS.map((version) => {
+                const option = document.createElement("option");
+                option.value = version;
+                option.textContent = version;
+                option.selected = version === VERSION;
+                return option;
+            })
+        );
+    }
+}
+
 function savedResponses() {
     return Object.fromEntries(
         [...stableIds].flatMap(([domId, stableId]) => {
@@ -96,6 +162,7 @@ function syncPersistentURL() {
     const bytes = new TextEncoder().encode(JSON.stringify(savedResponses()));
     params.set("responses", btoa(Array.from(bytes, (byte) => String.fromCharCode(byte)).join("")));
 
+    params.set("checklist", VERSION);
     window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
 }
 
@@ -212,6 +279,27 @@ function buildChecklist() {
     totalItems = 0;
     persistenceBlocked = false;
     const container = document.getElementById("app");
+    container.querySelector(".cards-grid")?.remove();
+    container.querySelector(".version-error")?.remove();
+    versionUnavailable = false;
+    try {
+        selectChecklist(requestedVersion());
+        updateVersionDisplay();
+    } catch (error) {
+        persistenceBlocked = true;
+        versionUnavailable = true;
+        const notice = document.createElement("div");
+        notice.className = "version-error";
+        notice.setAttribute("role", "alert");
+        const message = document.createElement("p");
+        message.textContent = `${error.message} The saved assessment has not been changed.`;
+        const link = document.createElement("a");
+        link.href = `?checklist=${encodeURIComponent(DEFAULT_VERSION)}`;
+        link.textContent = "Open the current checklist";
+        notice.append(message, link);
+        container.append(notice);
+        return;
+    }
 
     const cardsGrid = document.createElement("div");
     cardsGrid.className = "cards-grid";
@@ -539,20 +627,19 @@ function setState(state) {
 // Local Storage
 function saveToLocalStorage() {
     if (persistenceBlocked) return;
-    localStorage.setItem(
-        "stamped_checklist",
-        JSON.stringify({ format: PERSISTENCE_FORMAT, responses: savedResponses() })
-    );
+    writeSavedAssessment();
     showToast("💾 Progress saved to browser");
 }
 
 function loadFromLocalStorage() {
-    const data = localStorage.getItem("stamped_checklist");
+    const data = localStorage.getItem(storageKey()) || localStorage.getItem("stamped_checklist");
     if (data) {
         try {
             const parsed = JSON.parse(data);
-            if (parsed && parsed.responses !== undefined) {
-                restoreResponses(readResponses(parsed.responses, parsed.format));
+            if (parsed && parsed.responses !== undefined && savedVersion(parsed) === VERSION) {
+                if (parsed.format === undefined && VERSION !== ORIGINAL_VERSION)
+                    throw new Error("Positional answers require the original checklist");
+                restoreResponses(readResponses(parsed.responses, parsed.format, DATA));
             }
             updateAllCounts();
         } catch (e) {
@@ -563,10 +650,7 @@ function loadFromLocalStorage() {
 
 function autoSave() {
     if (persistenceBlocked) return;
-    localStorage.setItem(
-        "stamped_checklist",
-        JSON.stringify({ format: PERSISTENCE_FORMAT, responses: savedResponses() })
-    );
+    writeSavedAssessment();
     syncPersistentURL();
 }
 
@@ -590,9 +674,13 @@ function loadFromURL() {
     if (params.has("state") || params.has("responses") || params.has("format")) {
         try {
             const format = params.has("format") ? Number(params.get("format")) : undefined;
+            if ((params.get("checklist") ?? ORIGINAL_VERSION) !== VERSION)
+                throw new Error("Answers belong to a different checklist version");
+            if (format === undefined && VERSION !== ORIGINAL_VERSION)
+                throw new Error("Positional answers require the original checklist");
             let responses = {};
             if (format === undefined && stateParam !== null) {
-                responses = readLegacyState(atob(stateParam));
+                responses = readLegacyState(atob(stateParam), DATA);
             }
             if (responsesParam !== null) {
                 const binary = atob(responsesParam);
@@ -600,7 +688,7 @@ function loadFromURL() {
                     format === PERSISTENCE_FORMAT
                         ? new TextDecoder().decode(Uint8Array.from(binary, (char) => char.charCodeAt(0)))
                         : binary;
-                responses = { ...responses, ...readResponses(JSON.parse(json), format) };
+                responses = { ...responses, ...readResponses(JSON.parse(json), format, DATA) };
             } else if (format !== undefined) {
                 throw new Error("Missing responses for saved-answer format");
             }
@@ -625,6 +713,7 @@ function loadFromURL() {
 
 // Reset
 function confirmReset() {
+    if (versionUnavailable) return;
     if (confirm("Are you sure you want to reset all responses? This cannot be undone.")) {
         persistenceBlocked = false;
         Object.keys(responseStates).forEach((id) => {
@@ -686,7 +775,7 @@ function init() {
     buildChecklist();
 
     const versionEl = document.getElementById("version-indicator");
-    if (versionEl) versionEl.textContent = "v" + VERSION;
+    if (versionEl && !versionUnavailable) versionEl.textContent = `Checklist v${VERSION}`;
 
     updateHeaderHeight();
     if (typeof ResizeObserver !== "undefined") {
@@ -704,6 +793,7 @@ function init() {
 // scope automatically, so we assign them to window explicitly.
 if (typeof window !== "undefined") {
     Object.assign(window, {
+        selectChecklistVersion,
         saveToLocalStorage,
         confirmReset,
         setColumns,

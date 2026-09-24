@@ -4,17 +4,18 @@
 
 #### 🚀 Enhancement
 
+-   Opened saved assessments with their original checklist version and kept answers separate when selecting another version ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
 -   Kept card border colors tied to MUST, SHOULD, or MAY when answers change ([#135](https://github.com/stamped-principles/stamped-checklist/pull/135))
 -   Added per-row colour tints (MUST/SHOULD/MAY) and a vertical divider between counters and percentage in the header progress block ([#103](https://github.com/stamped-principles/stamped-checklist/pull/103))
 
 #### 🐛 Bug Fix
 
--   Preserved saved answers when adding M.4 using stable item IDs and a fixed migration for pre-M.4 browser saves and links ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
-
 -   Fixed PDF printout top banner: preserved header dark gradient background, hid theme-toggle icon and GitHub link, cleared page title during print, removed browser-generated URL/date/page-number margin strip via `@page { margin: 0 }`, and added vertical gap between header and intro-text box ([#106](https://github.com/stamped-principles/stamped-checklist/pull/106))
 
 #### 🏠 Internal
 
+-   Pinned upstream checklist and principles schema versions explicitly instead of always pulling the latest release, so upgrades are deliberate ([#138](https://github.com/stamped-principles/stamped-checklist/pull/138))
 -   Bumped `esbuild` to 0.28.1 via an npm override to fix a Windows dev-server path-traversal vulnerability ([GHSA-g7r4-m6w7-qqqr](https://github.com/advisories/GHSA-g7r4-m6w7-qqqr)) ([#121](https://github.com/stamped-principles/stamped-checklist/pull/121))
 -   Changed project licensing from ISC to CC-BY-4.0 to align with other STAMPED repositories ([#110](https://github.com/stamped-principles/stamped-checklist/pull/110))
 -   Added version-check CI workflow and agent instructions ([#101](https://github.com/stamped-principles/stamped-checklist/pull/101))
