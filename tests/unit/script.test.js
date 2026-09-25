@@ -343,7 +343,7 @@ describe("URL state encoding/decoding", () => {
         script.buildChecklist();
         expect(
             window.location.search.startsWith(
-                `?checklist=${DEFAULT_VERSION}&cols=auto&sections=off&format=3&responses=`
+                `?checklist=${DEFAULT_VERSION}&responses_version=${DEFAULT_VERSION}&cols=auto&sections=off&format=3&responses=`
             )
         ).toBe(true);
     });
@@ -359,7 +359,11 @@ describe("URL state encoding/decoding", () => {
         script.setSections("on");
 
         const search = window.location.search;
-        expect(search.startsWith(`?checklist=${DEFAULT_VERSION}&cols=2&sections=on&format=3&responses=`)).toBe(true);
+        expect(
+            search.startsWith(
+                `?checklist=${DEFAULT_VERSION}&responses_version=${DEFAULT_VERSION}&cols=2&sections=on&format=3&responses=`
+            )
+        ).toBe(true);
     });
 
     it("loadFromURL applies view params and keeps them in URL", () => {
@@ -372,7 +376,9 @@ describe("URL state encoding/decoding", () => {
         expect(grid.classList.contains("cols-1")).toBe(true);
         expect(app.classList.contains("flat-mode")).toBe(false);
         expect(
-            window.location.search.startsWith(`?checklist=${DEFAULT_VERSION}&cols=1&sections=on&format=3&responses=`)
+            window.location.search.startsWith(
+                `?checklist=${DEFAULT_VERSION}&responses_version=${DEFAULT_VERSION}&cols=1&sections=on&format=3&responses=`
+            )
         ).toBe(true);
     });
 
@@ -382,7 +388,7 @@ describe("URL state encoding/decoding", () => {
         expect(() => script.loadFromURL()).not.toThrow();
         expect(
             window.location.search.startsWith(
-                `?checklist=${DEFAULT_VERSION}&cols=auto&sections=off&format=3&responses=`
+                `?checklist=${DEFAULT_VERSION}&responses_version=${DEFAULT_VERSION}&cols=auto&sections=off&format=3&responses=`
             )
         ).toBe(true);
         expect(document.querySelector(".cards-grid").classList.contains("cols-auto")).toBe(true);
@@ -608,7 +614,9 @@ describe("setColumns", () => {
         const { setColumns } = await import("../../src/script.js");
         setColumns(2);
         expect(
-            window.location.search.startsWith(`?checklist=${DEFAULT_VERSION}&cols=2&sections=off&format=3&responses=`)
+            window.location.search.startsWith(
+                `?checklist=${DEFAULT_VERSION}&responses_version=${DEFAULT_VERSION}&cols=2&sections=off&format=3&responses=`
+            )
         ).toBe(true);
     });
 });
@@ -640,7 +648,9 @@ describe("setSections", () => {
         const { setSections } = await import("../../src/script.js");
         setSections("on");
         expect(
-            window.location.search.startsWith(`?checklist=${DEFAULT_VERSION}&cols=auto&sections=on&format=3&responses=`)
+            window.location.search.startsWith(
+                `?checklist=${DEFAULT_VERSION}&responses_version=${DEFAULT_VERSION}&cols=auto&sections=on&format=3&responses=`
+            )
         ).toBe(true);
     });
 
@@ -650,7 +660,9 @@ describe("setSections", () => {
         setColumns(1);
         setSections("on");
         expect(
-            window.location.search.startsWith(`?checklist=${DEFAULT_VERSION}&cols=1&sections=on&format=3&responses=`)
+            window.location.search.startsWith(
+                `?checklist=${DEFAULT_VERSION}&responses_version=${DEFAULT_VERSION}&cols=1&sections=on&format=3&responses=`
+            )
         ).toBe(true);
     });
 });

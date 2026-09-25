@@ -34,10 +34,16 @@ and removed questions do not inherit answers. Matching requires the same item ID
 question text, linked principle codes, principle statements, and requirement level.
 Saved assessment links reopen their original version; unversioned links use 0.1.0.
 
-New links use format 3 and include the checklist version inside the encoded answers.
-Changing only the `checklist` query is rejected when it disagrees with that version.
-Existing format 2 and unversioned links remain readable and are rewritten as format 3.
-Those older formats cannot detect a manually changed version when all item IDs fit.
+URLs identify the selected checklist with `checklist` and the source answers with
+`responses_version`. Editing `checklist` translates unchanged answers from the
+source version and rewrites the URL with both versions set to the target. A brief
+summary reports carried answers, unanswered questions, and omitted answers.
+
+Format 3 also embeds the source version in the answers. If `responses_version`
+disagrees with that embedded version, the original URL is preserved with an error.
+Existing format 2 and unversioned links remain readable. For older links without
+`responses_version`, the source is the original `checklist` value (or 0.1.0 when
+absent); add `responses_version` before editing their target version.
 Reset clears the default version's saved answers; older version saves remain intact.
 
 To adopt a new published checklist, append its version and matching release tags to

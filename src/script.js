@@ -105,13 +105,14 @@ function encodeResponses(version, responses) {
     return btoa(Array.from(bytes, (byte) => String.fromCharCode(byte)).join(""));
 }
 
-function openAssessment(version, responses) {
+function openAssessment(version, responses, sourceVersion = version) {
     const params = new URLSearchParams(window.location.search);
     params.delete("state");
     params.delete("responses");
     params.set("checklist", version);
     params.set("format", String(PERSISTENCE_FORMAT));
-    params.set("responses", encodeResponses(version, responses));
+    params.set("responses_version", sourceVersion);
+    params.set("responses", encodeResponses(sourceVersion, responses));
     window.history.replaceState({}, "", `${window.location.pathname}?${params}`);
     buildChecklist();
 }
@@ -121,9 +122,10 @@ function selectChecklistVersion(version) {
         updateVersionDisplay();
         return;
     }
-    const responses = translateResponses(savedResponses(), DATA, checklistData(version));
+    const responses = savedResponses();
+    const sourceVersion = VERSION;
     writeSavedAssessment();
-    openAssessment(version, responses);
+    openAssessment(version, responses, sourceVersion);
 }
 
 function updateVersionDisplay() {
@@ -178,6 +180,7 @@ function syncPersistentURL() {
     if (persistenceBlocked) return;
     const params = new URLSearchParams();
     params.set("checklist", VERSION);
+    params.set("responses_version", VERSION);
 
     params.set("cols", getSelectedOrDefaultView("cols", VALID_COLUMN_VALUES, "auto"));
     params.set("sections", getSelectedOrDefaultView("sections", VALID_SECTION_VALUES, "off"));
@@ -303,6 +306,7 @@ function buildChecklist() {
     const container = document.getElementById("app");
     container.querySelector(".cards-grid")?.remove();
     container.querySelector(".version-error")?.remove();
+    container.querySelector(".transfer-summary")?.remove();
     versionUnavailable = false;
     try {
         selectChecklist(requestedVersion());
@@ -696,29 +700,38 @@ function loadFromURL() {
     if (params.has("state") || params.has("responses") || params.has("format")) {
         try {
             const format = params.has("format") ? Number(params.get("format")) : undefined;
-            if ((params.get("checklist") ?? ORIGINAL_VERSION) !== VERSION)
-                throw new Error("Answers belong to a different checklist version");
-            if (format === undefined && VERSION !== ORIGINAL_VERSION)
-                throw new Error("Positional answers require the original checklist");
-            let responses = {};
-            if (format === undefined && stateParam !== null) {
-                responses = readLegacyState(atob(stateParam), DATA);
-            }
+            let decoded;
+            let encodedVersion;
             if (responsesParam !== null) {
                 const binary = atob(responsesParam);
                 const json =
                     format === 2 || format === PERSISTENCE_FORMAT
                         ? new TextDecoder().decode(Uint8Array.from(binary, (char) => char.charCodeAt(0)))
                         : binary;
-                let decoded = JSON.parse(json);
+                decoded = JSON.parse(json);
                 if (format === PERSISTENCE_FORMAT) {
-                    if (!decoded || decoded.checklist_version !== VERSION)
-                        throw new Error("Encoded answers belong to a different checklist version");
+                    if (!decoded || typeof decoded.checklist_version !== "string")
+                        throw new Error("Missing encoded checklist version");
+                    encodedVersion = decoded.checklist_version;
                     decoded = decoded.responses;
                 }
-                responses = { ...responses, ...readResponses(decoded, format, DATA) };
             } else if (format !== undefined) {
                 throw new Error("Missing responses for saved-answer format");
+            }
+            const sourceVersion =
+                params.get("responses_version") ?? encodedVersion ?? params.get("checklist") ?? ORIGINAL_VERSION;
+            if (encodedVersion && encodedVersion !== sourceVersion)
+                throw new Error("Response version disagrees with encoded answers");
+            if (format === undefined && sourceVersion !== ORIGINAL_VERSION)
+                throw new Error("Positional answers require the original checklist");
+            const sourceData = checklistData(sourceVersion);
+            let responses = {};
+            if (format === undefined && stateParam !== null) responses = readLegacyState(atob(stateParam), sourceData);
+            if (responsesParam !== null) responses = { ...responses, ...readResponses(decoded, format, sourceData) };
+            if (sourceVersion !== VERSION) {
+                const translated = translateResponses(responses, sourceData, DATA);
+                showTransferSummary(sourceVersion, responses, translated);
+                responses = translated;
             }
             restoreResponses(responses);
         } catch (e) {
@@ -737,6 +750,19 @@ function loadFromURL() {
     }
 
     syncPersistentURL();
+}
+
+function showTransferSummary(sourceVersion, source, translated) {
+    const answered = (responses) => Object.values(responses).filter((response) => response.value !== null).length;
+    const carried = answered(translated);
+    const omitted = answered(source) - carried;
+    const summary = document.createElement("p");
+    summary.className = "transfer-summary";
+    summary.setAttribute("role", "status");
+    summary.textContent = `From checklist ${sourceVersion}: answers carried over: ${carried}; questions unanswered: ${
+        totalItems - carried
+    }; answers omitted: ${omitted}. Scores use checklist ${VERSION}.`;
+    document.getElementById("app").prepend(summary);
 }
 
 // Reset

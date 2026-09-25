@@ -4,6 +4,8 @@
 
 #### 🚀 Enhancement
 
+-   Supported URL-driven answer transfer with `responses_version` and a brief transfer summary ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
 -   Listed checklist versions newest first, opened the default on fresh visits and Reset, translated unchanged answers through the dropdown, and bound new shared answers to their checklist version ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
 
 -   Bundled checklist versions 0.1.0, 0.2.0, and 0.3.0, defaulted new assessments to 0.3.0, and kept saved answers separate by version ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))

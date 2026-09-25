@@ -479,7 +479,11 @@ test("old response links retain their checklist version in links and browser sav
     ).toEqual(["0.3.0", "0.2.0", "0.1.0"]);
     await expect(item.locator(".reason-input")).toHaveValue("");
     await page.goto(sharedURL);
-    await page.locator("#checklist-version").selectOption("0.3.0");
+    const editedURL = new URL(page.url());
+    editedURL.searchParams.set("checklist", "0.3.0");
+    await page.goto(editedURL.toString());
+    await expect(page.locator(".transfer-summary")).toContainText("answers carried over: 1");
+    expect(new URL(page.url()).searchParams.get("responses_version")).toBe("0.3.0");
     await expect(page.locator("#checklist-version")).toHaveValue("0.3.0");
     await expect(item.locator(".reason-input")).toHaveValue("Rebuild required — café 🔬");
     const translatedURL = new URL(page.url());

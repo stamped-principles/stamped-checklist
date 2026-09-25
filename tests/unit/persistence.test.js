@@ -207,13 +207,13 @@ describe("version changes", () => {
         await build(originalURL);
         expectOriginal();
     });
-    it("rejects changing only the checklist query of a new link", async () => {
+    it("rejects a source version that disagrees with the encoded answers", async () => {
         vi.spyOn(console, "warn").mockImplementation(() => {});
         const script = await build("/?checklist=0.1.0");
         script.handleResponse("s1_p3_i0", "no");
         const original = localStorage.getItem("stamped_checklist");
         const params = new URLSearchParams(window.location.search);
-        params.set("checklist", "0.3.0");
+        params.set("responses_version", "0.3.0");
         const url = `/?${params}`;
         const reopened = await build(url);
         expect(document.getElementById("toast").textContent).toContain("could not be restored");
@@ -257,5 +257,54 @@ describe("translation checks the meaning of each question", () => {
     }
     it("does not carry answers for removed items", () => {
         expect(translateResponses({ item: answer }, source, [])).toEqual({});
+    });
+});
+
+describe("URL source and target versions", () => {
+    for (const format of [2, 3]) {
+        it(`translates manually edited format ${format} URLs and normalizes the source version`, async () => {
+            const responses = { [stableId]: answer };
+            const payload = format === 3 ? { checklist_version: "0.1.0", responses } : responses;
+            await build(`/?checklist=0.3.0&responses_version=0.1.0&format=${format}&responses=${encoded(payload)}`);
+            expect(document.getElementById("reason_s1_p4_i0").value).toBe(answer.reason);
+            expect(document.querySelector(".transfer-summary").textContent).toBe(
+                "From checklist 0.1.0: answers carried over: 1; questions unanswered: 30; answers omitted: 0. Scores use checklist 0.3.0."
+            );
+            const params = new URLSearchParams(window.location.search);
+            expect(params.get("checklist")).toBe("0.3.0");
+            expect(params.get("responses_version")).toBe("0.3.0");
+            expect(JSON.parse(atob(params.get("responses"))).checklist_version).toBe("0.3.0");
+            expect(localStorage.getItem("stamped_checklist")).toBeNull();
+            await build(window.location.pathname + window.location.search);
+            expect(document.getElementById("reason_s1_p4_i0").value).toBe(answer.reason);
+            expect(document.querySelector(".transfer-summary")).toBeNull();
+        });
+    }
+    it("uses the embedded source version for existing format 3 links", async () => {
+        await build(
+            `/?checklist=0.3.0&format=3&responses=${encoded({
+                checklist_version: "0.1.0",
+                responses: { [stableId]: answer },
+            })}`
+        );
+        expect(document.getElementById("reason_s1_p4_i0").value).toBe(answer.reason);
+        expect(document.querySelector(".transfer-summary")).not.toBeNull();
+    });
+    it("preserves the original URL when the source checklist is unavailable", async () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+        const url = `/?checklist=0.3.0&responses_version=9.9.9&format=2&responses=${encoded({ [stableId]: answer })}`;
+        const script = await build(url);
+        expect(window.location.search).toBe(url.slice(1));
+        expect(document.getElementById("toast").textContent).toContain("could not be restored");
+        script.saveToLocalStorage();
+        expect(localStorage.getItem("stamped_checklist")).toBeNull();
+    });
+    it("reports answers omitted when moving to a checklist without the question", async () => {
+        const script = await build("/?checklist=0.3.0");
+        script.handleResponse("s1_p3_i0", "yes");
+        script.selectChecklistVersion("0.1.0");
+        expect(document.querySelector(".transfer-summary").textContent).toContain(
+            "answers carried over: 0; questions unanswered: 30; answers omitted: 1"
+        );
     });
 });
