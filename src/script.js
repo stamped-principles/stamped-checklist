@@ -6,6 +6,7 @@ import {
     AVAILABLE_VERSIONS,
     selectChecklist,
     checklistData,
+    previewInfo,
 } from "./checklist.js";
 import { PERSISTENCE_FORMAT, readResponses, readLegacyState, translateResponses } from "./persistence.js";
 
@@ -130,14 +131,19 @@ function selectChecklistVersion(version) {
 
 function updateVersionDisplay() {
     const versionEl = document.getElementById("version-indicator");
-    if (versionEl) versionEl.textContent = `Checklist v${VERSION}`;
+    if (versionEl)
+        versionEl.textContent = previewInfo(VERSION)
+            ? `Schema preview (${previewInfo(VERSION).version})`
+            : `Checklist v${VERSION}`;
     const select = document.getElementById("checklist-version");
     if (select) {
         select.replaceChildren(
             ...AVAILABLE_VERSIONS.map((version) => {
                 const option = document.createElement("option");
                 option.value = version;
-                option.textContent = version;
+                option.textContent = previewInfo(version)
+                    ? `Schema preview (${previewInfo(version).version})`
+                    : version;
                 option.selected = version === VERSION;
                 return option;
             })
@@ -303,6 +309,32 @@ function getPrincipleExamplesURL(principle) {
     return `https://stamped-principles.github.io/stamped-examples/stamped_principles/${firstLetter}/`;
 }
 
+// Draft pins are disposable; released assessment URLs retain their existing rules.
+function discardStalePreviewURL() {
+    if (!previewInfo(DEFAULT_VERSION)) return false;
+    const params = new URLSearchParams(window.location.search);
+    const versions = [params.get("checklist"), params.get("responses_version")];
+    if (params.get("format") === String(PERSISTENCE_FORMAT) && params.has("responses")) {
+        try {
+            const bytes = Uint8Array.from(atob(params.get("responses")), (char) => char.charCodeAt(0));
+            versions.push(JSON.parse(new TextDecoder().decode(bytes)).checklist_version);
+        } catch {
+            // Existing restoration handling reports malformed answers.
+        }
+    }
+    const stale = versions.some(
+        (version) =>
+            typeof version === "string" &&
+            /^\d+\.\d+\.\d+-preview\.[a-f0-9]{40}\.[a-f0-9]{40}$/.test(version) &&
+            version !== DEFAULT_VERSION
+    );
+    if (!stale) return false;
+    for (const key of ["state", "responses", "responses_version", "format"]) params.delete(key);
+    params.set("checklist", DEFAULT_VERSION);
+    window.history.replaceState({}, "", `${window.location.pathname}?${params}`);
+    return true;
+}
+
 function buildChecklist() {
     responseStates = {};
     stableIds = new Map();
@@ -313,6 +345,7 @@ function buildChecklist() {
     container.querySelector(".version-error")?.remove();
     container.querySelectorAll(".dynamic-summary").forEach((notice) => notice.remove());
     versionUnavailable = false;
+    const discardedPreview = discardStalePreviewURL();
     try {
         selectChecklist(requestedVersion());
         updateVersionDisplay();
@@ -424,7 +457,7 @@ function buildChecklist() {
     loadModePreference();
     // Check before loadFromURL canonicalizes the URL, including view-only links.
     const params = new URLSearchParams(window.location.search);
-    if (!params.has("state") && !params.has("responses") && !params.has("format")) {
+    if (!discardedPreview && !params.has("state") && !params.has("responses") && !params.has("format")) {
         loadFromLocalStorage();
     }
     loadFromURL();
@@ -432,7 +465,28 @@ function buildChecklist() {
     loadColumnPreference();
     loadSectionsPreference();
     syncPersistentURL();
-    if (!persistenceBlocked && VERSION !== DEFAULT_VERSION) {
+    if (discardedPreview) {
+        showSummaryMessage(
+            "preview-updated",
+            "Preview updated",
+            "This preview has changed. Previous draft answers couldn’t be restored. The current preview is unanswered."
+        );
+    }
+    const preview = previewInfo(VERSION);
+    if (preview) {
+        const notice = showSummaryMessage(
+            "schema-preview",
+            "Unreleased schema preview",
+            `Reviewing checklist ${preview.version} with pinned, unreleased schema changes. Preview answers are saved separately from released checklists. Sources: `
+        );
+        for (const [kind, source] of Object.entries(preview.sources)) {
+            const link = document.createElement("a");
+            link.href = source.url;
+            link.textContent = `${kind} PR #${source.pr} (${source.sha.slice(0, 7)})`;
+            notice.append(link, " ");
+        }
+    }
+    if (!persistenceBlocked && !previewInfo(DEFAULT_VERSION) && VERSION !== DEFAULT_VERSION) {
         showSummaryMessage(
             "older-version",
             "A newer checklist is available",
@@ -877,8 +931,7 @@ function init() {
     setupPrintTitle();
     buildChecklist();
 
-    const versionEl = document.getElementById("version-indicator");
-    if (versionEl && !versionUnavailable) versionEl.textContent = `Checklist v${VERSION}`;
+    if (!versionUnavailable) updateVersionDisplay();
 
     updateHeaderHeight();
     if (typeof ResizeObserver !== "undefined") {
