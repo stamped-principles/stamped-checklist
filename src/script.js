@@ -309,6 +309,32 @@ function getPrincipleExamplesURL(principle) {
     return `https://stamped-principles.github.io/stamped-examples/stamped_principles/${firstLetter}/`;
 }
 
+// Draft pins are disposable; released assessment URLs retain their existing rules.
+function discardStalePreviewURL() {
+    if (!previewInfo(DEFAULT_VERSION)) return false;
+    const params = new URLSearchParams(window.location.search);
+    const versions = [params.get("checklist"), params.get("responses_version")];
+    if (params.get("format") === String(PERSISTENCE_FORMAT) && params.has("responses")) {
+        try {
+            const bytes = Uint8Array.from(atob(params.get("responses")), (char) => char.charCodeAt(0));
+            versions.push(JSON.parse(new TextDecoder().decode(bytes)).checklist_version);
+        } catch {
+            // Existing restoration handling reports malformed answers.
+        }
+    }
+    const stale = versions.some(
+        (version) =>
+            typeof version === "string" &&
+            /^\d+\.\d+\.\d+-preview\.[a-f0-9]{40}\.[a-f0-9]{40}$/.test(version) &&
+            version !== DEFAULT_VERSION
+    );
+    if (!stale) return false;
+    for (const key of ["state", "responses", "responses_version", "format"]) params.delete(key);
+    params.set("checklist", DEFAULT_VERSION);
+    window.history.replaceState({}, "", `${window.location.pathname}?${params}`);
+    return true;
+}
+
 function buildChecklist() {
     responseStates = {};
     stableIds = new Map();
@@ -319,6 +345,7 @@ function buildChecklist() {
     container.querySelector(".version-error")?.remove();
     container.querySelectorAll(".dynamic-summary").forEach((notice) => notice.remove());
     versionUnavailable = false;
+    const discardedPreview = discardStalePreviewURL();
     try {
         selectChecklist(requestedVersion());
         updateVersionDisplay();
@@ -430,7 +457,7 @@ function buildChecklist() {
     loadModePreference();
     // Check before loadFromURL canonicalizes the URL, including view-only links.
     const params = new URLSearchParams(window.location.search);
-    if (!params.has("state") && !params.has("responses") && !params.has("format")) {
+    if (!discardedPreview && !params.has("state") && !params.has("responses") && !params.has("format")) {
         loadFromLocalStorage();
     }
     loadFromURL();
@@ -438,6 +465,13 @@ function buildChecklist() {
     loadColumnPreference();
     loadSectionsPreference();
     syncPersistentURL();
+    if (discardedPreview) {
+        showSummaryMessage(
+            "preview-updated",
+            "Preview updated",
+            "This preview has changed. Previous draft answers couldn’t be restored. The current preview is unanswered."
+        );
+    }
     const preview = previewInfo(VERSION);
     if (preview) {
         const notice = showSummaryMessage(

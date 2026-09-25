@@ -42,3 +42,69 @@ it("identifies both preview sources and isolates saved preview answers from rele
     expect(JSON.parse(localStorage.getItem("stamped_checklist")).checklist_version).toBe("0.1.0");
     expect(JSON.parse(localStorage.getItem(`stamped_checklist:${bundle.checklist._preview.id}`))).toEqual(previewSave);
 });
+
+const oldPreview = `0.1.0-preview.${"c".repeat(40)}.${"d".repeat(40)}`;
+const encoded = (version) =>
+    encodeURIComponent(
+        btoa(
+            JSON.stringify({
+                checklist_version: version,
+                responses: { "stamped-checklist:must/001": { value: "yes", reason: "Draft answer" } },
+            })
+        )
+    );
+async function openPreview(url) {
+    document.body.innerHTML =
+        '<div id="app"></div><div id="levelStats"></div><div id="toast"></div><select id="checklist-version"></select>';
+    window.history.replaceState({}, "", url);
+    vi.resetModules();
+    vi.doMock("../../src/data/stamped-checklist.json", () => ({ default: bundle.checklist }));
+    vi.doMock("../../src/data/stamped-principles.json", () => ({ default: bundle.principles }));
+    const script = await import("../../src/script.js");
+    script.buildChecklist();
+    return script;
+}
+it.each([oldPreview, bundle.checklist._preview.id])(
+    "opens current preview unanswered when source pins are stale (target %s)",
+    async (target) => {
+        const saved = JSON.stringify({
+            format: 3,
+            checklist_version: bundle.checklist._preview.id,
+            responses: { "stamped-checklist:must/001": { value: "yes", reason: "Cached answer" } },
+        });
+        localStorage.setItem(`stamped_checklist:${bundle.checklist._preview.id}`, saved);
+        const script = await openPreview(`/?checklist=${target}&format=3&responses=${encoded(oldPreview)}&cols=2`);
+        expect(document.querySelector('[data-message="preview-updated"]').textContent).toContain(
+            "current preview is unanswered"
+        );
+        expect(document.querySelector(".version-error")).toBeNull();
+        expect(document.querySelector(".transfer-summary")).toBeNull();
+        const params = new URLSearchParams(window.location.search);
+        expect(params.get("checklist")).toBe(bundle.checklist._preview.id);
+        expect(params.get("cols")).toBe("2");
+        expect(JSON.parse(atob(params.get("responses"))).responses).toEqual({});
+        expect(localStorage.getItem(`stamped_checklist:${bundle.checklist._preview.id}`)).toBe(saved);
+        script.handleResponse("s0_p0_i0", "yes");
+        expect(
+            JSON.parse(localStorage.getItem("stamped_checklist")).responses["stamped-checklist:must/001"].value
+        ).toBe("yes");
+    }
+);
+it("restores answers for unchanged preview pins", async () => {
+    await openPreview(
+        `/?checklist=${bundle.checklist._preview.id}&format=3&responses=${encoded(bundle.checklist._preview.id)}`
+    );
+    expect(document.querySelector('[data-message="preview-updated"]')).toBeNull();
+    expect(
+        JSON.parse(atob(new URLSearchParams(window.location.search).get("responses"))).responses[
+            "stamped-checklist:must/001"
+        ].value
+    ).toBe("yes");
+});
+it("keeps unavailable released URLs unchanged even in a preview build", async () => {
+    const url = "/?checklist=9.9.9&format=3&responses=" + encoded("9.9.9");
+    await openPreview(url);
+    expect(window.location.search).toBe(url.slice(1));
+    expect(document.querySelector(".version-error")).not.toBeNull();
+    expect(document.querySelector('[data-message="preview-updated"]')).toBeNull();
+});

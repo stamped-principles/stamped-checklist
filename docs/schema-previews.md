@@ -61,9 +61,10 @@ The PR numbers provide source links; downloads use the SHAs.
 The preview becomes the default selection alongside all published checklist versions.
 A visible banner links both schema PRs and shows their short SHAs.
 Its URL and browser-save identity includes both full SHAs, keeping preview answers separate from released assessments and other preview revisions.
-Preview links are only usable in builds containing those pins.
-Automatic answer translation requires both source and target bundles to be available, so links from removed preview revisions cannot be migrated in a new build.
-Keep the old preview configuration if those assessments need to be reopened.
+The stable PR preview URL always serves the latest deployment and configured pins.
+If an assessment URL refers to previous preview pins, the current preview opens unanswered with a brief notice.
+It does not load historical schemas, retain old deployments, or migrate stale draft answers.
+Answers using the current pins still restore normally, and released-assessment URL handling is unchanged.
 
 The same configuration is used by `npm test`, `npm run test:e2e`, and `npm run build`.
 Presence of the file keeps the merge status pending even if its JSON is invalid; genuine build or test errors still fail normally.
