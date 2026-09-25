@@ -495,6 +495,7 @@ test("old response links retain their checklist version in links and browser sav
     await page.getByRole("button", { name: "Reset" }).click();
     await expect(page.locator("#checklist-version")).toHaveValue("0.3.0");
     await expect(page.locator(".response-btn.active")).toHaveCount(0);
+    expect(new URL(page.url()).search).toBe("");
     await page.evaluate(() => localStorage.clear());
     await page.goto(sharedURL);
     await expect(item.locator(".reason-input")).toHaveValue("Rebuild required — café 🔬");

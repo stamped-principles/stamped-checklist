@@ -233,6 +233,12 @@ describe("version changes", () => {
         expect(document.getElementById("version-indicator").textContent).toBe("Checklist v0.3.0");
         expect(document.querySelectorAll(".response-btn.active").length).toBe(0);
         expect(JSON.parse(localStorage.getItem("stamped_checklist:0.3.0")).responses).toEqual({});
+        expect(window.location.search).toBe("");
+        script.handleResponse("s0_p0_i0", "yes");
+        const params = new URLSearchParams(window.location.search);
+        expect(params.get("checklist")).toBe("0.3.0");
+        expect(params.get("responses_version")).toBe("0.3.0");
+        expect(JSON.parse(atob(params.get("responses"))).responses["stamped-checklist:must/001"].value).toBe("yes");
     });
 });
 

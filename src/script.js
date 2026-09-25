@@ -812,6 +812,8 @@ function confirmReset() {
     ) {
         openAssessment(DEFAULT_VERSION, {});
         autoSave();
+        // A reset is a fresh visit; the next interaction will encode state again.
+        window.history.replaceState({}, "", window.location.pathname);
         showToast("🗑️ Checklist reset");
     }
 }
