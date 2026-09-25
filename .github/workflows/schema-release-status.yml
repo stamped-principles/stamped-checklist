@@ -1,0 +1,31 @@
+name: Schema release gate
+
+on:
+    pull_request_target:
+        branches: [main]
+        types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+
+permissions:
+    contents: read
+    statuses: write
+    issues: write
+    pull-requests: write
+
+concurrency:
+    group: schema-release-gate-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
+
+jobs:
+    publish-status:
+        runs-on: ubuntu-latest
+        steps:
+            # Never check out or execute the PR head with this privileged token.
+            - uses: actions/checkout@v7
+              with:
+                  ref: ${{ github.event.pull_request.base.sha }}
+                  persist-credentials: false
+            - uses: actions/github-script@v8
+              with:
+                  script: |
+                      const publish = require('./.github/scripts/schema-release-status.cjs');
+                      await publish({github, context});

@@ -4,6 +4,8 @@
 
 #### 🚀 Enhancement
 
+-   Added pinned schema PR previews with isolated saves and a separate merge-readiness status (issue [#139](https://github.com/stamped-principles/stamped-checklist/issues/139))
+
 -   Rounded assessment notices and kept the older-version warning visible until upgrading ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
 
 -   Styled assessment notices as borderless banners, distinct from principle cards ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))

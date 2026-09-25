@@ -1,6 +1,8 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { previewSources, previewBundle } from "./schema-preview.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = resolve(__dirname, "..", "data");
@@ -47,7 +49,25 @@ for (const release of releases.releases) {
     archive[release.version] = { checklist, principles };
     console.log(`Bundled checklist ${release.version} with principles ${principles.version}`);
 }
-const current = archive[releases.defaultVersion];
+let current = archive[releases.defaultVersion];
+let preview;
+try {
+    preview = JSON.parse(await readFile(resolve(__dirname, "../../schema-preview.json"), "utf-8"));
+} catch (error) {
+    if (error.code !== "ENOENT") throw error;
+}
+if (preview !== undefined) {
+    const sources = previewSources(preview);
+    current = previewBundle(
+        preview,
+        await downloadJSON(sources.checklist.dataUrl),
+        await downloadJSON(sources.principles.dataUrl)
+    );
+    archive[current.checklist._preview.id] = current;
+    console.log(
+        `Bundled schema preview from checklist PR #${sources.checklist.pr} and principles PR #${sources.principles.pr}`
+    );
+}
 if (!current) throw new Error("Default checklist version is not in the release registry");
 for (const [name, data] of Object.entries({
     "stamped-checklist.json": current.checklist,

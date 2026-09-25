@@ -6,6 +6,7 @@ import {
     AVAILABLE_VERSIONS,
     selectChecklist,
     checklistData,
+    previewInfo,
 } from "./checklist.js";
 import { PERSISTENCE_FORMAT, readResponses, readLegacyState, translateResponses } from "./persistence.js";
 
@@ -130,14 +131,19 @@ function selectChecklistVersion(version) {
 
 function updateVersionDisplay() {
     const versionEl = document.getElementById("version-indicator");
-    if (versionEl) versionEl.textContent = `Checklist v${VERSION}`;
+    if (versionEl)
+        versionEl.textContent = previewInfo(VERSION)
+            ? `Schema preview (${previewInfo(VERSION).version})`
+            : `Checklist v${VERSION}`;
     const select = document.getElementById("checklist-version");
     if (select) {
         select.replaceChildren(
             ...AVAILABLE_VERSIONS.map((version) => {
                 const option = document.createElement("option");
                 option.value = version;
-                option.textContent = version;
+                option.textContent = previewInfo(version)
+                    ? `Schema preview (${previewInfo(version).version})`
+                    : version;
                 option.selected = version === VERSION;
                 return option;
             })
@@ -432,7 +438,21 @@ function buildChecklist() {
     loadColumnPreference();
     loadSectionsPreference();
     syncPersistentURL();
-    if (!persistenceBlocked && VERSION !== DEFAULT_VERSION) {
+    const preview = previewInfo(VERSION);
+    if (preview) {
+        const notice = showSummaryMessage(
+            "schema-preview",
+            "Unreleased schema preview",
+            `Reviewing checklist ${preview.version} with pinned, unreleased schema changes. Preview answers are saved separately from released checklists. Sources: `
+        );
+        for (const [kind, source] of Object.entries(preview.sources)) {
+            const link = document.createElement("a");
+            link.href = source.url;
+            link.textContent = `${kind} PR #${source.pr} (${source.sha.slice(0, 7)})`;
+            notice.append(link, " ");
+        }
+    }
+    if (!persistenceBlocked && !previewInfo(DEFAULT_VERSION) && VERSION !== DEFAULT_VERSION) {
         showSummaryMessage(
             "older-version",
             "A newer checklist is available",
@@ -877,8 +897,7 @@ function init() {
     setupPrintTitle();
     buildChecklist();
 
-    const versionEl = document.getElementById("version-indicator");
-    if (versionEl && !versionUnavailable) versionEl.textContent = `Checklist v${VERSION}`;
+    if (!versionUnavailable) updateVersionDisplay();
 
     updateHeaderHeight();
     if (typeof ResizeObserver !== "undefined") {
