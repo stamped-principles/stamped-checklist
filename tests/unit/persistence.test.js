@@ -350,3 +350,20 @@ it("dismisses the version warning without changing the transfer summary or answe
     expect(document.querySelectorAll(".older-version").length).toBe(1);
     expect(document.querySelectorAll(".transfer-summary").length).toBe(1);
 });
+
+it("dismisses the transfer summary independently without changing saved answers", async () => {
+    const script = await build("/?checklist=0.3.0");
+    script.handleResponse("s0_p0_i0", "yes");
+    script.selectChecklistVersion("0.1.0");
+    const warning = document.querySelector(".older-version");
+    const url = window.location.href;
+    const saved = localStorage.getItem("stamped_checklist");
+    document.querySelector('[aria-label="Dismiss answer transfer summary"]').click();
+    expect(document.querySelector(".transfer-summary")).toBeNull();
+    expect(document.querySelector(".older-version")).toBe(warning);
+    expect(window.location.href).toBe(url);
+    expect(localStorage.getItem("stamped_checklist")).toBe(saved);
+    expect(document.activeElement).toBe(document.getElementById("checklist-version"));
+    script.selectChecklistVersion("0.3.0");
+    expect(document.querySelector(".transfer-summary")).not.toBeNull();
+});

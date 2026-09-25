@@ -1177,9 +1177,12 @@ code {
 }
 
 /* Keep the version warning distinct from answer-transfer information. */
-.dynamic-summary.version-notice {
+.dynamic-summary.dismissible-summary {
     position: relative;
     padding-right: 3.5rem;
+}
+
+.dynamic-summary.version-notice {
     color: #702c35;
     background: #fbe9eb;
     border-color: #e4b6be;
