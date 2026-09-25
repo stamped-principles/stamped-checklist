@@ -4,7 +4,7 @@
 
 #### 🚀 Enhancement
 
--   Added a persistent violet summary box for transfers, older checklist notices, and restoration errors ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+-   Added a persistent muted-violet summary box for transfers, older checklist notices, and restoration errors ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
 
 -   Supported URL-driven answer transfer with `responses_version` and a brief transfer summary ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
 

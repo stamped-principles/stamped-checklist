@@ -1138,12 +1138,12 @@ code {
 .dynamic-summary {
     margin: 0 0 1.25rem;
     padding: 1.1rem 1.25rem;
-    color: #ffffff;
-    background: #5331bf;
-    border: 2px solid #a994ff;
-    border-left: 7px solid #c8bbff;
+    color: #444052;
+    background: #eeecf3;
+    border: 1px solid #ccc7d8;
+    border-left: 5px solid #9387ad;
     border-radius: var(--radius);
-    box-shadow: 0 3px 12px rgba(83, 49, 191, 0.25);
+    box-shadow: none;
     line-height: 1.6;
 }
 
@@ -1156,11 +1156,11 @@ code {
 .dynamic-summary > div + div {
     margin-top: 0.85rem;
     padding-top: 0.85rem;
-    border-top: 1px solid #a994ff;
+    border-top: 1px solid #ccc7d8;
 }
 
 .dynamic-summary a {
-    color: #ffffff;
+    color: #444052;
     text-decoration: underline;
     font-weight: 600;
 }
@@ -1169,4 +1169,19 @@ code {
     .dynamic-summary {
         display: none;
     }
+}
+
+[data-theme="dark"] .dynamic-summary {
+    color: #e3dfeb;
+    background: #2d2b36;
+    border-color: #514b60;
+    border-left-color: #9387ad;
+}
+
+[data-theme="dark"] .dynamic-summary a {
+    color: inherit;
+}
+
+[data-theme="dark"] .dynamic-summary > div + div {
+    border-top-color: #514b60;
 }
