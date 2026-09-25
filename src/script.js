@@ -165,7 +165,12 @@ function restoreResponses(responses) {
 function reportPersistenceError(error) {
     persistenceBlocked = true;
     console.warn("Could not restore saved checklist answers", error);
-    showToast("Saved answers could not be restored. Original data kept; reset to start a new assessment.");
+    showSummaryMessage(
+        "restore-error",
+        "Answers could not be restored",
+        "Saved answers could not be restored. Original data kept; reset to start a new assessment.",
+        true
+    );
 }
 
 function getSelectedOrDefaultView(name, validValues, fallback) {
@@ -306,7 +311,7 @@ function buildChecklist() {
     const container = document.getElementById("app");
     container.querySelector(".cards-grid")?.remove();
     container.querySelector(".version-error")?.remove();
-    container.querySelector(".transfer-summary")?.remove();
+    container.querySelector(".dynamic-summary")?.remove();
     versionUnavailable = false;
     try {
         selectChecklist(requestedVersion());
@@ -314,16 +319,16 @@ function buildChecklist() {
     } catch (error) {
         persistenceBlocked = true;
         versionUnavailable = true;
-        const notice = document.createElement("div");
-        notice.className = "version-error";
-        notice.setAttribute("role", "alert");
-        const message = document.createElement("p");
-        message.textContent = `${error.message} The saved assessment has not been changed.`;
+        const notice = showSummaryMessage(
+            "version-error",
+            "Checklist unavailable",
+            `${error.message} The saved assessment has not been changed.`,
+            true
+        );
         const link = document.createElement("a");
         link.href = `?checklist=${encodeURIComponent(DEFAULT_VERSION)}`;
         link.textContent = "Open the current checklist";
-        notice.append(message, link);
-        container.append(notice);
+        notice.append(link);
         return;
     }
 
@@ -427,6 +432,13 @@ function buildChecklist() {
     loadColumnPreference();
     loadSectionsPreference();
     syncPersistentURL();
+    if (!persistenceBlocked && VERSION !== DEFAULT_VERSION) {
+        showSummaryMessage(
+            "older-version",
+            "A newer checklist is available",
+            `You are using checklist ${VERSION}. The latest is ${DEFAULT_VERSION}. Choose it in the Checklist version dropdown to carry over matching answers. New or changed questions will need review, and your score may change.`
+        );
+    }
 }
 
 function handleResponse(id, value) {
@@ -752,17 +764,42 @@ function loadFromURL() {
     syncPersistentURL();
 }
 
+// Persistent assessment messages share one dynamic summary box. It is created
+// only when needed and cleared when a different assessment is opened.
+function showSummaryMessage(kind, title, text, urgent = false) {
+    const app = document.getElementById("app");
+    let box = app.querySelector(".dynamic-summary");
+    if (!box) {
+        box = document.createElement("section");
+        box.className = "dynamic-summary";
+        box.setAttribute("aria-label", "Assessment updates");
+        app.prepend(box);
+    }
+    box.querySelector(`[data-message="${kind}"]`)?.remove();
+    const entry = document.createElement("div");
+    entry.dataset.message = kind;
+    entry.setAttribute("role", urgent ? "alert" : "status");
+    const heading = document.createElement("h2");
+    heading.textContent = title;
+    const message = document.createElement("p");
+    message.className = kind;
+    message.textContent = text;
+    entry.append(heading, message);
+    box.append(entry);
+    return entry;
+}
+
 function showTransferSummary(sourceVersion, source, translated) {
     const answered = (responses) => Object.values(responses).filter((response) => response.value !== null).length;
     const carried = answered(translated);
     const omitted = answered(source) - carried;
-    const summary = document.createElement("p");
-    summary.className = "transfer-summary";
-    summary.setAttribute("role", "status");
-    summary.textContent = `From checklist ${sourceVersion}: answers carried over: ${carried}; questions unanswered: ${
-        totalItems - carried
-    }; answers omitted: ${omitted}. Scores use checklist ${VERSION}.`;
-    document.getElementById("app").prepend(summary);
+    showSummaryMessage(
+        "transfer-summary",
+        "Answers transferred",
+        `From checklist ${sourceVersion}: answers carried over: ${carried}; questions unanswered: ${
+            totalItems - carried
+        }; answers omitted: ${omitted}. Scores use checklist ${VERSION}.`
+    );
 }
 
 // Reset

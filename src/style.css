@@ -1134,14 +1134,39 @@ code {
     padding: 1rem;
 }
 
-.transfer-summary {
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
+/* Dynamic summary box: persistent updates, distinct from score colors. */
+.dynamic-summary {
+    margin: 0 0 1.25rem;
+    padding: 1.1rem 1.25rem;
+    color: #ffffff;
+    background: #5331bf;
+    border: 2px solid #a994ff;
+    border-left: 7px solid #c8bbff;
+    border-radius: var(--radius);
+    box-shadow: 0 3px 12px rgba(83, 49, 191, 0.25);
+    line-height: 1.6;
+}
+
+.dynamic-summary h2 {
+    color: inherit;
+    font-size: 1.05rem;
+    margin-bottom: 0.3rem;
+}
+
+.dynamic-summary > div + div {
+    margin-top: 0.85rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid #a994ff;
+}
+
+.dynamic-summary a {
+    color: #ffffff;
+    text-decoration: underline;
+    font-weight: 600;
 }
 
 @media print {
-    .transfer-summary {
+    .dynamic-summary {
         display: none;
     }
 }

@@ -4,6 +4,8 @@
 
 #### 🚀 Enhancement
 
+-   Added a persistent violet summary box for transfers, older checklist notices, and restoration errors ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
 -   Supported URL-driven answer transfer with `responses_version` and a brief transfer summary ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
 
 -   Listed checklist versions newest first, opened the default on fresh visits and Reset, translated unchanged answers through the dropdown, and bound new shared answers to their checklist version ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))

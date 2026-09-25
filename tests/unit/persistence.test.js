@@ -176,7 +176,7 @@ describe("assessments keep their original checklist", () => {
         it(`preserves an unreadable assessment: ${url}`, async () => {
             vi.spyOn(console, "warn").mockImplementation(() => {});
             const script = await build(url);
-            expect(document.getElementById("toast").textContent).toContain("could not be restored");
+            expect(document.querySelector(".dynamic-summary").textContent).toContain("could not be restored");
             script.handleResponse("s0_p0_i0", "yes");
             expect(window.location.search).toBe(url.slice(1));
             expect(localStorage.getItem("stamped_checklist")).toBeNull();
@@ -216,7 +216,7 @@ describe("version changes", () => {
         params.set("responses_version", "0.3.0");
         const url = `/?${params}`;
         const reopened = await build(url);
-        expect(document.getElementById("toast").textContent).toContain("could not be restored");
+        expect(document.querySelector(".dynamic-summary").textContent).toContain("could not be restored");
         expect(document.querySelectorAll(".response-btn.active").length).toBe(0);
         reopened.saveToLocalStorage();
         expect(localStorage.getItem("stamped_checklist")).toBe(original);
@@ -295,7 +295,7 @@ describe("URL source and target versions", () => {
         const url = `/?checklist=0.3.0&responses_version=9.9.9&format=2&responses=${encoded({ [stableId]: answer })}`;
         const script = await build(url);
         expect(window.location.search).toBe(url.slice(1));
-        expect(document.getElementById("toast").textContent).toContain("could not be restored");
+        expect(document.querySelector(".dynamic-summary").textContent).toContain("could not be restored");
         script.saveToLocalStorage();
         expect(localStorage.getItem("stamped_checklist")).toBeNull();
     });
@@ -307,4 +307,17 @@ describe("URL source and target versions", () => {
             "answers carried over: 0; questions unanswered: 30; answers omitted: 1"
         );
     });
+});
+
+it("shows an older-version notice but keeps a fresh current assessment uncluttered", async () => {
+    await build();
+    expect(document.querySelector(".dynamic-summary")).toBeNull();
+    const script = await build("/?checklist=0.1.0");
+    expect(document.querySelector(".older-version").textContent).toContain("Checklist version dropdown");
+    script.handleResponse("s0_p0_i0", "yes");
+    expect(document.querySelector(".older-version")).not.toBeNull();
+    script.selectChecklistVersion("0.3.0");
+    expect(document.querySelector(".older-version")).toBeNull();
+    expect(document.querySelector(".transfer-summary")).not.toBeNull();
+    expect(document.querySelectorAll(".dynamic-summary").length).toBe(1);
 });
