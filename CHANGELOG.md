@@ -4,6 +4,26 @@
 
 #### 🚀 Enhancement
 
+-   Rounded assessment notices and kept the older-version warning visible until upgrading ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
+-   Styled assessment notices as borderless banners, distinct from principle cards ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
+-   Added independent dismissal of answer-transfer summaries ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
+-   Separated the newer-version warning from answer transfers and added a dismiss button ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
+-   Updated the default checklist to 0.3.1 with principles 0.2.0, retaining earlier releases ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
+-   Cleared URL parameters on Reset, restoring shareable state on the next interaction ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
+-   Added a persistent muted-violet summary box for transfers, older checklist notices, and restoration errors ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
+-   Supported URL-driven answer transfer with `responses_version` and a brief transfer summary ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
+-   Listed checklist versions newest first, opened the default on fresh visits and Reset, translated unchanged answers through the dropdown, and bound new shared answers to their checklist version ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
+-   Bundled checklist versions 0.1.0, 0.2.0, and 0.3.0, defaulted new assessments to 0.3.0, and kept saved answers separate by version ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
 -   Kept card border colors tied to MUST, SHOULD, or MAY when answers change ([#135](https://github.com/stamped-principles/stamped-checklist/pull/135))
 -   Added per-row colour tints (MUST/SHOULD/MAY) and a vertical divider between counters and percentage in the header progress block ([#103](https://github.com/stamped-principles/stamped-checklist/pull/103))
 

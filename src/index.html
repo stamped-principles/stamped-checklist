@@ -33,6 +33,14 @@
         </div>
 
         <div class="toolbar">
+            <label class="col-toggle"
+                >Checklist version:
+                <select
+                    id="checklist-version"
+                    aria-label="Checklist version"
+                    onchange="selectChecklistVersion(this.value)"
+                ></select>
+            </label>
             <button onclick="window.print()" title="Print or save as PDF"><span class="icon">🖨️</span> Print</button>
             <button class="danger" onclick="confirmReset()" title="Reset all responses">
                 <span class="icon">🗑️</span> Reset

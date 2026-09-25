@@ -1,7 +1,19 @@
-import { VERSION, DATA } from "./checklist.js";
+import {
+    VERSION,
+    DATA,
+    DEFAULT_VERSION,
+    ORIGINAL_VERSION,
+    AVAILABLE_VERSIONS,
+    selectChecklist,
+    checklistData,
+} from "./checklist.js";
+import { PERSISTENCE_FORMAT, readResponses, readLegacyState, translateResponses } from "./persistence.js";
 
 let responseStates = {};
 let totalItems = 0;
+let stableIds = new Map();
+let persistenceBlocked = false;
+let versionUnavailable = false;
 const THEME_KEY = "stamped_theme";
 const VALID_COLUMN_VALUES = new Set(["1", "2", "auto"]);
 const VALID_SECTION_VALUES = new Set(["on", "off"]);
@@ -50,20 +62,115 @@ function renderInlineMarkdown(text) {
         .join("");
 }
 
-function getEncodedStateBits() {
-    // Encode each checklist item to one bit in DATA traversal order:
-    // sections -> principles -> items, where getState() true => 1 and false => 0.
-    const state = getState();
-    const bits = [];
-    DATA.forEach((section, si) => {
-        section.principles.forEach((principle, pi) => {
-            principle.items.forEach((_, ii) => {
-                const id = generateId(si, pi, ii);
-                bits.push(state[id] ? "1" : "0");
-            });
-        });
+function savedVersion(saved) {
+    return saved.checklist_version ?? ORIGINAL_VERSION;
+}
+
+function requestedVersion() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("checklist")) return params.get("checklist");
+    if (params.has("state") || params.has("responses") || params.has("format")) return ORIGINAL_VERSION;
+    return DEFAULT_VERSION;
+}
+
+function storageKey() {
+    return `stamped_checklist:${VERSION}`;
+}
+
+function writeSavedAssessment() {
+    // Preserve the previous assessment before changing the last-opened pointer,
+    // including old saves that predate the per-version storage keys.
+    const previous = localStorage.getItem("stamped_checklist");
+    if (previous) {
+        try {
+            const parsed = JSON.parse(previous);
+            const key = `stamped_checklist:${savedVersion(parsed)}`;
+            if (!localStorage.getItem(key)) localStorage.setItem(key, previous);
+        } catch {
+            /* Unreadable saves are handled when loading the assessment. */
+        }
+    }
+    const saved = JSON.stringify({
+        format: PERSISTENCE_FORMAT,
+        checklist_version: VERSION,
+        responses: savedResponses(),
     });
-    return btoa(bits.join(""));
+    localStorage.setItem(storageKey(), saved);
+    // Retain the compatibility save alongside the per-version assessments.
+    localStorage.setItem("stamped_checklist", saved);
+}
+
+function encodeResponses(version, responses) {
+    const bytes = new TextEncoder().encode(JSON.stringify({ checklist_version: version, responses }));
+    return btoa(Array.from(bytes, (byte) => String.fromCharCode(byte)).join(""));
+}
+
+function openAssessment(version, responses, sourceVersion = version) {
+    const params = new URLSearchParams(window.location.search);
+    params.delete("state");
+    params.delete("responses");
+    params.set("checklist", version);
+    params.set("format", String(PERSISTENCE_FORMAT));
+    params.set("responses_version", sourceVersion);
+    params.set("responses", encodeResponses(sourceVersion, responses));
+    window.history.replaceState({}, "", `${window.location.pathname}?${params}`);
+    buildChecklist();
+}
+
+function selectChecklistVersion(version) {
+    if (persistenceBlocked) {
+        updateVersionDisplay();
+        return;
+    }
+    const responses = savedResponses();
+    const sourceVersion = VERSION;
+    writeSavedAssessment();
+    openAssessment(version, responses, sourceVersion);
+}
+
+function updateVersionDisplay() {
+    const versionEl = document.getElementById("version-indicator");
+    if (versionEl) versionEl.textContent = `Checklist v${VERSION}`;
+    const select = document.getElementById("checklist-version");
+    if (select) {
+        select.replaceChildren(
+            ...AVAILABLE_VERSIONS.map((version) => {
+                const option = document.createElement("option");
+                option.value = version;
+                option.textContent = version;
+                option.selected = version === VERSION;
+                return option;
+            })
+        );
+    }
+}
+
+function savedResponses() {
+    return Object.fromEntries(
+        [...stableIds].flatMap(([domId, stableId]) => {
+            const response = responseStates[domId];
+            return response.value !== null || response.reason ? [[stableId, response]] : [];
+        })
+    );
+}
+
+function restoreResponses(responses) {
+    for (const [domId, stableId] of stableIds) {
+        responseStates[domId] = responses[stableId] || { value: null, reason: "" };
+        applyResponseState(domId);
+    }
+    updateAllCounts();
+}
+
+function reportPersistenceError(error) {
+    persistenceBlocked = true;
+    console.warn("Could not restore saved checklist answers", error);
+    showSummaryMessage(
+        "restore-error",
+        "Answers could not be restored",
+        "Saved answers could not be restored. Original data kept; reset to start a new assessment.",
+        true
+    );
 }
 
 function getSelectedOrDefaultView(name, validValues, fallback) {
@@ -75,22 +182,17 @@ function getSelectedOrDefaultView(name, validValues, fallback) {
 }
 
 function syncPersistentURL() {
+    if (persistenceBlocked) return;
     const params = new URLSearchParams();
+    params.set("checklist", VERSION);
+    params.set("responses_version", VERSION);
 
     params.set("cols", getSelectedOrDefaultView("cols", VALID_COLUMN_VALUES, "auto"));
     params.set("sections", getSelectedOrDefaultView("sections", VALID_SECTION_VALUES, "off"));
-    params.set("state", getEncodedStateBits());
-
-    const nonEmptyResponses = {};
-    Object.entries(responseStates).forEach(([id, rs]) => {
-        if (rs.value !== null || rs.reason) {
-            nonEmptyResponses[id] = rs;
-        }
-    });
-    if (Object.keys(nonEmptyResponses).length > 0) {
-        params.set("responses", btoa(JSON.stringify(nonEmptyResponses)));
-    }
-
+    params.set("format", String(PERSISTENCE_FORMAT));
+    // Always include responses, even when empty, so a shared blank assessment
+    // does not inherit unrelated answers from the recipient's browser.
+    params.set("responses", encodeResponses(VERSION, savedResponses()));
     window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
 }
 
@@ -202,7 +304,33 @@ function getPrincipleExamplesURL(principle) {
 }
 
 function buildChecklist() {
+    responseStates = {};
+    stableIds = new Map();
+    totalItems = 0;
+    persistenceBlocked = false;
     const container = document.getElementById("app");
+    container.querySelector(".cards-grid")?.remove();
+    container.querySelector(".version-error")?.remove();
+    container.querySelectorAll(".dynamic-summary").forEach((notice) => notice.remove());
+    versionUnavailable = false;
+    try {
+        selectChecklist(requestedVersion());
+        updateVersionDisplay();
+    } catch (error) {
+        persistenceBlocked = true;
+        versionUnavailable = true;
+        const notice = showSummaryMessage(
+            "version-error",
+            "Checklist unavailable",
+            `${error.message} The saved assessment has not been changed.`,
+            true
+        );
+        const link = document.createElement("a");
+        link.href = `?checklist=${encodeURIComponent(DEFAULT_VERSION)}`;
+        link.textContent = "Open the current checklist";
+        notice.append(link);
+        return;
+    }
 
     const cardsGrid = document.createElement("div");
     cardsGrid.className = "cards-grid";
@@ -260,6 +388,7 @@ function buildChecklist() {
 
             principle.items.forEach((item, ii) => {
                 const id = generateId(si, pi, ii);
+                stableIds.set(id, principle.itemIds[ii]);
                 const itemText = renderInlineMarkdown(item);
                 totalItems++;
                 responseStates[id] = { value: null, reason: "" };
@@ -293,15 +422,23 @@ function buildChecklist() {
     // when applyResponseState calls autoResizeTextarea (display:none parent yields
     // scrollHeight=0, which would collapse all reason textareas on load).
     loadModePreference();
-    loadFromURL();
-    // URL state is authoritative when present; localStorage only hydrates when URL has no encoded state.
-    if (!new URLSearchParams(window.location.search).has("state")) {
+    // Check before loadFromURL canonicalizes the URL, including view-only links.
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has("state") && !params.has("responses") && !params.has("format")) {
         loadFromLocalStorage();
     }
+    loadFromURL();
     updateAllCounts();
     loadColumnPreference();
     loadSectionsPreference();
     syncPersistentURL();
+    if (!persistenceBlocked && VERSION !== DEFAULT_VERSION) {
+        showSummaryMessage(
+            "older-version",
+            "A newer checklist is available",
+            `You are using checklist ${VERSION}. The latest is ${DEFAULT_VERSION}. Choose it in the Checklist version dropdown to carry over matching answers. New or changed questions will need review, and your score may change.`
+        );
+    }
 }
 
 function handleResponse(id, value) {
@@ -527,30 +664,31 @@ function setState(state) {
 
 // Local Storage
 function saveToLocalStorage() {
-    localStorage.setItem("stamped_checklist", JSON.stringify({ responses: responseStates }));
+    if (persistenceBlocked) return;
+    writeSavedAssessment();
     showToast("💾 Progress saved to browser");
 }
 
 function loadFromLocalStorage() {
-    const data = localStorage.getItem("stamped_checklist");
+    const data = localStorage.getItem(storageKey()) || localStorage.getItem("stamped_checklist");
     if (data) {
         try {
             const parsed = JSON.parse(data);
-            if (parsed && parsed.responses !== undefined) {
-                Object.keys(parsed.responses || {}).forEach((id) => {
-                    if (id in responseStates) {
-                        responseStates[id] = parsed.responses[id];
-                        applyResponseState(id);
-                    }
-                });
+            if (parsed && parsed.responses !== undefined && savedVersion(parsed) === VERSION) {
+                if (parsed.format === undefined && VERSION !== ORIGINAL_VERSION)
+                    throw new Error("Positional answers require the original checklist");
+                restoreResponses(readResponses(parsed.responses, parsed.format, DATA));
             }
             updateAllCounts();
-        } catch (e) {}
+        } catch (e) {
+            reportPersistenceError(e);
+        }
     }
 }
 
 function autoSave() {
-    localStorage.setItem("stamped_checklist", JSON.stringify({ responses: responseStates }));
+    if (persistenceBlocked) return;
+    writeSavedAssessment();
     syncPersistentURL();
 }
 
@@ -568,40 +706,48 @@ function loadFromURL() {
     const validColsParam = colsParam && VALID_COLUMN_VALUES.has(colsParam) ? colsParam : null;
     const validSectionsParam = sectionsParam && VALID_SECTION_VALUES.has(sectionsParam) ? sectionsParam : null;
 
-    if (!stateParam && !responsesParam && !colsParam && !sectionsParam) return;
+    if (!params.has("state") && !params.has("responses") && !params.has("format") && !colsParam && !sectionsParam)
+        return;
 
-    if (stateParam) {
+    if (params.has("state") || params.has("responses") || params.has("format")) {
         try {
-            const bits = atob(decodeURIComponent(stateParam)).split("");
-            let idx = 0;
-            const state = {};
-            DATA.forEach((section, si) => {
-                section.principles.forEach((principle, pi) => {
-                    principle.items.forEach((_, ii) => {
-                        const id = generateId(si, pi, ii);
-                        state[id] = bits[idx] === "1";
-                        idx++;
-                    });
-                });
-            });
-            setState(state);
-        } catch (e) {
-            console.warn("Could not load state from URL", e);
-        }
-    }
-
-    if (responsesParam) {
-        try {
-            const decoded = JSON.parse(atob(decodeURIComponent(responsesParam)));
-            Object.keys(decoded).forEach((id) => {
-                if (id in responseStates) {
-                    responseStates[id] = decoded[id];
-                    applyResponseState(id);
+            const format = params.has("format") ? Number(params.get("format")) : undefined;
+            let decoded;
+            let encodedVersion;
+            if (responsesParam !== null) {
+                const binary = atob(responsesParam);
+                const json =
+                    format === 2 || format === PERSISTENCE_FORMAT
+                        ? new TextDecoder().decode(Uint8Array.from(binary, (char) => char.charCodeAt(0)))
+                        : binary;
+                decoded = JSON.parse(json);
+                if (format === PERSISTENCE_FORMAT) {
+                    if (!decoded || typeof decoded.checklist_version !== "string")
+                        throw new Error("Missing encoded checklist version");
+                    encodedVersion = decoded.checklist_version;
+                    decoded = decoded.responses;
                 }
-            });
-            updateAllCounts();
+            } else if (format !== undefined) {
+                throw new Error("Missing responses for saved-answer format");
+            }
+            const sourceVersion =
+                params.get("responses_version") ?? encodedVersion ?? params.get("checklist") ?? ORIGINAL_VERSION;
+            if (encodedVersion && encodedVersion !== sourceVersion)
+                throw new Error("Response version disagrees with encoded answers");
+            if (format === undefined && sourceVersion !== ORIGINAL_VERSION)
+                throw new Error("Positional answers require the original checklist");
+            const sourceData = checklistData(sourceVersion);
+            let responses = {};
+            if (format === undefined && stateParam !== null) responses = readLegacyState(atob(stateParam), sourceData);
+            if (responsesParam !== null) responses = { ...responses, ...readResponses(decoded, format, sourceData) };
+            if (sourceVersion !== VERSION) {
+                const translated = translateResponses(responses, sourceData, DATA);
+                showTransferSummary(sourceVersion, responses, translated);
+                responses = translated;
+            }
+            restoreResponses(responses);
         } catch (e) {
-            console.warn("Could not load responses from URL", e);
+            reportPersistenceError(e);
         }
     }
 
@@ -618,15 +764,66 @@ function loadFromURL() {
     syncPersistentURL();
 }
 
+// Each contextual message has its own card, cleared when another assessment opens.
+function showSummaryMessage(kind, title, text, urgent = false) {
+    const app = document.getElementById("app");
+    app.querySelector(`[data-message="${kind}"]`)?.remove();
+    const entry = document.createElement("section");
+    entry.className = "dynamic-summary";
+    entry.dataset.message = kind;
+    entry.setAttribute("aria-label", title);
+    entry.setAttribute("role", urgent ? "alert" : "status");
+    if (kind === "older-version") {
+        entry.classList.add("version-notice");
+    }
+    if (kind === "transfer-summary") {
+        entry.classList.add("dismissible-summary");
+        const close = document.createElement("button");
+        close.type = "button";
+        close.className = "summary-close";
+        close.setAttribute("aria-label", "Dismiss answer transfer summary");
+        close.textContent = "×";
+        close.addEventListener("click", () => {
+            document.getElementById("checklist-version")?.focus();
+            entry.remove();
+        });
+        entry.append(close);
+    }
+    const heading = document.createElement("h2");
+    heading.textContent = title;
+    const message = document.createElement("p");
+    message.className = kind;
+    message.textContent = text;
+    entry.append(heading, message);
+    app.prepend(entry);
+    return entry;
+}
+
+function showTransferSummary(sourceVersion, source, translated) {
+    const answered = (responses) => Object.values(responses).filter((response) => response.value !== null).length;
+    const carried = answered(translated);
+    const omitted = answered(source) - carried;
+    showSummaryMessage(
+        "transfer-summary",
+        "Answers transferred",
+        `From checklist ${sourceVersion}: answers carried over: ${carried}; questions unanswered: ${
+            totalItems - carried
+        }; answers omitted: ${omitted}. Scores use checklist ${VERSION}.`
+    );
+}
+
 // Reset
 function confirmReset() {
-    if (confirm("Are you sure you want to reset all responses? This cannot be undone.")) {
-        Object.keys(responseStates).forEach((id) => {
-            responseStates[id] = { value: null, reason: "" };
-            applyResponseState(id);
-        });
-        updateAllCounts();
+    if (versionUnavailable) return;
+    if (
+        confirm(
+            "Reset responses and start a blank assessment on the latest checklist? This clears saved answers for the latest version."
+        )
+    ) {
+        openAssessment(DEFAULT_VERSION, {});
         autoSave();
+        // A reset is a fresh visit; the next interaction will encode state again.
+        window.history.replaceState({}, "", window.location.pathname);
         showToast("🗑️ Checklist reset");
     }
 }
@@ -660,6 +857,7 @@ export {
     autoSave,
     loadFromURL,
     confirmReset,
+    selectChecklistVersion,
     showToast,
     updateHeaderHeight,
     init,
@@ -680,7 +878,7 @@ function init() {
     buildChecklist();
 
     const versionEl = document.getElementById("version-indicator");
-    if (versionEl) versionEl.textContent = "v" + VERSION;
+    if (versionEl && !versionUnavailable) versionEl.textContent = `Checklist v${VERSION}`;
 
     updateHeaderHeight();
     if (typeof ResizeObserver !== "undefined") {
@@ -698,6 +896,7 @@ function init() {
 // scope automatically, so we assign them to window explicitly.
 if (typeof window !== "undefined") {
     Object.assign(window, {
+        selectChecklistVersion,
         saveToLocalStorage,
         confirmReset,
         setColumns,

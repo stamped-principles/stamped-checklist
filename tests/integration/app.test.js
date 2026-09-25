@@ -2,7 +2,7 @@ import { test as base, expect } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { DATA } from "../../src/checklist.js";
+import { DATA, DEFAULT_VERSION, AVAILABLE_VERSIONS } from "../../src/checklist.js";
 
 const TOTAL_PRINCIPLES = DATA.flatMap((s) => s.principles).length;
 const COVERAGE_ENABLED = process.env.PW_COVERAGE === "1";
@@ -302,7 +302,7 @@ test.describe("STAMPED Checklist App", () => {
     });
 
     test("version indicator is populated", async ({ page }) => {
-        await expect(page.locator("#version-indicator")).toHaveText(/^v\d/);
+        await expect(page.locator("#version-indicator")).toHaveText(/^Checklist v\d/);
     });
 
     test("reset button resets responses", async ({ page }) => {
@@ -448,4 +448,56 @@ test.describe("STAMPED Checklist App", () => {
 
         await context.close();
     });
+});
+
+// Old links and explicit version selection retain the original assessment.
+test("old response links retain their checklist version in links and browser saves", async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const legacy = Buffer.from(
+        JSON.stringify({ s1_p3_i0: { value: "no", reason: "Needs a fresh environment" } })
+    ).toString("base64");
+    await page.goto(`/?responses=${encodeURIComponent(legacy)}`);
+    const item = page.locator(".check-item").filter({ hasText: "Is the pipeline tested in a fresh container" });
+    await expect(item.locator(".no-btn")).toHaveClass(/active/);
+    await expect(item.locator(".reason-input")).toHaveValue("Needs a fresh environment");
+    await item.locator(".reason-input").fill("Rebuild required — café 🔬");
+    const sharedURL = await page.evaluate(() => window.location.href);
+    expect(new URL(sharedURL).searchParams.get("format")).toBe("3");
+    expect(new URL(sharedURL).searchParams.has("state")).toBe(false);
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("stamped_checklist")));
+    expect(saved.checklist_version).toBe("0.1.0");
+    expect(new URL(sharedURL).searchParams.get("checklist")).toBe("0.1.0");
+    expect(saved.responses["stamped-checklist:should/004"]).toEqual({
+        value: "no",
+        reason: "Rebuild required — café 🔬",
+    });
+    await page.goto("/");
+    await expect(page.locator("#checklist-version")).toHaveValue(DEFAULT_VERSION);
+    expect(
+        await page.locator("#checklist-version option").evaluateAll((options) => options.map((option) => option.value))
+    ).toEqual(AVAILABLE_VERSIONS);
+    await expect(item.locator(".reason-input")).toHaveValue("");
+    await page.goto(sharedURL);
+    const editedURL = new URL(page.url());
+    editedURL.searchParams.set("checklist", DEFAULT_VERSION);
+    await page.goto(editedURL.toString());
+    await expect(page.locator(".transfer-summary")).toContainText("answers carried over: 1");
+    expect(new URL(page.url()).searchParams.get("responses_version")).toBe(DEFAULT_VERSION);
+    await expect(page.locator("#checklist-version")).toHaveValue(DEFAULT_VERSION);
+    await expect(item.locator(".reason-input")).toHaveValue("Rebuild required — café 🔬");
+    const translatedURL = new URL(page.url());
+    expect([...translatedURL.searchParams.keys()][0]).toBe("checklist");
+    expect(translatedURL.searchParams.get("responses")).not.toBe(new URL(sharedURL).searchParams.get("responses"));
+    await page.locator("#checklist-version").selectOption("0.1.0");
+    await expect(item.locator(".reason-input")).toHaveValue("Rebuild required — café 🔬");
+    page.once("dialog", (dialog) => dialog.accept());
+    await page.getByRole("button", { name: "Reset" }).click();
+    await expect(page.locator("#checklist-version")).toHaveValue(DEFAULT_VERSION);
+    await expect(page.locator(".response-btn.active")).toHaveCount(0);
+    expect(new URL(page.url()).search).toBe("");
+    await page.evaluate(() => localStorage.clear());
+    await page.goto(sharedURL);
+    await expect(item.locator(".reason-input")).toHaveValue("Rebuild required — café 🔬");
+    await context.close();
 });

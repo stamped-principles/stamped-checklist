@@ -1122,3 +1122,93 @@ code {
         padding: 0 0.7rem 0.5rem;
     }
 }
+
+#checklist-version {
+    font: inherit;
+    color: var(--text);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+.version-error {
+    padding: 1rem;
+}
+
+/* Dynamic summary box: persistent updates, distinct from score colors. */
+.dynamic-summary {
+    margin: 0 0 1.25rem;
+    padding: 1.1rem 1.25rem;
+    color: #343a40;
+    background: #e9ecef;
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: none;
+    line-height: 1.6;
+}
+
+.dynamic-summary h2 {
+    color: inherit;
+    font-size: 1.05rem;
+    margin-bottom: 0.3rem;
+}
+
+.dynamic-summary a {
+    color: #343a40;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+@media print {
+    .dynamic-summary {
+        display: none;
+    }
+}
+
+[data-theme="dark"] .dynamic-summary {
+    color: #e9ecef;
+    background: #343a40;
+}
+
+[data-theme="dark"] .dynamic-summary a {
+    color: inherit;
+}
+
+/* Keep the version warning distinct from answer-transfer information. */
+.dynamic-summary.dismissible-summary {
+    position: relative;
+    padding-right: 3.5rem;
+}
+
+.dynamic-summary.version-notice {
+    color: #fff;
+    background: #a83c4b;
+}
+
+[data-theme="dark"] .dynamic-summary.version-notice {
+    color: #fff;
+    background: #893441;
+}
+
+.summary-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.summary-close:hover {
+    background: rgb(128 128 128 / 20%);
+}
+
+.summary-close:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
