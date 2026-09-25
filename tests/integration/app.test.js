@@ -2,7 +2,7 @@ import { test as base, expect } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { DATA } from "../../src/checklist.js";
+import { DATA, DEFAULT_VERSION, AVAILABLE_VERSIONS } from "../../src/checklist.js";
 
 const TOTAL_PRINCIPLES = DATA.flatMap((s) => s.principles).length;
 const COVERAGE_ENABLED = process.env.PW_COVERAGE === "1";
@@ -473,18 +473,18 @@ test("old response links retain their checklist version in links and browser sav
         reason: "Rebuild required — café 🔬",
     });
     await page.goto("/");
-    await expect(page.locator("#checklist-version")).toHaveValue("0.3.0");
+    await expect(page.locator("#checklist-version")).toHaveValue(DEFAULT_VERSION);
     expect(
         await page.locator("#checklist-version option").evaluateAll((options) => options.map((option) => option.value))
-    ).toEqual(["0.3.0", "0.2.0", "0.1.0"]);
+    ).toEqual(AVAILABLE_VERSIONS);
     await expect(item.locator(".reason-input")).toHaveValue("");
     await page.goto(sharedURL);
     const editedURL = new URL(page.url());
-    editedURL.searchParams.set("checklist", "0.3.0");
+    editedURL.searchParams.set("checklist", DEFAULT_VERSION);
     await page.goto(editedURL.toString());
     await expect(page.locator(".transfer-summary")).toContainText("answers carried over: 1");
-    expect(new URL(page.url()).searchParams.get("responses_version")).toBe("0.3.0");
-    await expect(page.locator("#checklist-version")).toHaveValue("0.3.0");
+    expect(new URL(page.url()).searchParams.get("responses_version")).toBe(DEFAULT_VERSION);
+    await expect(page.locator("#checklist-version")).toHaveValue(DEFAULT_VERSION);
     await expect(item.locator(".reason-input")).toHaveValue("Rebuild required — café 🔬");
     const translatedURL = new URL(page.url());
     expect([...translatedURL.searchParams.keys()][0]).toBe("checklist");
@@ -493,7 +493,7 @@ test("old response links retain their checklist version in links and browser sav
     await expect(item.locator(".reason-input")).toHaveValue("Rebuild required — café 🔬");
     page.once("dialog", (dialog) => dialog.accept());
     await page.getByRole("button", { name: "Reset" }).click();
-    await expect(page.locator("#checklist-version")).toHaveValue("0.3.0");
+    await expect(page.locator("#checklist-version")).toHaveValue(DEFAULT_VERSION);
     await expect(page.locator(".response-btn.active")).toHaveCount(0);
     expect(new URL(page.url()).search).toBe("");
     await page.evaluate(() => localStorage.clear());
