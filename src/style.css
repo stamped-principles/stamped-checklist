@@ -1138,11 +1138,10 @@ code {
 .dynamic-summary {
     margin: 0 0 1.25rem;
     padding: 1.1rem 1.25rem;
-    color: #444052;
-    background: #eeecf3;
-    border: 1px solid #ccc7d8;
-    border-left: 5px solid #9387ad;
-    border-radius: var(--radius);
+    color: #343a40;
+    background: #e9ecef;
+    border: none;
+    border-radius: 0;
     box-shadow: none;
     line-height: 1.6;
 }
@@ -1154,7 +1153,7 @@ code {
 }
 
 .dynamic-summary a {
-    color: #444052;
+    color: #343a40;
     text-decoration: underline;
     font-weight: 600;
 }
@@ -1166,10 +1165,8 @@ code {
 }
 
 [data-theme="dark"] .dynamic-summary {
-    color: #e3dfeb;
-    background: #2d2b36;
-    border-color: #514b60;
-    border-left-color: #9387ad;
+    color: #e9ecef;
+    background: #343a40;
 }
 
 [data-theme="dark"] .dynamic-summary a {
@@ -1183,17 +1180,13 @@ code {
 }
 
 .dynamic-summary.version-notice {
-    color: #702c35;
-    background: #fbe9eb;
-    border-color: #e4b6be;
-    border-left-color: #b94b5b;
+    color: #fff;
+    background: #a83c4b;
 }
 
 [data-theme="dark"] .dynamic-summary.version-notice {
-    color: #f6dce1;
-    background: #442b32;
-    border-color: #83505c;
-    border-left-color: #d78494;
+    color: #fff;
+    background: #893441;
 }
 
 .summary-close {
@@ -1212,7 +1205,7 @@ code {
 }
 
 .summary-close:hover {
-    background: rgb(128 64 80 / 12%);
+    background: rgb(128 128 128 / 20%);
 }
 
 .summary-close:focus-visible {

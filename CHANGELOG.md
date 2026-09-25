@@ -4,6 +4,8 @@
 
 #### 🚀 Enhancement
 
+-   Styled assessment notices as borderless banners, distinct from principle cards ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
 -   Added independent dismissal of answer-transfer summaries ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
 
 -   Separated the newer-version warning from answer transfers and added a dismiss button ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
