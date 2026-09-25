@@ -1,5 +1,5 @@
 import { beforeEach, describe, it, expect, vi } from "vitest";
-import { DATA } from "../../src/checklist.js";
+import { DATA, DEFAULT_VERSION } from "../../src/checklist.js";
 
 // Set up a minimal DOM before importing script.js so that module-level
 // code that queries the DOM doesn't throw.
@@ -341,7 +341,11 @@ describe("URL state encoding/decoding", () => {
         window.history.replaceState({}, "", "/");
         document.getElementById("app").innerHTML = "";
         script.buildChecklist();
-        expect(window.location.search.startsWith("?cols=auto&sections=off&format=2&responses=")).toBe(true);
+        expect(
+            window.location.search.startsWith(
+                `?checklist=${DEFAULT_VERSION}&cols=auto&sections=off&format=3&responses=`
+            )
+        ).toBe(true);
     });
 
     it("loadFromURL handles missing URL params gracefully", () => {
@@ -355,7 +359,7 @@ describe("URL state encoding/decoding", () => {
         script.setSections("on");
 
         const search = window.location.search;
-        expect(search.startsWith("?cols=2&sections=on&format=2&responses=")).toBe(true);
+        expect(search.startsWith(`?checklist=${DEFAULT_VERSION}&cols=2&sections=on&format=3&responses=`)).toBe(true);
     });
 
     it("loadFromURL applies view params and keeps them in URL", () => {
@@ -367,14 +371,20 @@ describe("URL state encoding/decoding", () => {
         const app = document.getElementById("app");
         expect(grid.classList.contains("cols-1")).toBe(true);
         expect(app.classList.contains("flat-mode")).toBe(false);
-        expect(window.location.search.startsWith("?cols=1&sections=on&format=2&responses=")).toBe(true);
+        expect(
+            window.location.search.startsWith(`?checklist=${DEFAULT_VERSION}&cols=1&sections=on&format=3&responses=`)
+        ).toBe(true);
     });
 
     it("loadFromURL ignores invalid view params and removes them from URL", () => {
         window.history.replaceState({}, "", "/?cols=3&sections=invalid");
 
         expect(() => script.loadFromURL()).not.toThrow();
-        expect(window.location.search.startsWith("?cols=auto&sections=off&format=2&responses=")).toBe(true);
+        expect(
+            window.location.search.startsWith(
+                `?checklist=${DEFAULT_VERSION}&cols=auto&sections=off&format=3&responses=`
+            )
+        ).toBe(true);
         expect(document.querySelector(".cards-grid").classList.contains("cols-auto")).toBe(true);
         expect(document.getElementById("app").classList.contains("flat-mode")).toBe(true);
     });
@@ -401,12 +411,12 @@ describe("URL state encoding/decoding", () => {
         expect(params.get("cols")).toBe("auto");
         expect(params.get("sections")).toBe("off");
         expect(params.get("state")).toBeNull();
-        expect(params.get("format")).toBe("2");
+        expect(params.get("format")).toBe("3");
 
         const encodedResponses = params.get("responses");
         expect(encodedResponses).not.toBeNull();
         const decodedResponses = JSON.parse(atob(encodedResponses));
-        expect(decodedResponses[DATA[0].principles[0].itemIds[0]]).toEqual({
+        expect(decodedResponses.responses[DATA[0].principles[0].itemIds[0]]).toEqual({
             value: "no",
             reason: "Missing provenance metadata",
         });
@@ -425,7 +435,10 @@ describe("URL state encoding/decoding", () => {
 
         const params = new URLSearchParams(window.location.search);
         const decodedResponses = JSON.parse(atob(params.get("responses")));
-        expect(decodedResponses[DATA[0].principles[0].itemIds[0]]).toEqual({ value: "no", reason: "x".repeat(250) });
+        expect(decodedResponses.responses[DATA[0].principles[0].itemIds[0]]).toEqual({
+            value: "no",
+            reason: "x".repeat(250),
+        });
     });
 
     it("reason counter resets when no response is cleared", () => {
@@ -470,8 +483,8 @@ describe("URL state encoding/decoding", () => {
 
         const decodedResponses = JSON.parse(atob(encodedResponses));
         const totalItems = DATA.flatMap((s) => s.principles).flatMap((p) => p.items).length;
-        expect(Object.keys(decodedResponses)).toHaveLength(totalItems);
-        Object.values(decodedResponses).forEach((response) => {
+        expect(Object.keys(decodedResponses.responses)).toHaveLength(totalItems);
+        Object.values(decodedResponses.responses).forEach((response) => {
             expect(response).toEqual({ value: "no", reason: reasonText });
         });
 
@@ -594,7 +607,9 @@ describe("setColumns", () => {
     it("updates URL in real time when columns change", async () => {
         const { setColumns } = await import("../../src/script.js");
         setColumns(2);
-        expect(window.location.search.startsWith("?cols=2&sections=off&format=2&responses=")).toBe(true);
+        expect(
+            window.location.search.startsWith(`?checklist=${DEFAULT_VERSION}&cols=2&sections=off&format=3&responses=`)
+        ).toBe(true);
     });
 });
 
@@ -624,7 +639,9 @@ describe("setSections", () => {
     it("updates URL in real time when sections change", async () => {
         const { setSections } = await import("../../src/script.js");
         setSections("on");
-        expect(window.location.search.startsWith("?cols=auto&sections=on&format=2&responses=")).toBe(true);
+        expect(
+            window.location.search.startsWith(`?checklist=${DEFAULT_VERSION}&cols=auto&sections=on&format=3&responses=`)
+        ).toBe(true);
     });
 
     it("preserves both cols and sections params in URL when both settings are applied", async () => {
@@ -632,6 +649,8 @@ describe("setSections", () => {
         document.getElementById("app").innerHTML = `<div class="cards-grid cols-auto"></div>`;
         setColumns(1);
         setSections("on");
-        expect(window.location.search.startsWith("?cols=1&sections=on&format=2&responses=")).toBe(true);
+        expect(
+            window.location.search.startsWith(`?checklist=${DEFAULT_VERSION}&cols=1&sections=on&format=3&responses=`)
+        ).toBe(true);
     });
 });

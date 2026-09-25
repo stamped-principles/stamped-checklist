@@ -1,4 +1,5 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
+import { translateResponses } from "../../src/persistence.js";
 import archive from "../../src/data/checklist-versions.json" with { type: "json" };
 const { checklist: originalChecklist, principles: originalPrinciples } = archive["0.1.0"];
 
@@ -61,7 +62,10 @@ describe("assessments keep their original checklist", () => {
             const responses = { s1_p3_i0: answer };
             const saved = JSON.stringify({ responses });
             let url = "/";
-            if (transport === "browser") localStorage.setItem("stamped_checklist", saved);
+            if (transport === "browser") {
+                localStorage.setItem("stamped_checklist", saved);
+                url = "/?checklist=0.1.0";
+            }
             if (transport === "responses") url = `/?responses=${encoded(responses)}`;
             if (transport === "state" || transport === "combined")
                 url = `/?state=${btoa("0".repeat(20) + "1" + "0".repeat(9))}`;
@@ -81,6 +85,20 @@ describe("assessments keep their original checklist", () => {
         expect(document.querySelectorAll(".check-item").length).toBe(31);
         expect(document.getElementById("version-indicator").textContent).toBe("Checklist v0.3.0");
         expect(document.querySelectorAll(".response-btn.active").length).toBe(0);
+    });
+    it("opens the default on a plain visit and retains older browser answers", async () => {
+        const saved = JSON.stringify({ responses: { s1_p3_i0: answer } });
+        localStorage.setItem("stamped_checklist", saved);
+        await build();
+        expect(document.getElementById("version-indicator").textContent).toBe("Checklist v0.3.0");
+        expect(document.querySelectorAll(".response-btn.active").length).toBe(0);
+        expect([...document.querySelectorAll("#checklist-version option")].map((option) => option.value)).toEqual([
+            "0.3.0",
+            "0.1.0",
+        ]);
+        expect(localStorage.getItem("stamped_checklist")).toBe(saved);
+        await build("/?checklist=0.1.0");
+        expectOriginal();
     });
     it("keeps browser assessments separate when selecting a different checklist", async () => {
         let script = await build("/?checklist=0.1.0");
@@ -117,7 +135,7 @@ describe("assessments keep their original checklist", () => {
         const url = window.location.search;
         script.saveToLocalStorage();
         expect(JSON.parse(localStorage.getItem("stamped_checklist"))).toEqual({
-            format: 2,
+            format: 3,
             checklist_version: "0.3.0",
             responses: { [stableId]: answer },
         });
@@ -129,12 +147,12 @@ describe("assessments keep their original checklist", () => {
     it("does not replace a missing checklist version with current questions or overwrite its answers", async () => {
         const original = JSON.stringify({ format: 2, checklist_version: "9.9.9", responses: { [stableId]: answer } });
         localStorage.setItem("stamped_checklist", original);
-        const script = await build();
+        const script = await build("/?checklist=9.9.9");
         expect(document.querySelector('[role="alert"]').textContent).toContain("9.9.9");
         expect(document.querySelectorAll(".check-item").length).toBe(0);
         script.saveToLocalStorage();
         expect(localStorage.getItem("stamped_checklist")).toBe(original);
-        expect(window.location.search).toBe("");
+        expect(window.location.search).toBe("?checklist=9.9.9");
     });
     it("preserves a link naming an unavailable version", async () => {
         const url = `/?checklist=9.9.9&format=2&responses=${encoded({ [stableId]: answer })}`;
@@ -142,10 +160,11 @@ describe("assessments keep their original checklist", () => {
         expect(document.querySelector('[role="alert"]').textContent).toContain("9.9.9");
         expect(window.location.search).toBe(url.slice(1));
     });
-    it("view-only links reopen saved answers with their own checklist", async () => {
+    it("view-only links use the default checklist without borrowing old answers", async () => {
         localStorage.setItem("stamped_checklist", JSON.stringify({ responses: { s1_p3_i0: answer } }));
         await build("/?cols=1");
-        expectOriginal();
+        expect(document.getElementById("version-indicator").textContent).toBe("Checklist v0.3.0");
+        expect(document.querySelectorAll(".response-btn.active").length).toBe(0);
     });
     it("an explicit empty assessment overrides browser answers", async () => {
         localStorage.setItem("stamped_checklist", JSON.stringify({ responses: { s1_p3_i0: answer } }));
@@ -163,4 +182,80 @@ describe("assessments keep their original checklist", () => {
             expect(localStorage.getItem("stamped_checklist")).toBeNull();
         });
     }
+});
+
+describe("version changes", () => {
+    it("translates unchanged answers in both directions and leaves new questions blank", async () => {
+        const script = await build(`/?checklist=0.1.0&format=2&responses=${encoded({ [stableId]: answer })}`);
+        const originalURL = window.location.search;
+        script.selectChecklistVersion("0.3.0");
+        expect(document.getElementById("reason_s1_p4_i0").value).toBe(answer.reason);
+        expect(document.getElementById("yes_s1_p3_i0").classList.contains("active")).toBe(false);
+        expect(document.getElementById("no_s1_p3_i0").classList.contains("active")).toBe(false);
+        const params = new URLSearchParams(window.location.search);
+        expect([...params.keys()][0]).toBe("checklist");
+        const payload = JSON.parse(atob(params.get("responses")));
+        expect(payload.checklist_version).toBe("0.3.0");
+        expect(payload.responses[stableId]).toEqual(answer);
+        expect(JSON.parse(localStorage.getItem("stamped_checklist:0.1.0")).responses[stableId]).toEqual(answer);
+        script.handleResponse("s1_p3_i0", "yes");
+        script.selectChecklistVersion("0.1.0");
+        expectOriginal();
+        expect(JSON.parse(atob(new URLSearchParams(window.location.search).get("responses"))).responses).toEqual({
+            [stableId]: answer,
+        });
+        await build(originalURL);
+        expectOriginal();
+    });
+    it("rejects changing only the checklist query of a new link", async () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+        const script = await build("/?checklist=0.1.0");
+        script.handleResponse("s1_p3_i0", "no");
+        const original = localStorage.getItem("stamped_checklist");
+        const params = new URLSearchParams(window.location.search);
+        params.set("checklist", "0.3.0");
+        const url = `/?${params}`;
+        const reopened = await build(url);
+        expect(document.getElementById("toast").textContent).toContain("could not be restored");
+        expect(document.querySelectorAll(".response-btn.active").length).toBe(0);
+        reopened.saveToLocalStorage();
+        expect(localStorage.getItem("stamped_checklist")).toBe(original);
+        expect(window.location.search).toBe(url.slice(1));
+    });
+    it("reset opens a blank default checklist without loading its saved answers", async () => {
+        const script = await build(`/?checklist=0.1.0&format=2&responses=${encoded({ [stableId]: answer })}`);
+        localStorage.setItem(
+            "stamped_checklist:0.3.0",
+            JSON.stringify({ format: 2, checklist_version: "0.3.0", responses: { [stableId]: answer } })
+        );
+        vi.spyOn(window, "confirm").mockReturnValue(true);
+        script.confirmReset();
+        expect(document.getElementById("version-indicator").textContent).toBe("Checklist v0.3.0");
+        expect(document.querySelectorAll(".response-btn.active").length).toBe(0);
+        expect(JSON.parse(localStorage.getItem("stamped_checklist:0.3.0")).responses).toEqual({});
+    });
+});
+
+describe("translation checks the meaning of each question", () => {
+    const source = [
+        {
+            level: "should",
+            principles: [{ code: "M.4", desc: "Original principle", itemIds: ["item"], items: ["Original question"] }],
+        },
+    ];
+    for (const field of ["question", "principle", "code", "level", "id"]) {
+        it(`leaves an answer blank when its ${field} changes`, () => {
+            const target = structuredClone(source);
+            const entry = target[0].principles[0];
+            if (field === "question") entry.items[0] = "Changed question";
+            if (field === "principle") entry.desc = "Changed principle";
+            if (field === "code") entry.code = "M.5";
+            if (field === "level") target[0].level = "must";
+            if (field === "id") entry.itemIds[0] = "new-item";
+            expect(translateResponses({ item: answer }, source, target)).toEqual({});
+        });
+    }
+    it("does not carry answers for removed items", () => {
+        expect(translateResponses({ item: answer }, source, [])).toEqual({});
+    });
 });

@@ -450,7 +450,7 @@ test.describe("STAMPED Checklist App", () => {
     });
 });
 
-// Real-browser smoke test for the one supported pre-M.4 migration.
+// Old links and explicit version selection retain the original assessment.
 test("old response links retain their checklist version in links and browser saves", async ({ browser }) => {
     const context = await browser.newContext();
     const page = await context.newPage();
@@ -463,7 +463,7 @@ test("old response links retain their checklist version in links and browser sav
     await expect(item.locator(".reason-input")).toHaveValue("Needs a fresh environment");
     await item.locator(".reason-input").fill("Rebuild required — café 🔬");
     const sharedURL = await page.evaluate(() => window.location.href);
-    expect(new URL(sharedURL).searchParams.get("format")).toBe("2");
+    expect(new URL(sharedURL).searchParams.get("format")).toBe("3");
     expect(new URL(sharedURL).searchParams.has("state")).toBe(false);
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("stamped_checklist")));
     expect(saved.checklist_version).toBe("0.1.0");
@@ -473,7 +473,24 @@ test("old response links retain their checklist version in links and browser sav
         reason: "Rebuild required — café 🔬",
     });
     await page.goto("/");
+    await expect(page.locator("#checklist-version")).toHaveValue("0.3.0");
+    expect(
+        await page.locator("#checklist-version option").evaluateAll((options) => options.map((option) => option.value))
+    ).toEqual(["0.3.0", "0.2.0", "0.1.0"]);
+    await expect(item.locator(".reason-input")).toHaveValue("");
+    await page.goto(sharedURL);
+    await page.locator("#checklist-version").selectOption("0.3.0");
+    await expect(page.locator("#checklist-version")).toHaveValue("0.3.0");
     await expect(item.locator(".reason-input")).toHaveValue("Rebuild required — café 🔬");
+    const translatedURL = new URL(page.url());
+    expect([...translatedURL.searchParams.keys()][0]).toBe("checklist");
+    expect(translatedURL.searchParams.get("responses")).not.toBe(new URL(sharedURL).searchParams.get("responses"));
+    await page.locator("#checklist-version").selectOption("0.1.0");
+    await expect(item.locator(".reason-input")).toHaveValue("Rebuild required — café 🔬");
+    page.once("dialog", (dialog) => dialog.accept());
+    await page.getByRole("button", { name: "Reset" }).click();
+    await expect(page.locator("#checklist-version")).toHaveValue("0.3.0");
+    await expect(page.locator(".response-btn.active")).toHaveCount(0);
     await page.evaluate(() => localStorage.clear());
     await page.goto(sharedURL);
     await expect(item.locator(".reason-input")).toHaveValue("Rebuild required — café 🔬");

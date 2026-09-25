@@ -49,16 +49,21 @@ function makeData(checklist, principlesSet) {
 export const DEFAULT_VERSION = checklist.checklist_version ?? checklist.version;
 export const ORIGINAL_VERSION = "0.1.0";
 const bundles = { ...archive, [DEFAULT_VERSION]: { checklist, principles: principlesSet } };
-export const AVAILABLE_VERSIONS = Object.keys(bundles);
+export const AVAILABLE_VERSIONS = Object.keys(bundles).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
 export let VERSION = DEFAULT_VERSION;
 export let CHECKLIST = checklist;
 export let PRINCIPLES = principlesSet;
 export let DATA = makeData(CHECKLIST, PRINCIPLES);
 
-export function selectChecklist(version) {
+export function checklistData(version) {
     if (!Object.hasOwn(bundles, version)) throw new Error(`Checklist version ${version} is not available.`);
     const bundle = bundles[version];
-    const data = makeData(bundle.checklist, bundle.principles);
+    return makeData(bundle.checklist, bundle.principles);
+}
+
+export function selectChecklist(version) {
+    const data = checklistData(version);
+    const bundle = bundles[version];
     VERSION = version;
     CHECKLIST = bundle.checklist;
     PRINCIPLES = bundle.principles;
