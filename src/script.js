@@ -311,7 +311,7 @@ function buildChecklist() {
     const container = document.getElementById("app");
     container.querySelector(".cards-grid")?.remove();
     container.querySelector(".version-error")?.remove();
-    container.querySelector(".dynamic-summary")?.remove();
+    container.querySelectorAll(".dynamic-summary").forEach((notice) => notice.remove());
     versionUnavailable = false;
     try {
         selectChecklist(requestedVersion());
@@ -764,28 +764,35 @@ function loadFromURL() {
     syncPersistentURL();
 }
 
-// Persistent assessment messages share one dynamic summary box. It is created
-// only when needed and cleared when a different assessment is opened.
+// Each contextual message has its own card, cleared when another assessment opens.
 function showSummaryMessage(kind, title, text, urgent = false) {
     const app = document.getElementById("app");
-    let box = app.querySelector(".dynamic-summary");
-    if (!box) {
-        box = document.createElement("section");
-        box.className = "dynamic-summary";
-        box.setAttribute("aria-label", "Assessment updates");
-        app.prepend(box);
-    }
-    box.querySelector(`[data-message="${kind}"]`)?.remove();
-    const entry = document.createElement("div");
+    app.querySelector(`[data-message="${kind}"]`)?.remove();
+    const entry = document.createElement("section");
+    entry.className = "dynamic-summary";
     entry.dataset.message = kind;
+    entry.setAttribute("aria-label", title);
     entry.setAttribute("role", urgent ? "alert" : "status");
+    if (kind === "older-version") {
+        entry.classList.add("version-notice");
+        const close = document.createElement("button");
+        close.type = "button";
+        close.className = "summary-close";
+        close.setAttribute("aria-label", "Dismiss newer checklist notice");
+        close.textContent = "×";
+        close.addEventListener("click", () => {
+            document.getElementById("checklist-version")?.focus();
+            entry.remove();
+        });
+        entry.append(close);
+    }
     const heading = document.createElement("h2");
     heading.textContent = title;
     const message = document.createElement("p");
     message.className = kind;
     message.textContent = text;
     entry.append(heading, message);
-    box.append(entry);
+    app.prepend(entry);
     return entry;
 }
 

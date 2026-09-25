@@ -327,3 +327,26 @@ it("shows an older-version notice but keeps a fresh current assessment unclutter
     expect(document.querySelector(".transfer-summary")).not.toBeNull();
     expect(document.querySelectorAll(".dynamic-summary").length).toBe(1);
 });
+
+it("dismisses the version warning without changing the transfer summary or answers", async () => {
+    const script = await build("/?checklist=0.3.0");
+    script.handleResponse("s0_p0_i0", "yes");
+    script.selectChecklistVersion("0.1.0");
+    const summary = document.querySelector(".transfer-summary");
+    const warning = document.querySelector(".older-version");
+    expect(summary.closest("section")).not.toBe(warning.closest("section"));
+    const url = window.location.href;
+    const saved = localStorage.getItem("stamped_checklist");
+    document.querySelector('[aria-label="Dismiss newer checklist notice"]').click();
+    expect(document.querySelector(".older-version")).toBeNull();
+    expect(document.querySelector(".transfer-summary")).toBe(summary);
+    expect(document.activeElement).toBe(document.getElementById("checklist-version"));
+    expect(window.location.href).toBe(url);
+    expect(localStorage.getItem("stamped_checklist")).toBe(saved);
+    script.handleResponse("s0_p0_i0", "no");
+    expect(document.querySelector(".older-version")).toBeNull();
+    script.selectChecklistVersion("0.3.0");
+    script.selectChecklistVersion("0.1.0");
+    expect(document.querySelectorAll(".older-version").length).toBe(1);
+    expect(document.querySelectorAll(".transfer-summary").length).toBe(1);
+});

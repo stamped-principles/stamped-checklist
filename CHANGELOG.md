@@ -4,6 +4,8 @@
 
 #### 🚀 Enhancement
 
+-   Separated the newer-version warning from answer transfers and added a dismiss button ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
+
 -   Updated the default checklist to 0.3.1 with principles 0.2.0, retaining earlier releases ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
 
 -   Cleared URL parameters on Reset, restoring shareable state on the next interaction ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))

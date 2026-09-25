@@ -1153,12 +1153,6 @@ code {
     margin-bottom: 0.3rem;
 }
 
-.dynamic-summary > div + div {
-    margin-top: 0.85rem;
-    padding-top: 0.85rem;
-    border-top: 1px solid #ccc7d8;
-}
-
 .dynamic-summary a {
     color: #444052;
     text-decoration: underline;
@@ -1182,6 +1176,43 @@ code {
     color: inherit;
 }
 
-[data-theme="dark"] .dynamic-summary > div + div {
-    border-top-color: #514b60;
+/* Keep the version warning distinct from answer-transfer information. */
+.dynamic-summary.version-notice {
+    position: relative;
+    padding-right: 3.5rem;
+    color: #702c35;
+    background: #fbe9eb;
+    border-color: #e4b6be;
+    border-left-color: #b94b5b;
+}
+
+[data-theme="dark"] .dynamic-summary.version-notice {
+    color: #f6dce1;
+    background: #442b32;
+    border-color: #83505c;
+    border-left-color: #d78494;
+}
+
+.summary-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.summary-close:hover {
+    background: rgb(128 64 80 / 12%);
+}
+
+.summary-close:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
 }
