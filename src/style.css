@@ -1141,7 +1141,7 @@ code {
     color: #343a40;
     background: #e9ecef;
     border: none;
-    border-radius: 0;
+    border-radius: var(--radius);
     box-shadow: none;
     line-height: 1.6;
 }

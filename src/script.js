@@ -776,15 +776,12 @@ function showSummaryMessage(kind, title, text, urgent = false) {
     if (kind === "older-version") {
         entry.classList.add("version-notice");
     }
-    if (kind === "older-version" || kind === "transfer-summary") {
+    if (kind === "transfer-summary") {
         entry.classList.add("dismissible-summary");
         const close = document.createElement("button");
         close.type = "button";
         close.className = "summary-close";
-        close.setAttribute(
-            "aria-label",
-            kind === "older-version" ? "Dismiss newer checklist notice" : "Dismiss answer transfer summary"
-        );
+        close.setAttribute("aria-label", "Dismiss answer transfer summary");
         close.textContent = "×";
         close.addEventListener("click", () => {
             document.getElementById("checklist-version")?.focus();
