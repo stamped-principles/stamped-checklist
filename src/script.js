@@ -129,21 +129,23 @@ function selectChecklistVersion(version) {
     openAssessment(version, responses, sourceVersion);
 }
 
+function previewLabel(preview) {
+    return preview.label
+        ? `Schema preview: ${preview.label} (${preview.version})`
+        : `Schema preview (${preview.version})`;
+}
+
 function updateVersionDisplay() {
     const versionEl = document.getElementById("version-indicator");
     if (versionEl)
-        versionEl.textContent = previewInfo(VERSION)
-            ? `Schema preview (${previewInfo(VERSION).version})`
-            : `Checklist v${VERSION}`;
+        versionEl.textContent = previewInfo(VERSION) ? previewLabel(previewInfo(VERSION)) : `Checklist v${VERSION}`;
     const select = document.getElementById("checklist-version");
     if (select) {
         select.replaceChildren(
             ...AVAILABLE_VERSIONS.map((version) => {
                 const option = document.createElement("option");
                 option.value = version;
-                option.textContent = previewInfo(version)
-                    ? `Schema preview (${previewInfo(version).version})`
-                    : version;
+                option.textContent = previewInfo(version) ? previewLabel(previewInfo(version)) : version;
                 option.selected = version === VERSION;
                 return option;
             })
@@ -326,7 +328,7 @@ function discardStalePreviewURL() {
         (version) =>
             typeof version === "string" &&
             /^\d+\.\d+\.\d+-preview\.[a-f0-9]{40}\.[a-f0-9]{40}$/.test(version) &&
-            version !== DEFAULT_VERSION
+            !AVAILABLE_VERSIONS.includes(version)
     );
     if (!stale) return false;
     for (const key of ["state", "responses", "responses_version", "format"]) params.delete(key);
@@ -482,11 +484,12 @@ function buildChecklist() {
         for (const [kind, source] of Object.entries(preview.sources)) {
             const link = document.createElement("a");
             link.href = source.url;
-            link.textContent = `${kind} PR #${source.pr} (${source.sha.slice(0, 7)})`;
+            const sourceLabel = source.tag ?? (source.pr ? `PR #${source.pr}` : "commit");
+            link.textContent = `${kind} ${sourceLabel} (${source.sha.slice(0, 7)})`;
             notice.append(link, " ");
         }
     }
-    if (!persistenceBlocked && !previewInfo(DEFAULT_VERSION) && VERSION !== DEFAULT_VERSION) {
+    if (!persistenceBlocked && !preview && !previewInfo(DEFAULT_VERSION) && VERSION !== DEFAULT_VERSION) {
         showSummaryMessage(
             "older-version",
             "A newer checklist is available",

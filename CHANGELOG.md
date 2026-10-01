@@ -4,6 +4,8 @@
 
 #### 🚀 Enhancement
 
+-   Unified released and preview schema pairs in one validated catalog with an explicit default and a release-aware merge gate ([#140](https://github.com/stamped-principles/stamped-checklist/pull/140))
+
 -   Opened the current preview unanswered with a notice when draft schema pins change ([#140](https://github.com/stamped-principles/stamped-checklist/pull/140))
 
 -   Added pinned schema PR previews with isolated saves and a separate merge-readiness status ([#140](https://github.com/stamped-principles/stamped-checklist/pull/140))

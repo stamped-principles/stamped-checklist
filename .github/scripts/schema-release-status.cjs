@@ -1,4 +1,6 @@
 // Loaded only from the trusted base commit by pull_request_target.
+const { TextDecoder } = require("node:util");
+
 module.exports = async ({ github, context }) => {
     const pr = context.payload.pull_request;
     const repo = context.repo;
@@ -8,37 +10,46 @@ module.exports = async ({ github, context }) => {
         context: "Schema releases ready",
         target_url: `${context.serverUrl}/${repo.owner}/${repo.repo}/actions/runs/${context.runId}`,
     };
-    // Fail closed if the API lookup or runner fails after this point.
+    // Overwrite any previous success before reading or resolving untrusted data.
     await github.rest.repos.createCommitStatus({
         ...status,
         state: "pending",
-        description: "Checking schema preview configuration",
+        description: "Checking every schema catalog source",
     });
-    let preview = false;
     try {
-        await github.rest.repos.getContent({
+        // This module is also from the trusted base checkout. Never import PR code.
+        const { buildCatalog, resolveSource } = await import("../../src/scripts/schema-catalog.mjs");
+        const { data } = await github.rest.repos.getContent({
             owner: pr.head.repo.owner.login,
             repo: pr.head.repo.name,
             ref: pr.head.sha,
-            path: "schema-preview.json",
+            path: "src/checklist-releases.json",
         });
-        // Presence blocks merging even if the file is empty or malformed.
-        preview = true;
+        if (data?.type !== "file" || data.encoding !== "base64" || typeof data.content !== "string") {
+            throw new Error("Schema catalog must be a readable JSON file");
+        }
+        const catalog = JSON.parse(
+            new TextDecoder("utf-8", { fatal: true }).decode(Buffer.from(data.content, "base64"))
+        );
+        const { hasPreviews } = await buildCatalog(catalog, (kind, pin) =>
+            resolveSource(kind, pin, {
+                getJSON: async (url) => (await github.request(`GET ${url}`)).data,
+            })
+        );
+        await github.rest.repos.createCommitStatus({
+            ...status,
+            state: hasPreviews ? "pending" : "success",
+            description: hasPreviews
+                ? "Schema preview: replace every SHA pin with a release tag"
+                : "Every schema catalog source is a verified release tag",
+        });
     } catch (error) {
-        if (error.status !== 404) throw error;
-    }
-    await github.rest.repos.createCommitStatus({
-        ...status,
-        state: preview ? "pending" : "success",
-        description: preview
-            ? "Schema preview: replace PR pins with releases before merging"
-            : "No unreleased schema preview configuration",
-    });
-    const labels = await github.paginate(github.rest.issues.listLabelsOnIssue, { ...repo, issue_number: pr.number });
-    const labeled = labels.some((label) => label.name === "schema-preview");
-    if (preview && !labeled) {
-        await github.rest.issues.addLabels({ ...repo, issue_number: pr.number, labels: ["schema-preview"] });
-    } else if (!preview && labeled) {
-        await github.rest.issues.removeLabel({ ...repo, issue_number: pr.number, name: "schema-preview" });
+        // A missing catalog, invalid entry, or failed lookup must never pass the gate.
+        await github.rest.repos.createCommitStatus({
+            ...status,
+            state: "error",
+            description: "Schema catalog validation failed; inspect the workflow logs",
+        });
+        throw error;
     }
 };

@@ -10,9 +10,11 @@ The LinkML schemas and JSON instances are maintained in dedicated repositories:
 -   Checklist: <https://github.com/stamped-principles/stamped-checklist-schema>
 
 This app pulls the checklist and principle JSON instances from those repositories into `src/data/` via `npm run sync:schemas`.
-The upstream release tags are pinned explicitly in `src/checklist-releases.json`; new upstream releases are not picked up automatically, so upgrading to a new schema version is a deliberate change (add the release pair, select the default version, and adapt the app in the same PR).
+`src/checklist-releases.json` is the single catalog of explicitly configured checklist/principles pairs. Its `entries` may contain verified release tags, pinned schema PR commits, or a mix of the two, and `default` selects an entry by ID. New upstream releases and PR updates are never picked up automatically; adopting them is a deliberate catalog change.
 
-For unreleased or unmerged schema changes, see [schema PR previews and merge-gate setup](docs/schema-previews.md).
+An all-tag entry is released, with its ID matching the checklist's declared version. Any SHA-sourced entry is an unreleased preview with its own commit-pair assessment identity. Multiple previews can coexist with released versions, and only the manually configured pairs appear in the app.
+
+For the catalog format, preview behavior, and one-time required-status setup, see [schema catalog and previews](docs/schema-previews.md).
 
 ## Licensing
 
