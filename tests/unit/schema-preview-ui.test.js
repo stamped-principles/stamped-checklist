@@ -1,11 +1,11 @@
 import { afterEach, expect, it, vi } from "vitest";
 import archive from "../../src/data/checklist-versions.json" with { type: "json" };
-function previewBundle(sources, label) {
+function previewBundle(sources, label = "review") {
     const released = archive["0.1.0"];
     const version = "0.1.0";
     const id = `${version}-preview.${sources.checklist.sha}.${sources.principles.sha}`;
     return {
-        checklist: { ...released.checklist, _preview: { id, version, sources, ...(label ? { label } : {}) } },
+        checklist: { ...released.checklist, _preview: { id, version, sources, label } },
         principles: released.principles,
     };
 }
@@ -54,7 +54,9 @@ it("identifies both preview sources and isolates saved preview answers from rele
         "https://github.com/stamped-principles/stamped-checklist-schema/pull/15",
         "https://github.com/stamped-principles/stamped-principles-schema/pull/19",
     ]);
-    expect(document.querySelector("#checklist-version option:checked").textContent).toBe("Schema preview (0.1.0)");
+    expect(document.querySelector("#checklist-version option:checked").textContent).toBe(
+        "Schema preview: review (0.1.0)"
+    );
     script.handleResponse("s0_p0_i0", "yes");
     const previewSave = JSON.parse(localStorage.getItem("stamped_checklist"));
     expect(previewSave.checklist_version).toBe(bundle.checklist._preview.id);
@@ -182,18 +184,6 @@ it("restores a configured preview alongside a released default", async () => {
         "0.1.0"
     );
     expect(localStorage.getItem(`stamped_checklist:${id}`)).toBe(saved);
-});
-
-it("labels SHA-only sources without inventing a PR number", async () => {
-    const shaOnly = previewBundle({
-        ...mixedBundle.checklist._preview.sources,
-        checklist: {
-            sha: "e".repeat(40),
-            url: `https://github.com/stamped-principles/stamped-checklist-schema/commit/${"e".repeat(40)}`,
-        },
-    });
-    await openPreview("/", shaOnly);
-    expect(document.querySelector('[data-message="schema-preview"] a').textContent).toBe("checklist commit (eeeeeee)");
 });
 
 it("preserves unavailable preview URLs when the default is released", async () => {

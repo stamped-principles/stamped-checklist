@@ -130,9 +130,7 @@ function selectChecklistVersion(version) {
 }
 
 function previewLabel(preview) {
-    return preview.label
-        ? `Schema preview: ${preview.label} (${preview.version})`
-        : `Schema preview (${preview.version})`;
+    return `Schema preview: ${preview.label} (${preview.version})`;
 }
 
 function updateVersionDisplay() {
@@ -484,7 +482,7 @@ function buildChecklist() {
         for (const [kind, source] of Object.entries(preview.sources)) {
             const link = document.createElement("a");
             link.href = source.url;
-            const sourceLabel = source.tag ?? (source.pr ? `PR #${source.pr}` : "commit");
+            const sourceLabel = source.tag ?? `PR #${source.pr}`;
             link.textContent = `${kind} ${sourceLabel} (${source.sha.slice(0, 7)})`;
             notice.append(link, " ");
         }

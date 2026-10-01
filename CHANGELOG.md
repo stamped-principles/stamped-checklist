@@ -4,7 +4,7 @@
 
 #### 🚀 Enhancement
 
--   Defined released and unreleased dropdown versions in one JSON catalog, with a merge gate for unreleased schemas ([#140](https://github.com/stamped-principles/stamped-checklist/pull/140))
+-   Defined released and unreleased dropdown versions in one JSON catalog, with a merge gate for unreleased schemas and labels derived from validated entries ([#140](https://github.com/stamped-principles/stamped-checklist/pull/140))
 
 -   Rounded assessment notices and kept the older-version warning visible until upgrading ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
 
