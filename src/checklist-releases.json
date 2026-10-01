@@ -1,25 +1,41 @@
 {
-    "defaultVersion": "0.3.1",
-    "releases": [
+    "default": "0.3.1",
+    "entries": [
         {
-            "version": "0.1.0",
-            "checklistTag": "v0.1.0",
-            "principlesTag": "v0.1.0"
+            "id": "0.1.0",
+            "checklist": {
+                "tag": "v0.1.0"
+            },
+            "principles": {
+                "tag": "v0.1.0"
+            }
         },
         {
-            "version": "0.2.0",
-            "checklistTag": "checklist-v0.2.0",
-            "principlesTag": "v0.1.0"
+            "id": "0.2.0",
+            "checklist": {
+                "tag": "checklist-v0.2.0"
+            },
+            "principles": {
+                "tag": "v0.1.0"
+            }
         },
         {
-            "version": "0.3.0",
-            "checklistTag": "v0.3.0",
-            "principlesTag": "v0.2.0"
+            "id": "0.3.0",
+            "checklist": {
+                "tag": "v0.3.0"
+            },
+            "principles": {
+                "tag": "v0.2.0"
+            }
         },
         {
-            "version": "0.3.1",
-            "checklistTag": "v0.3.1",
-            "principlesTag": "v0.2.0"
+            "id": "0.3.1",
+            "checklist": {
+                "tag": "v0.3.1"
+            },
+            "principles": {
+                "tag": "v0.2.0"
+            }
         }
     ]
 }
