@@ -1,6 +1,17 @@
 {
-    "default": "0.3.1",
+    "default": "pr-20-23",
     "entries": [
+        {
+            "id": "pr-20-23",
+            "checklist": {
+                "sha": "528f9e30e754a8ad594019ef7aa2102b09162b1c",
+                "pr": 20
+            },
+            "principles": {
+                "sha": "ca3be7e30dc126da3e7da2b83676cc72a7d18dce",
+                "pr": 23
+            }
+        },
         {
             "id": "0.3.1",
             "checklist": {

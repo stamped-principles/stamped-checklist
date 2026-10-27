@@ -302,7 +302,7 @@ test.describe("STAMPED Checklist App", () => {
     });
 
     test("version indicator is populated", async ({ page }) => {
-        await expect(page.locator("#version-indicator")).toHaveText(/^Checklist v\d/);
+        await expect(page.locator("#version-indicator")).toHaveText(/^Schema preview: pr-20-23 \(0\.4\.0\)$/);
     });
 
     test("reset button resets responses", async ({ page }) => {
