@@ -1,6 +1,6 @@
 {
     "name": "checklist",
-    "version": "1.1.16",
+    "version": "1.1.17",
     "description": "An interactive checklist for compliance to STAMPED principles.",
     "scripts": {
         "sync:schemas": "node src/scripts/pull-schemas.mjs",
@@ -56,7 +56,7 @@
         "jsdom": "^29.0.2",
         "prettier": "^3.1.0",
         "storybook": "^10.3.5",
-        "vite": "^8.0.16",
+        "vite": "^8.3.5",
         "vitest": "^5.0.1"
     }
 }

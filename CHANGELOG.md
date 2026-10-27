@@ -33,6 +33,8 @@
 
 #### 🏠 Internal
 
+-   Updated frontend build dependencies (npm group update) ([#143](https://github.com/stamped-principles/stamped-checklist/pull/143))
+
 -   Bumped `undici` to 7.30.0 ([#141](https://github.com/stamped-principles/stamped-checklist/pull/141))
 -   Pinned upstream checklist and principles schema versions explicitly instead of always pulling the latest release, so upgrades are deliberate ([#138](https://github.com/stamped-principles/stamped-checklist/pull/138))
 -   Bumped `esbuild` to 0.28.1 via an npm override to fix a Windows dev-server path-traversal vulnerability ([GHSA-g7r4-m6w7-qqqr](https://github.com/advisories/GHSA-g7r4-m6w7-qqqr)) ([#121](https://github.com/stamped-principles/stamped-checklist/pull/121))
