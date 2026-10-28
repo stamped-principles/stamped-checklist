@@ -50,6 +50,11 @@ it("identifies both preview sources and isolates saved preview answers from rele
     const script = await openPreview("/");
     const notice = document.querySelector('[data-message="schema-preview"]');
     expect(notice.textContent).toContain("Unreleased schema preview");
+    expect(notice.classList.contains("preview-notice")).toBe(true);
+    expect(notice.querySelector("p.schema-preview").textContent).not.toContain("Sources");
+    expect(notice.querySelector("p.preview-sources").textContent).toBe(
+        "Sources: checklist PR #15 (aaaaaaa) principles PR #19 (bbbbbbb)"
+    );
     expect([...notice.querySelectorAll("a")].map((a) => a.href)).toEqual([
         "https://github.com/stamped-principles/stamped-checklist-schema/pull/15",
         "https://github.com/stamped-principles/stamped-principles-schema/pull/19",

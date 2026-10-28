@@ -477,15 +477,19 @@ function buildChecklist() {
         const notice = showSummaryMessage(
             "schema-preview",
             "Unreleased schema preview",
-            `Reviewing checklist ${preview.version} with pinned, unreleased schema changes. Preview answers are saved separately from released checklists. Sources: `
+            `Reviewing checklist ${preview.version} with pinned, unreleased schema changes. Preview answers are saved separately from released checklists.`
         );
+        const sources = document.createElement("p");
+        sources.className = "preview-sources";
+        sources.append("Sources:");
         for (const [kind, source] of Object.entries(preview.sources)) {
             const link = document.createElement("a");
             link.href = source.url;
             const sourceLabel = source.tag ?? `PR #${source.pr}`;
             link.textContent = `${kind} ${sourceLabel} (${source.sha.slice(0, 7)})`;
-            notice.append(link, " ");
+            sources.append(" ", link);
         }
+        notice.append(sources);
     }
     if (!persistenceBlocked && !preview && !previewInfo(DEFAULT_VERSION) && VERSION !== DEFAULT_VERSION) {
         showSummaryMessage(
@@ -830,6 +834,9 @@ function showSummaryMessage(kind, title, text, urgent = false) {
     entry.setAttribute("role", urgent ? "alert" : "status");
     if (kind === "older-version") {
         entry.classList.add("version-notice");
+    }
+    if (kind === "schema-preview") {
+        entry.classList.add("preview-notice");
     }
     if (kind === "transfer-summary") {
         entry.classList.add("dismissible-summary");
