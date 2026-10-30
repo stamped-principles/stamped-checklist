@@ -2,14 +2,13 @@
     "default": "pr-20-23",
     "entries": [
         {
-            "id": "pr-20-23",
+            "id": "pr-20",
             "checklist": {
-                "sha": "cb9f376f831c86db5a00d6dd6bdf4f2ce11886ce",
+                "sha": "2695dcaf0fb12e1fdc2cf865bf0ac0cf4e0f6060",
                 "pr": 20
             },
             "principles": {
-                "sha": "ca3be7e30dc126da3e7da2b83676cc72a7d18dce",
-                "pr": 23
+                "tag": "v0.3.0"
             }
         },
         {
