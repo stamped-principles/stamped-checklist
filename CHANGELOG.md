@@ -6,7 +6,7 @@
 
 -   Moved schema preview sources to their own line and centered the preview notice at its content width ([#145](https://github.com/stamped-principles/stamped-checklist/pull/145))
 
--   Enabled a combined preview of checklist schema PR 20 and principles schema PR 23, updated to their current commits ([#140](https://github.com/stamped-principles/stamped-checklist/pull/140))
+-   Enabled a preview of checklist schema PR 20 against principles release 0.3.0, pinned to its current commit ([#140](https://github.com/stamped-principles/stamped-checklist/pull/140))
 
 -   Defined released and unreleased dropdown versions in one JSON catalog listed newest first, with a merge gate for unreleased schemas and labels derived from validated entries ([#140](https://github.com/stamped-principles/stamped-checklist/pull/140))
 
