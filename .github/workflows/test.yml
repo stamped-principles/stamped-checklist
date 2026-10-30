@@ -29,6 +29,8 @@ jobs:
               run: npm ci
 
             - name: Run unit tests with coverage
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
               run: npm run test:coverage
 
             - name: Upload coverage to Codecov
@@ -63,6 +65,8 @@ jobs:
               run: npx playwright install chromium --with-deps
 
             - name: Run integration tests with coverage
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
               run: npm run test:e2e:coverage
 
             - name: Build integration coverage report

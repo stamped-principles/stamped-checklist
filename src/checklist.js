@@ -46,10 +46,14 @@ function makeData(checklist, principlesSet) {
     }));
 }
 
-export const DEFAULT_VERSION = checklist.checklist_version ?? checklist.version;
+export const DEFAULT_VERSION = checklist._preview?.id ?? checklist.checklist_version ?? checklist.version;
 export const ORIGINAL_VERSION = "0.1.0";
 const bundles = { ...archive, [DEFAULT_VERSION]: { checklist, principles: principlesSet } };
 export const AVAILABLE_VERSIONS = Object.keys(bundles).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+export function previewInfo(version) {
+    return bundles[version]?.checklist._preview;
+}
+
 export let VERSION = DEFAULT_VERSION;
 export let CHECKLIST = checklist;
 export let PRINCIPLES = principlesSet;
