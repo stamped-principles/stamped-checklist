@@ -2,10 +2,9 @@
     "default": "pr-20",
     "entries": [
         {
-            "id": "pr-20",
+            "id": "0.4.0",
             "checklist": {
-                "sha": "2695dcaf0fb12e1fdc2cf865bf0ac0cf4e0f6060",
-                "pr": 20
+                "tag": "v0.4.0"
             },
             "principles": {
                 "tag": "v0.3.0"
