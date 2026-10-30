@@ -39,6 +39,8 @@
 
 #### 🏠 Internal
 
+-   Documented schema previews and the release merge gate in `docs/development.md` ([#146](https://github.com/stamped-principles/stamped-checklist/pull/146))
+
 -   Updated frontend build dependencies (npm group update) ([#143](https://github.com/stamped-principles/stamped-checklist/pull/143))
 
 -   Bumped `undici` to 7.30.0 ([#141](https://github.com/stamped-principles/stamped-checklist/pull/141))
