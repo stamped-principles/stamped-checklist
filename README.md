@@ -9,7 +9,7 @@ The LinkML schemas and JSON instances are maintained in dedicated repositories:
 -   Principles: <https://github.com/stamped-principles/stamped-principles-schema>
 -   Checklist: <https://github.com/stamped-principles/stamped-checklist-schema>
 
-This app pulls the checklist and principle JSON instances into `src/data/` via `npm run sync:schemas`. `src/checklist-releases.json` defines the dropdown entries and default, using release tags or pinned PR commits.
+This app pulls the checklist and principle JSON instances into `src/data/` via `npm run sync:schemas`. `src/checklist-releases.json` defines the dropdown entries and default, using release tags or pinned PR commits. See [`docs/development.md`](docs/development.md#schema-previews) for previewing unreleased schemas.
 
 ## Licensing
 
