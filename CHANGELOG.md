@@ -39,6 +39,8 @@
 
 #### 🏠 Internal
 
+-   Upgraded Playwright to 1.65.0 so browser installs work on Ubuntu 26.04 CI runners ([#147](https://github.com/stamped-principles/stamped-checklist/pull/147))
+
 -   Documented schema previews and the release merge gate in `docs/development.md` ([#146](https://github.com/stamped-principles/stamped-checklist/pull/146))
 
 -   Updated frontend build dependencies (npm group update) ([#143](https://github.com/stamped-principles/stamped-checklist/pull/143))
