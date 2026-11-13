@@ -1189,6 +1189,14 @@ code {
     background: #893441;
 }
 
+/* Shrink the preview notice to its content and center it. */
+.dynamic-summary.preview-notice {
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+    text-align: center;
+}
+
 .summary-close {
     position: absolute;
     top: 0.5rem;

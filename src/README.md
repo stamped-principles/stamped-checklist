@@ -46,6 +46,6 @@ Existing format 2 and unversioned links remain readable. For older links without
 absent); add `responses_version` before editing their target version.
 Reset clears the default version's saved answers; older version saves remain intact.
 
-To adopt a new published checklist, append its version and matching release tags to
-`src/checklist-releases.json`, update `defaultVersion`, then build and deploy.
+To adopt a new published checklist, add its version and matching release tags to the
+top of `src/checklist-releases.json`, update `default`, then build and deploy.
 Keep existing entries so old assessments remain available.

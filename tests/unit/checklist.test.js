@@ -2,8 +2,8 @@ import { describe, it, expect, vi } from "vitest";
 import { VERSION, DATA, CHECKLIST } from "../../src/checklist.js";
 
 describe("VERSION", () => {
-    it("follows semantic versioning format (x.y.z)", () => {
-        expect(VERSION).toMatch(/^\d+\.\d+\.\d+$/);
+    it("follows semantic versioning format (with optional pinned preview suffix)", () => {
+        expect(VERSION).toMatch(/^\d+\.\d+\.\d+(-preview\.[a-f0-9]{40}\.[a-f0-9]{40})?$/);
     });
 
     it("is a non-empty string", () => {
@@ -120,7 +120,7 @@ it("reads the new checklist version field when upgrading the pinned data", async
     const { version, ...checklist } = CHECKLIST;
     vi.resetModules();
     vi.doMock("../../src/data/stamped-checklist.json", () => ({
-        default: { ...checklist, checklist_version: "0.3.0" },
+        default: { ...checklist, _preview: undefined, checklist_version: "0.3.0" },
     }));
     try {
         const updated = await import("../../src/checklist.js");

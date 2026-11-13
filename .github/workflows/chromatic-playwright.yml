@@ -30,6 +30,8 @@ jobs:
             - name: Install Playwright Browsers
               run: npx playwright install --with-deps
             - name: Run Playwright tests
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
               run: npm run test:chromatic
             - name: Run Chromatic
               uses: chromaui/action@latest

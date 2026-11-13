@@ -4,6 +4,12 @@
 
 #### 🚀 Enhancement
 
+-   Moved schema preview sources to their own line and centered the preview notice at its content width ([#145](https://github.com/stamped-principles/stamped-checklist/pull/145))
+
+-   Added checklist release 0.4.0 with principles 0.3.0 to the catalog and made it the default ([#140](https://github.com/stamped-principles/stamped-checklist/pull/140))
+
+-   Defined released and unreleased dropdown versions in one JSON catalog listed newest first, with a merge gate for unreleased schemas and labels derived from validated entries ([#140](https://github.com/stamped-principles/stamped-checklist/pull/140))
+
 -   Rounded assessment notices and kept the older-version warning visible until upgrading ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
 
 -   Styled assessment notices as borderless banners, distinct from principle cards ([#134](https://github.com/stamped-principles/stamped-checklist/pull/134))
@@ -32,6 +38,8 @@
 -   Fixed PDF printout top banner: preserved header dark gradient background, hid theme-toggle icon and GitHub link, cleared page title during print, removed browser-generated URL/date/page-number margin strip via `@page { margin: 0 }`, and added vertical gap between header and intro-text box ([#106](https://github.com/stamped-principles/stamped-checklist/pull/106))
 
 #### 🏠 Internal
+
+-   Documented schema previews and the release merge gate in `docs/development.md` ([#146](https://github.com/stamped-principles/stamped-checklist/pull/146))
 
 -   Updated frontend build dependencies (npm group update) ([#143](https://github.com/stamped-principles/stamped-checklist/pull/143))
 
